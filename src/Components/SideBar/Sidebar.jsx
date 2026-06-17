@@ -15,7 +15,7 @@ import { useLanguage } from '../../context/LanguageContext';
 
 const CORE_VIEWS = [
   { name: 'Dashboard', icon: LayoutGrid, path: '/dashboard' },
-  { name: 'AI Legal Copilot', icon: Scale, path: '/dashboard/chat/new' },
+  { name: 'AI Legal Assistant', icon: Scale, path: '/dashboard/chat/new' },
   { name: 'My Cases', icon: Briefcase, path: '/dashboard/cases' },
 ];
 

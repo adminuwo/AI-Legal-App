@@ -346,7 +346,7 @@ export default function HomeDashboard() {
 
   // Navigate to case helper
   const handleOpenWorkspace = (cId) => {
-    navigate(`/dashboard/chat/new?caseId=${cId}`, { replace: true });
+    navigate(`/dashboard/cases/${cId}`, { replace: true });
   };
 
   // Loading Skeleton Component

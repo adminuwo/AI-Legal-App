@@ -266,7 +266,7 @@ const SettingsPage = () => {
                     className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-[#6D5DFC] transition-all cursor-pointer"
                   >
                     <option value="/dashboard">Main Dashboard</option>
-                    <option value="/dashboard/chat/new">AI Legal Copilot</option>
+                    <option value="/dashboard/chat/new">AI Legal Assistant</option>
                     <option value="/dashboard/cases">My Cases</option>
                   </select>
                 </div>

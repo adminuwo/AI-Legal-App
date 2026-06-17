@@ -30,7 +30,6 @@ import ErrorBoundary from '../Components/ErrorBoundary';
 
 import ProfileSettingsDropdown from '../Components/ProfileSettingsDropdown/ProfileSettingsDropdown';
 import ThemeToggle from '../Components/ThemeToggle';
-import FaqModal from './FaqModal';
 
 /**
  * Landing Page - Principal entry point for AISA.

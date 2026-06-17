@@ -7,14 +7,11 @@ import Onboarding from './pages/Onboarding';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import VerificationForm from './pages/VerificationForm';
-import LegalWorkspace from './pages/Workspace/LegalWorkspace';
 import Sidebar from './Components/SideBar/Sidebar.jsx';
-import AiPersonalAssistantDashboard from './Tools/AI_Personal_Assistant/Dashboard';
 import Pricing from './landingpage/Pricing';
-import SocialAgentPage from './Tools/AI_Social_Media/SocialAgentPage.jsx';
 import CreditUpsellPopup from './Components/CreditUpsellPopup';
 import SharedChat from './pages/SharedChat';
-import HomeDashboard from './pages/HomeDashboard';
+
 
 
 
@@ -33,8 +30,7 @@ import ResetPassword from './pages/ResetPassword.jsx';
 import PrivacyPolicy from './landingpage/PrivacyPolicy.jsx';
 import TermsOfService from './landingpage/TermsOfService.jsx';
 import CookiePolicy from './landingpage/CookiePolicy.jsx';
-import SettingsPage from './pages/Settings.jsx';
-import HelpSupport from './pages/HelpSupport.jsx';
+
 import { AnimatePresence, motion } from 'framer-motion';
 import { lazy, Suspense } from 'react';
 import { Toaster } from 'react-hot-toast';
@@ -49,6 +45,11 @@ const AiBase = lazy(() => import('./Tools/AI_Base/AI_Base').catch(() => ({ defau
 
 const SecurityAndGuidelines = lazy(() => import('./landingpage/SecurityAndGuidelines'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+
+const LegalWorkspace = lazy(() => import('./pages/Workspace/LegalWorkspace'));
+const HomeDashboard = lazy(() => import('./pages/HomeDashboard'));
+const SettingsPage = lazy(() => import('./pages/Settings'));
+const HelpSupport = lazy(() => import('./pages/HelpSupport'));
 
 const isAuthenticated = () => {
   const tokenStr = localStorage.getItem('token');
@@ -308,7 +309,16 @@ const DashboardLayout = () => {
           className={`flex-1 ${(location.pathname.includes('/chat') || location.pathname.includes('/case')) ? 'overflow-hidden' : 'overflow-y-auto'} relative w-full scroll-smooth p-0 scrollbar-hide transition-all duration-300 ease-in-out`}
           style={{ paddingTop: '0px' }}
         >
-          <Outlet />
+          <Suspense fallback={
+            <div className="flex h-full w-full items-center justify-center bg-transparent">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500 animate-pulse">Loading Page...</span>
+              </div>
+            </div>
+          }>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
       <AnimatePresence>
@@ -451,6 +461,7 @@ const NavigateProvider = () => {
           <Route path="chat" element={<Navigate to="new" replace state={{ forceGlobal: true }} />} />
           <Route path="chat/:sessionId" element={<LegalWorkspace />} />
           <Route path="cases" element={<LegalWorkspace />} />
+          <Route path="cases/:caseId" element={<LegalWorkspace />} />
           <Route path="case/:caseId" element={<LegalWorkspace />} />
           <Route path="social-agent" element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />
           <Route path="ai-personal-assistant" element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />

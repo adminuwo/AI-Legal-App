@@ -41,7 +41,7 @@ const ModernDashboard = ({
         {/* Header Section */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#111827] tracking-tight flex items-center justify-center gap-2">
-            <span>⚖️ AI Legal Copilot</span>
+            <span>⚖️ AI Legal Assistant</span>
           </h1>
           <p className="text-sm text-[#6B7280] font-medium max-w-md mx-auto leading-relaxed">
             Your AI-powered legal assistant for research, drafting, evidence analysis, and case intelligence.

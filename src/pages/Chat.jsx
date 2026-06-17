@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, Fragment } from 'react';
+import React, { useState, useRef, useEffect, Fragment, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Send, SendHorizontal, Bot, User, Sparkles, Plus, Monitor, ChevronDown, History, Paperclip, X, AlertCircle, FileText, Image as ImageIcon, Cloud, HardDrive, Edit2, Download, Mic, Wand2, Eye, FileSpreadsheet, Presentation, File as FileIcon, MoreVertical, Trash2, Check, Camera, Video, Copy, ThumbsUp, ThumbsDown, Share, Search, Undo2, Menu as MenuIcon, Volume2, Pause, Headphones, MessageCircle, ExternalLink, ZoomIn, ZoomOut, RotateCcw, Minus, Code, Globe, Sliders, PlayCircle, Brain, ImagePlus, PlaySquare, RefreshCcw, TrendingUp, Zap, Gavel, Navigation, Rocket, Megaphone, Scale, ArrowLeft, ChevronRight, Briefcase, Calendar, Users, FolderOpen, Save, Sun, Moon, LayoutDashboard, ArrowDown } from 'lucide-react';
@@ -22,12 +22,7 @@ import LiveAI from '../Components/LiveAI';
 import { apiService } from '../services/apiService';
 import { useLegalToolCredits } from '../hooks/useLegalToolCredits';
 
-const ImageEditor = React.lazy(() => import('../Tools/AI_Image_Generator/ImageEditor').catch(() => ({ default: () => null })));
-const CustomVideoPlayer = React.lazy(() => import('../Tools/AI_Video_Generator/CustomVideoPlayer').catch(() => ({ default: () => null })));
 import ModelSelector from '../Components/ModelSelector';
-const MagicToolSettingsCard = React.lazy(() => import('../Tools/MagicTools/MagicToolSettingsCard').catch(() => ({ default: () => null })));
-const CashFlowStockModal = React.lazy(() => import('../Tools/AI_Cashflow/CashFlowStockModal').catch(() => ({ default: () => null })));
-const CashFlowChartWidget = React.lazy(() => import('../Tools/AI_Cashflow/CashFlowChartWidget').catch(() => ({ default: () => null })));
 const LegalToolkitCard = React.lazy(() => import('../Tools/AI_Legal/LegalToolkitCard').catch(() => ({ default: () => null })));
 import LegalPrecedents from '../Tools/AI_Legal/LegalPrecedents';
 import { PREMIUM_TOOLS } from '../Tools/AI_Legal/constants/legalTools';
@@ -42,9 +37,6 @@ import { userData, getUserData, clearUser, sessionsData, toggleState, memoryData
 import { usePersonalization } from '../context/PersonalizationContext';
 import OnboardingModal from '../Components/OnboardingModal';
 import PremiumUpsellModal from '../Components/PremiumUpsellModal';
-const MagicVideoGenModal = React.lazy(() => import('../Tools/AI_Video_Generator/MagicVideoGenModal').catch(() => ({ default: () => null })));
-const MagicImageEditModal = React.lazy(() => import('../Tools/AI_Image_Generator/MagicImageEditModal').catch(() => ({ default: () => null })));
-const AiSocialMediaDashboard = React.lazy(() => import('../Tools/AI_Social_Media/AiSocialMediaDashboard').catch(() => ({ default: () => null })));
 import DeleteConfirmModal from '../Components/DeleteConfirmModal';
 import { getSubscriptionDetails } from '../services/pricingService';
 import IntentSuggestionBanner from '../Components/IntentSuggestionBanner';
@@ -55,7 +47,6 @@ import FuturisticToolCards from '../landingpage/FuturisticToolCards';
 import ModernDashboard from '../landingpage/ModernDashboard';
 import AisaTypingIndicator from '../Components/AisaTypingIndicator';
 import GmailConnectedModal from '../Components/GmailConnectedModal';
-import AISnapshot from '../landingpage/AISnapshot';
 import ShareModal from '../Components/ShareModal';
 import ProfileSettingsDropdown from '../Components/ProfileSettingsDropdown/ProfileSettingsDropdown.jsx';
 import GlobalFloatingNavbar from '../Components/GlobalFloatingNavbar.jsx';
@@ -76,13 +67,23 @@ import { useGenerationStore } from '../userStore/useGenerationStore';
 const transformLegalActions = (content) => {
   if (!content) return "";
 
-  // Pattern: 👉 **Title**: Description [Action: Button](action:id)
-  // This regex handles various slight variations in spacing and bolding
-  const actionRegex = /(?:👉\s*)?(?:\*\*)?([^*:]+)(?:\*\*)?[:\-]?\s*([^\[\n]+)\s*\[(Action:\s*[^\]]+)\]\(action:([^)]+)\)/g;
+  let clean = content;
 
-  return content.replace(actionRegex, (match, title, desc, action, link) => {
-    return `\n[ActionCard|${title.trim()}|${desc.trim()}|${action.trim()}](action:${link.trim()})\n`;
-  });
+  // 1. Remove [ACTIVE TOOL: ...] tags (case insensitive, including surrounding stars/spaces)
+  clean = clean.replace(/\*?\*?\[ACTIVE TOOL:.*?\]\*?\*?/gi, '');
+
+  // 2. Remove any Suggested Actions section completely (from "Suggested Next Actions" or "Suggested Actions" to the end)
+  clean = clean.replace(/(?:💡\s*)?Suggested\s+(?:Next\s+)?Actions[\s\S]*$/gi, '');
+
+  // 3. Remove individual action cards/button patterns
+  clean = clean.replace(/👉\s*\*\*.*?\*\*[\s\S]*?\(action:.*?\)/gi, '');
+  clean = clean.replace(/\[ActionCard\|.*?\]\(action:.*?\)/gi, '');
+  clean = clean.replace(/\[(?:🔗|🔒)\s*Action:.*?\]\(action:.*?\)/gi, '');
+
+  // 4. Remove internal workflow & routing labels
+  clean = clean.replace(/(?:Active Tool|Current Tool|Running Tool|Selected Tool|Assistant Engine|Pipeline|Internal AI|Selected Module|Hidden Agent|Workflow)\s*(?::|-)?\s*.*?(?:\n|$)/gi, '');
+
+  return clean.trim();
 };
 
 const LEGAL_TOOL_WELCOME_MESSAGES = {
@@ -145,10 +146,10 @@ const ToolActivationMessage = ({ title, desc }) => (
 );
 
 const Skeleton = () => (
-  <div className="w-full space-y-3 animate-pulse py-2">
-    <div className="h-3 bg-slate-200 dark:bg-zinc-800 rounded-full w-3/4" />
-    <div className="h-3 bg-slate-200 dark:bg-zinc-800 rounded-full w-1/2" />
-    <div className="h-3 bg-slate-200 dark:bg-zinc-800 rounded-full w-5/6" />
+  <div className="w-full min-w-[220px] max-w-[320px] space-y-3 animate-pulse py-2 px-1">
+    <div className="h-2.5 bg-slate-200 dark:bg-zinc-800 rounded-full w-5/6" />
+    <div className="h-2.5 bg-slate-200 dark:bg-zinc-800 rounded-full w-3/4 animate-pulse [animation-delay:200ms]" />
+    <div className="h-2.5 bg-slate-200 dark:bg-zinc-800 rounded-full w-1/2 animate-pulse [animation-delay:400ms]" />
   </div>
 );
 
@@ -3706,6 +3707,33 @@ const Chat = () => {
   const ticking = useRef(false);
   const scrollTimeoutRef = useRef(null);
 
+  const updateScrollDownButtonVisibility = useCallback(() => {
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      const hasOverflow = scrollHeight > clientHeight;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 30;
+      
+      const shouldShow = messages.length > 0 && hasOverflow && !isNearBottom;
+      setShowScrollDownBtn(shouldShow);
+    } else {
+      setShowScrollDownBtn(false);
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      updateScrollDownButtonVisibility();
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [updateScrollDownButtonVisibility]);
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      shouldAutoScrollRef.current = true;
+    }
+  }, [messages]);
+
   const handleScroll = () => {
     if (chatContainerRef.current) {
       if (!ticking.current) {
@@ -3734,10 +3762,10 @@ const Chat = () => {
             }, 300);
           }
 
-          // Precise threshold (15px) to determine if user is reading or at the bottom
-          const isNearBottom = scrollHeight - scrollTop - clientHeight < 15;
+          // Precise threshold (30px) to determine if user is reading or at the bottom
+          const isNearBottom = scrollHeight - scrollTop - clientHeight < 30;
           shouldAutoScrollRef.current = isNearBottom;
-          setShowScrollDownBtn(!isNearBottom);
+          updateScrollDownButtonVisibility();
           ticking.current = false;
         });
         ticking.current = true;
@@ -3754,7 +3782,7 @@ const Chat = () => {
   const scrollToBottom = (force = false, behavior = 'auto') => {
     if (chatContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 15;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 30;
 
       if (force) {
         shouldAutoScrollRef.current = true;
@@ -3774,20 +3802,20 @@ const Chat = () => {
   };
 
   useEffect(() => {
-    // Do NOT auto-scroll while AI is streaming
-    if (gen.isGenerating) return;
-    if (isStreamingRef.current) return;
-
     // If we just loaded a case workspace, restore its scroll position
     if (caseId && chatContainerRef.current) {
       const ws = getWorkspace(caseId);
       if (ws?.uiState?.scrollPosition) {
         chatContainerRef.current.scrollTop = ws.uiState.scrollPosition;
+        updateScrollDownButtonVisibility();
         return;
       }
     }
 
-    scrollToBottom();
+    if (shouldAutoScrollRef.current) {
+      scrollToBottom();
+    }
+    updateScrollDownButtonVisibility();
   }, [messages, isLoading, caseId, gen.isGenerating]);
 
   const handleNewChat = async () => {
@@ -7000,25 +7028,6 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                             </div>
 
                             <div className="flex-1 min-w-0 chatgpt-text select-text">
-                              {/* Mode Badge - Integrated Tool Indicator */}
-                              {msg.role === 'user' && msg.mode && getModeInfo(msg.mode) && (
-                                <motion.div
-                                  initial={{ opacity: 0, scale: 0.9 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  className={`inline-flex !flex-row !items-center w-fit gap-2 px-3 py-1 rounded-full border shadow-sm ${getModeInfo(msg.mode).bg} ${getModeInfo(msg.mode).border} ${getModeInfo(msg.mode).color} mt-1.5 mb-3`}
-                                >
-                                  {(() => {
-                                    const Icon = getModeInfo(msg.mode).icon;
-                                    return <Icon size={12} className="shrink-0" strokeWidth={3} />;
-                                  })()}
-                                  <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap leading-none">{getModeInfo(msg.mode).label}</span>
-                                </motion.div>
-                              )}
-
-
-
-
-
                               {/* Attachment Display */}
                               {((msg.attachments && msg.attachments.length > 0) || msg.attachment) && (
                                 <div className="flex flex-col gap-3 mb-3 mt-1">
@@ -7182,7 +7191,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
 
                                     <div className="relative group/msg-content">
                                       {msg.id === typingMessageId && !msg.content ? (
-                                        <Skeleton />
+                                        <AisaTypingIndicator visible={true} message={loadingText} />
                                       ) : (
                                         <div className="flex flex-col">
                                           <div className="collapsible-container">
@@ -7427,11 +7436,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                           
                                         </div>
                                       )}
-                                      {msg.cashflowData && (
-                                        <React.Suspense fallback={<div className="h-48 w-full bg-surface-hover animate-pulse rounded-xl" />}>
-                                          <CashFlowChartWidget data={msg.cashflowData} />
-                                        </React.Suspense>
-                                      )}
+
                                     </div>
                                     {/* Sources List (ONLY for Web Search, HIDE for RAG as requested) */}
                                     {msg.role === 'model' && msg.isRealTime && msg.sources && msg.sources.length > 0 && (
@@ -7466,13 +7471,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                       </div>
                                     )}
 
-                                    {msg.videoUrl && (
-                                      <div className="relative mt-4 mb-2 w-fit max-w-full">
-                                        <React.Suspense fallback={<div className="w-full aspect-video bg-black/20 animate-pulse rounded-xl" />}>
-                                          <CustomVideoPlayer src={msg.videoUrl} compact={true} />
-                                        </React.Suspense>
-                                      </div>
-                                    )}
+
 
                                     {/* Dynamic Image Rendering (if not in markdown) */}
                                     {msg.imageUrl && (
@@ -7567,7 +7566,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                         </div>
                                       </div>
                                     )}
-                                    {msg.snapshot && <AISnapshot data={msg.snapshot} />}
+
 
                                     {/* Render Actions and Timestamp INSIDE the bubble */}
                                     {msg.role === 'user' ? (
@@ -8332,7 +8331,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                           exit={{ opacity: 0, scale: 0.95, y: 15 }}
                           transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
                           ref={menuRef}
-                          className={`fixed sm:absolute bottom-[max(80px,calc(env(safe-area-inset-bottom)+80px))] sm:bottom-full left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 ${(isWebSearch || isDeepSearch || isImageGeneration || isVideoGeneration || isVoiceMode || isAudioConvertMode || isDocumentConvert || isCodeWriter || isMagicEditing || isFileAnalysis || isCashFlowMode || currentMode === 'LEGAL_TOOLKIT') ? 'sm:mb-[68px]' : 'sm:mb-6'} w-[calc(100%-32px)] sm:w-[220px] bg-white/95 dark:bg-[#1c1c1e]/95 border border-slate-200/50 dark:border-white/10 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden z-[1020] backdrop-blur-xl ring-1 ring-black/[0.05]`}
+                          className={`fixed sm:absolute bottom-[max(80px,calc(env(safe-area-inset-bottom)+80px))] sm:bottom-full left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 ${(isWebSearch || isDeepSearch || isVoiceMode || isAudioConvertMode || isDocumentConvert || isFileAnalysis) ? 'sm:mb-[68px]' : 'sm:mb-6'} w-[calc(100%-32px)] sm:w-[220px] bg-white/95 dark:bg-[#1c1c1e]/95 border border-slate-200/50 dark:border-white/10 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden z-[1020] backdrop-blur-xl ring-1 ring-black/[0.05]`}
                         >
                           <div className="p-2.5 space-y-1">
                             {getAgentCapabilities(activeAgent.agentName, activeAgent.category).canCamera && (
@@ -8373,7 +8372,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                           exit={{ opacity: 0, scale: 0.95, y: 15 }}
                           transition={{ duration: 0.22, ease: [0.2, 0.8, 0.2, 1] }}
                           ref={toolsMenuRef}
-                          className={`fixed sm:absolute bottom-[max(80px,calc(env(safe-area-inset-bottom)+80px))] sm:bottom-full left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 ${(isWebSearch || isDeepSearch || isImageGeneration || isVideoGeneration || isVoiceMode || isAudioConvertMode || isDocumentConvert || isCodeWriter || isMagicEditing || isFileAnalysis || isCashFlowMode || currentMode === 'LEGAL_TOOLKIT') ? 'sm:mb-[68px]' : 'sm:mb-6'} w-[calc(100%-24px)] sm:w-[320px] bg-white dark:bg-[#1c1c1e] border border-slate-200/50 dark:border-white/10 rounded-[32px] shadow-[0_30px_60px_-12px_rgba(0,0,0,0.3)] dark:shadow-[0_30px_60px_-12px_rgba(0,0,0,0.6)] overflow-hidden z-[1020] ring-1 ring-black/[0.05] backdrop-blur-xl`}
+                          className={`fixed sm:absolute bottom-[max(80px,calc(env(safe-area-inset-bottom)+80px))] sm:bottom-full left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 ${(isWebSearch || isDeepSearch || isVoiceMode || isAudioConvertMode || isDocumentConvert || isFileAnalysis) ? 'sm:mb-[68px]' : 'sm:mb-6'} w-[calc(100%-24px)] sm:w-[320px] bg-white dark:bg-[#1c1c1e] border border-slate-200/50 dark:border-white/10 rounded-[32px] shadow-[0_30px_60px_-12px_rgba(0,0,0,0.3)] dark:shadow-[0_30px_60px_-12px_rgba(0,0,0,0.6)] overflow-hidden z-[1020] ring-1 ring-black/[0.05] backdrop-blur-xl`}
                           style={{ maxHeight: 'calc(100vh - 180px)' }}
                         >
                           <div className="px-6 py-5 bg-slate-50/50 dark:bg-white/5 border-b border-slate-200/50 dark:border-white/5 shrink-0">
@@ -8383,7 +8382,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div>
                                 <h3 className="text-[17px] font-black text-slate-800 dark:text-white uppercase tracking-tight leading-none">
-                                  AI LEGAL™ ™ Magic Tools
+                                  AI LEGAL Tools
                                 </h3>
                                 <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-widest">Advanced Suite</p>
                               </div>
@@ -8395,81 +8394,12 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                             <button
                               type="button"
                               onClick={() => {
-                                if (!checkPremiumTool('AI-Powered Legal Research')) return;
-                                setIsToolsMenuOpen(false);
-                                const newMode = !isImageGeneration;
-                                setIsImageGeneration(newMode);
-                                setIsVideoGeneration(false);
-                                setIsDeepSearch(false);
-                                setIsAudioConvertMode(false);
-                                setIsDocumentConvert(false);
-                                setIsCodeWriter(false);
-                                if (newMode) {
-                                  setActiveTool('image');
-                                  toast.success("AI-Powered Legal Research Mode Enabled");
-                                } else {
-                                  setActiveTool(null);
-                                }
-                              }}
-                              className={`w-full text-left px-3.5 py-2.5 flex items-center gap-3.5 rounded-3xl transition-all group cursor-pointer border-2 ${isImageGeneration ? 'bg-primary/5 border-primary/20 shadow-inner' : 'bg-white/50 dark:bg-white/5 border-white/80 dark:border-white/5 hover:border-primary/30 hover:bg-white dark:hover:bg-zinc-800 shadow-sm hover:shadow-md'}`}
-                            >
-                              <div className={`w-11 h-11 rounded-2xl border-2 flex items-center justify-center transition-all shrink-0 tool-icon-premium ${isImageGeneration ? 'bg-primary border-primary text-white' : 'bg-slate-50 dark:bg-zinc-800 border-white dark:border-zinc-700 text-slate-600 dark:text-slate-300'}`}>
-                                <ImageIcon className="w-5.5 h-5.5" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
-                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">AI-Powered Legal Research</span>
-                                </div>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Create unique AI art from your text.</p>
-                              </div>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!checkPremiumTool('Generate Video')) return;
-                                setIsToolsMenuOpen(false);
-                                const newMode = !isVideoGeneration;
-                                setIsVideoGeneration(newMode);
-                                setIsImageGeneration(false);
-                                setIsDeepSearch(false);
-                                setIsAudioConvertMode(false);
-                                setIsDocumentConvert(false);
-                                setIsCodeWriter(false);
-                                if (newMode) {
-                                  setActiveTool('video');
-                                  toast.success("Video Generation Mode Enabled");
-                                } else {
-                                  setActiveTool(null);
-                                }
-                              }}
-                              className={`w-full text-left px-3.5 py-2.5 flex items-center gap-3.5 rounded-3xl transition-all group cursor-pointer border-2 ${isVideoGeneration ? 'bg-primary/5 border-primary/20 shadow-inner' : 'bg-white/50 dark:bg-white/5 border-white/80 dark:border-white/5 hover:border-primary/30 hover:bg-white dark:hover:bg-zinc-800 shadow-sm hover:shadow-md'}`}
-                            >
-                              <div className={`w-11 h-11 rounded-2xl border-2 flex items-center justify-center transition-all shrink-0 tool-icon-premium ${isVideoGeneration ? 'bg-primary border-primary text-white' : 'bg-slate-50 dark:bg-zinc-800 border-white dark:border-zinc-700 text-slate-600 dark:text-slate-300'}`}>
-                                <Video className="w-5.5 h-5.5" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
-                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Generate Video</span>
-                                </div>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Convert scenes into dynamic videos.</p>
-                              </div>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
                                 if (!checkPremiumTool('Web Search')) return;
                                 setIsToolsMenuOpen(false);
                                 setIsWebSearch(!isWebSearch);
                                 setIsDeepSearch(false);
-                                setIsImageGeneration(false);
-                                setIsVideoGeneration(false);
                                 setIsAudioConvertMode(false);
                                 setIsDocumentConvert(false);
-                                setIsCodeWriter(false);
                                 if (!isWebSearch) {
                                   setActiveTool('web_search');
                                   toast.success("Real-Time Web Search Active");
@@ -8484,7 +8414,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Web Search</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Fast and accurate web queries.</p>
@@ -8498,11 +8428,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                 setIsToolsMenuOpen(false);
                                 setIsDeepSearch(!isDeepSearch);
                                 setIsWebSearch(false);
-                                setIsImageGeneration(false);
-                                setIsVideoGeneration(false);
                                 setIsAudioConvertMode(false);
                                 setIsDocumentConvert(false);
-                                setIsCodeWriter(false);
                                 if (!isDeepSearch) {
                                   setActiveTool('deep_search');
                                   toast.success("Precedents Search & Citations Mode Enabled");
@@ -8517,7 +8444,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Precedents Search & Citations</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">In-depth analysis and data mining.</p>
@@ -8531,10 +8458,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                 setIsToolsMenuOpen(false);
                                 setIsAudioConvertMode(!isAudioConvertMode);
                                 setIsDeepSearch(false);
-                                setIsImageGeneration(false);
-                                setIsVideoGeneration(false);
+                                setIsWebSearch(false);
                                 setIsDocumentConvert(false);
-                                setIsCodeWriter(false);
                                 if (!isAudioConvertMode) {
                                   setActiveTool('audio');
                                   toast.success("Convert to Audio Mode Active");
@@ -8549,7 +8474,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Convert to Audio</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Natural-sounding text-to-speech.</p>
@@ -8565,10 +8490,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                 setIsDocumentConvert(nextState);
                                 setIsFileAnalysis(false);
                                 setIsDeepSearch(false);
-                                setIsImageGeneration(false);
-                                setIsVideoGeneration(false);
+                                setIsWebSearch(false);
                                 setIsAudioConvertMode(false);
-                                setIsCodeWriter(false);
                                 if (nextState) {
                                   setActiveTool('document');
                                   uploadInputRef.current?.click();
@@ -8584,129 +8507,12 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Convert Documents</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Format conversion and text extraction.</p>
                               </div>
                             </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!checkPremiumTool('Draft Maker')) return;
-                                setIsToolsMenuOpen(false);
-                                setIsCodeWriter(!isCodeWriter);
-                                setIsDeepSearch(false);
-                                setIsImageGeneration(false);
-                                setIsVideoGeneration(false);
-                                setIsAudioConvertMode(false);
-                                setIsDocumentConvert(false);
-                                setIsEditingImage(false);
-                                setIsMagicEditing(false);
-                                if (!isCodeWriter) {
-                                  setActiveTool('code');
-                                  toast.success("Draft Maker Mode Enabled");
-                                } else {
-                                  setActiveTool(null);
-                                }
-                              }}
-                              className={`w-full text-left px-3.5 py-2.5 flex items-center gap-3.5 rounded-3xl transition-all group cursor-pointer border-2 ${isCodeWriter ? 'bg-primary/5 border-primary/20 shadow-inner' : 'bg-white/50 dark:bg-white/5 border-white/80 dark:border-white/5 hover:border-primary/30 hover:bg-white dark:hover:bg-zinc-800 shadow-sm hover:shadow-md'}`}
-                            >
-                              <div className={`w-11 h-11 rounded-2xl border-2 flex items-center justify-center transition-all shrink-0 tool-icon-premium ${isCodeWriter ? 'bg-primary border-primary text-white' : 'bg-slate-50 dark:bg-zinc-800 border-white dark:border-zinc-700 text-slate-600 dark:text-slate-300'}`}>
-                                <Code className="w-5.5 h-5.5" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
-                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Draft Maker</span>
-                                </div>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Generate multi-language code snippets.</p>
-                              </div>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!checkPremiumTool('Edit Image')) return;
-                                setIsToolsMenuOpen(false);
-                                const newMode = !isMagicEditing;
-                                setIsMagicEditing(newMode);
-                                setIsMagicImageModalOpen(false);
-
-                                if (newMode && !editRefImage && messages.length > 0) {
-                                  const lastImg = [...messages].reverse().find(m => m.imageUrl);
-                                  if (lastImg) setEditRefImage({ url: lastImg.imageUrl, name: 'Last Generated', type: 'image' });
-                                }
-
-                                setIsImageGeneration(false);
-                                setIsVideoGeneration(false);
-                                setIsDeepSearch(false);
-                                setIsWebSearch(false);
-                                setIsAudioConvertMode(false);
-                                setIsDocumentConvert(false);
-                                setIsCodeWriter(false);
-                                setIsCashFlowMode(false);
-                                setIsFileAnalysis(false);
-                                if (newMode) {
-                                  setActiveTool('edit_image');
-                                  toast.success("Image Editing Enabled");
-                                } else {
-                                  setActiveTool(null);
-                                }
-                              }}
-                              className={`w-full text-left px-3.5 py-2.5 flex items-center gap-3.5 rounded-3xl transition-all group cursor-pointer border-2 ${isMagicEditing ? 'bg-primary/5 border-primary/20 shadow-inner' : 'bg-white/50 dark:bg-white/5 border-white/80 dark:border-white/5 hover:border-primary/30 hover:bg-white dark:hover:bg-zinc-800 shadow-sm hover:shadow-md'}`}
-                            >
-                              <div className={`w-11 h-11 rounded-2xl border-2 flex items-center justify-center transition-all shrink-0 tool-icon-premium ${isMagicEditing ? 'bg-primary border-primary text-white' : 'bg-slate-50 dark:bg-zinc-800 border-white dark:border-zinc-700 text-slate-600 dark:text-slate-300'}`}>
-                                <Wand2 className="w-5.5 h-5.5" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
-                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Edit Image</span>
-                                </div>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Magic Image Editor.</p>
-                              </div>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!checkPremiumTool('AI CashFlow')) return;
-                                setIsToolsMenuOpen(false);
-                                const newMode = !isCashFlowMode;
-                                setIsCashFlowMode(newMode);
-                                setIsImageGeneration(false);
-                                setIsVideoGeneration(false);
-                                setIsDeepSearch(false);
-                                setIsWebSearch(false);
-                                setIsAudioConvertMode(false);
-                                setIsDocumentConvert(false);
-                                setIsCodeWriter(false);
-                                setIsMagicEditing(false);
-                                setIsFileAnalysis(false);
-                                if (newMode) {
-                                  setActiveTool('ai_cashflow');
-                                  setIsStockModalOpen(true);
-                                  toast.success("AI CashFlow Explorer Active");
-                                } else {
-                                  setActiveTool(null);
-                                }
-                              }}
-                              className={`w-full text-left px-3.5 py-2.5 flex items-center gap-3.5 rounded-3xl transition-all group cursor-pointer border-2 ${isCashFlowMode ? 'bg-primary/5 border-primary/20 shadow-inner' : 'bg-white/50 dark:bg-white/5 border-white/80 dark:border-white/5 hover:border-primary/30 hover:bg-white dark:hover:bg-zinc-800 shadow-sm hover:shadow-md'}`}
-                            >
-                              <div className={`w-11 h-11 rounded-2xl border-2 flex items-center justify-center transition-all shrink-0 tool-icon-premium ${isCashFlowMode ? 'bg-primary border-primary text-white' : 'bg-slate-50 dark:bg-zinc-800 border-white dark:border-zinc-700 text-slate-600 dark:text-slate-300'}`}>
-                                <TrendingUp className="w-5.5 h-5.5" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
-                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">AI CashFlow</span>
-                                </div>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Live Analysis & Reports.</p>
-                              </div>
-                            </button>
-
 
                             <button
                               type="button"
@@ -8724,13 +8530,9 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                 }
 
                                 setActiveLegalToolkit(newMode);
-                                setIsImageGeneration(false);
-                                setIsVideoGeneration(false);
                                 setIsDeepSearch(false);
                                 setIsAudioConvertMode(false);
                                 setIsDocumentConvert(false);
-                                setIsCodeWriter(false);
-                                setIsMagicEditing(false);
                                 if (newMode) {
                                   setActiveTool('legal');
                                   toast.success("AI Legal Enabled ⚖️");
@@ -8745,58 +8547,13 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">AI Legal</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">{t('aiLegalToolsCount')}</p>
                               </div>
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!checkPremiumTool('Image to Video')) return;
-                                setIsToolsMenuOpen(false);
-                                setIsMagicVideoModalOpen(true);
-                                setActiveTool('image_to_video');
-                                toast.success("Image to Video Mode Active");
-                              }}
-                              className={`w-full text-left px-3.5 py-2.5 flex items-center gap-3.5 rounded-3xl transition-all group cursor-pointer border-2 bg-white/50 dark:bg-white/5 border-white/80 dark:border-white/5 hover:border-primary/30 hover:bg-white dark:hover:bg-zinc-800 shadow-sm hover:shadow-md`}
-                            >
-                              <div className={`w-11 h-11 rounded-2xl border-2 flex items-center justify-center transition-all shrink-0 tool-icon-premium bg-slate-50 dark:bg-zinc-800 border-white dark:border-zinc-700 text-slate-600 dark:text-slate-300`}>
-                                <PlaySquare className="w-5.5 h-5.5" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
-                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Image to Video</span>
-                                </div>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Animate your images with AI magic.</p>
-                              </div>
-                            </button>
 
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (!checkPremiumTool('AI Ad Agent')) return;
-                                setIsToolsMenuOpen(false);
-                                setIsSocialMediaDashboardOpen(true);
-                                setActiveTool('aiad_agent');
-                                toast.success("AI ADS™ Active");
-                              }}
-                              className={`w-full text-left px-3.5 py-2.5 flex items-center gap-3.5 rounded-3xl transition-all group cursor-pointer border-2 bg-white/50 dark:bg-white/5 border-white/80 dark:border-white/5 hover:border-primary/30 hover:bg-white dark:hover:bg-zinc-800 shadow-sm hover:shadow-md`}
-                            >
-                              <div className={`w-11 h-11 rounded-2xl border-2 flex items-center justify-center transition-all shrink-0 tool-icon-premium bg-slate-50 dark:bg-zinc-800 border-white dark:border-zinc-700 text-slate-600 dark:text-slate-300`}>
-                                <Megaphone className="w-5.5 h-5.5" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
-                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">AIADS™</span>
-                                </div>
-                                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Automate 30 days of social media content.</p>
-                              </div>
-                            </button>
 
                           </div>
                         </motion.div>
@@ -10065,76 +9822,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
       <React.Suspense fallback={null}>
         <PremiumUpsellModal />
         {renderNewCaseModal()}
-        <MagicImageEditModal
-          isOpen={isMagicImageModalOpen}
-          onClose={() => setIsMagicImageModalOpen(false)}
-          onImageGenerated={(imageUrl) => {
-            setImagePreview(imageUrl);
-            setIsImageGeneration(true);
-          }}
-        />
-        <MagicVideoGenModal
-          isOpen={isMagicVideoModalOpen}
-          onClose={() => {
-            setIsMagicVideoModalOpen(false);
-            setIsVideoGeneration(false); // Reset video mode when closing magic video gen
-          }}
-          onVideoGenerated={(videoUrl) => {
-            setVideoPreview(videoUrl);
-            setIsVideoGeneration(true);
-          }}
-          onCreditDeduction={(credits) => console.log('deducted', credits)}
-        />
 
-
-        <MagicToolSettingsCard
-          isOpen={isMagicSettingsOpen}
-          onClose={() => setIsMagicSettingsOpen(false)}
-          referenceImage={editRefImage}
-          toolType={isMagicEditing ? 'edit' : isImageGeneration ? 'image' : isVideoGeneration ? 'video' : ''}
-          config={
-            isMagicEditing
-              ? { modelId: editModelId }
-              : isImageGeneration
-                ? { aspectRatio: imageAspectRatio, modelId: imageModelId }
-                : isVideoGeneration
-                  ? { aspectRatio: videoAspectRatio, resolution: videoResolution, modelId: videoModelId }
-                  : {}
-          }
-          onChange={(key, value) => {
-            if (isMagicEditing) {
-              if (key === 'modelId') setEditModelId(value);
-            } else if (isImageGeneration) {
-              if (key === 'aspectRatio') setImageAspectRatio(value);
-              if (key === 'modelId') setImageModelId(value);
-            } else if (isVideoGeneration) {
-              if (key === 'aspectRatio') setVideoAspectRatio(value);
-              if (key === 'modelId') setVideoModelId(value);
-              if (key === 'resolution') setVideoResolution(value);
-            }
-          }}
-          onContentSelect={(content) => {
-            setInputValue(content);
-            // Auto-focus input if possible for immediate refinement
-            const inputEl = document.querySelector('textarea');
-            if (inputEl) inputEl.focus();
-          }}
-          pricing={TOOL_PRICING}
-        />
-        <AiSocialMediaDashboard
-          isOpen={isSocialMediaDashboardOpen}
-          onClose={() => setIsSocialMediaDashboardOpen(false)}
-          userPlan={userPlanName}
-          isPremium={isPremiumUser}
-          isAdmin={isAdminUser}
-        />
-        <CashFlowStockModal
-          isOpen={isStockModalOpen}
-          onClose={() => setIsStockModalOpen(false)}
-          onSelect={(stock) => handleStockAnalysis(stock)}
-          isDarkMode={theme === 'dark'}
-          initialStock={selectedStock}
-        />
 
 
         <LegalToolkitCard

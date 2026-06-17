@@ -8,8 +8,11 @@ import { initSocket } from '../services/socketService';
 import { API } from '../types';
 import { Clock } from 'lucide-react';
 
-
-const PersonalizationContext = createContext();
+console.log("PersonalizationContext file loaded!");
+if (typeof window !== 'undefined' && !window.__PersonalizationContext) {
+    window.__PersonalizationContext = createContext();
+}
+const PersonalizationContext = typeof window !== 'undefined' ? window.__PersonalizationContext : createContext();
 
 const DEFAULT_PREFERENCES = {
     general: {

@@ -112,11 +112,7 @@ const apis = {
   removeAvatar: `${API}/user/avatar`,
   sessions: `${API}/user/sessions`,
   deleteAccount: `${API}/user`,
-  aiAdAgent: {
-    configure: `${API}/ai-ad/configure`,
-    posts: `${API}/ai-ad/posts`,
-    status: `${API}/ai-ad/status`,
-  },
+
   imageProxy: `${API}/image/proxy`,
   precedents: `${API}/precedents`,
   baseUrl: API,

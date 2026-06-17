@@ -22,8 +22,30 @@ import { copyText } from '../utils/clipboard';
 import ActionCard from '../Components/ActionCard';
 import { useTheme } from '../context/ThemeContext';
 
-// Lazy load video player to optimize initial bundle size
-const CustomVideoPlayer = React.lazy(() => import('../Tools/AI_Video_Generator/CustomVideoPlayer').catch(() => ({ default: () => null })));
+const transformLegalActions = (content) => {
+  if (!content) return "";
+
+  let clean = content;
+
+  // 1. Remove [ACTIVE TOOL: ...] tags (case insensitive, including surrounding stars/spaces)
+  clean = clean.replace(/\*?\*?\[ACTIVE TOOL:.*?\]\*?\*?/gi, '');
+
+  // 2. Remove any Suggested Actions section completely (from "Suggested Next Actions" or "Suggested Actions" to the end)
+  clean = clean.replace(/(?:💡\s*)?Suggested\s+(?:Next\s+)?Actions[\s\S]*$/gi, '');
+
+  // 3. Remove individual action cards/button patterns
+  clean = clean.replace(/👉\s*\*\*.*?\*\*[\s\S]*?\(action:.*?\)/gi, '');
+  clean = clean.replace(/\[ActionCard\|.*?\]\(action:.*?\)/gi, '');
+  clean = clean.replace(/\[?:🔗|🔒\s*Action:.*?\]\(action:.*?\)/gi, '');
+
+  // 4. Remove internal workflow & routing labels
+  clean = clean.replace(/(?:Active Tool|Current Tool|Running Tool|Selected Tool|Assistant Engine|Pipeline|Internal AI|Selected Module|Hidden Agent|Workflow)\s*(?::|-)?\s*.*?(?:\n|$)/gi, '');
+
+  return clean.trim();
+};
+
+
+
 
 const ImageViewer = ({ src, alt }) => {
   const [scale, setScale] = useState(1);
@@ -174,22 +196,12 @@ const getModeInfo = (mode) => {
       return { label: "AI Precedents Search & Citations", icon: Search, color: "text-sky-500", bg: "bg-sky-500/10", border: "border-sky-500/20" };
     case MODES.WEB_SEARCH:
       return { label: "AI Web Search", icon: Globe, color: "text-cyan-500", bg: "bg-cyan-500/10", border: "border-cyan-500/20" };
-    case MODES.IMAGE_GENERATION:
-      return { label: "AI AI-Powered Legal Research", icon: ImagePlus, color: "text-violet-500", bg: "bg-violet-500/10", border: "border-violet-500/20" };
-    case MODES.VIDEO_GENERATION:
-      return { label: "AI Video Generation", icon: Video, color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/20" };
-    case MODES.IMAGE_EDIT:
-      return { label: "AI Magic Edit", icon: Wand2, color: "text-rose-500", bg: "bg-rose-500/10", border: "border-rose-500/20" };
-    case MODES.CODING_HELP:
-      return { label: "AI Draft Maker", icon: Code, color: "text-indigo-500", bg: "bg-indigo-500/10", border: "border-indigo-500/20" };
     case MODES.DOCUMENT_CONVERT:
       return { label: "AI Doc Convert", icon: FileText, color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" };
     case MODES.FILE_ANALYSIS:
       return { label: "AI File Analysis", icon: Search, color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" };
     case MODES.LEGAL_TOOLKIT:
       return { label: "AI Legal™", icon: Scale, color: "text-indigo-600 dark:text-indigo-400", bg: "bg-indigo-600/10 dark:bg-indigo-400/10", border: "border-indigo-600/20 dark:border-indigo-400/20" };
-    case MODES.CASHFLOW:
-      return { label: "AI CashFlow", icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20" };
     default:
       return null;
   }
@@ -467,17 +479,6 @@ const SharedChat = () => {
                 </div>
 
                 <div className="flex-1 min-w-0 chatgpt-text select-text">
-                  {/* Mode Badge - Integrated Tool Indicator */}
-                  {msg.role === 'user' && msg.mode && getModeInfo(msg.mode) && (
-                    <div className={`inline-flex !flex-row !items-center w-fit gap-2 px-3 py-1 rounded-full border shadow-sm ${getModeInfo(msg.mode).bg} ${getModeInfo(msg.mode).border} ${getModeInfo(msg.mode).color} mt-1.5 mb-3`}>
-                      {(() => {
-                        const Icon = getModeInfo(msg.mode).icon;
-                        return <Icon size={12} className="shrink-0" strokeWidth={3} />;
-                      })()}
-                      <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap leading-none">{getModeInfo(msg.mode).label}</span>
-                    </div>
-                  )}
-
                   {/* Mode Indicator for Model */}
                   {msg.role === 'model' && (msg.mode === MODES.WEB_SEARCH || msg.isRealTime) && (
                     <div className="flex items-center gap-2 mb-4 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full w-fit">
@@ -748,7 +749,7 @@ const SharedChat = () => {
                               }
                             }}
                           >
-                            {msg.content}
+                            {transformLegalActions(msg.content || msg.text || "")}
                           </ReactMarkdown>
                         </div>
 
@@ -758,14 +759,7 @@ const SharedChat = () => {
                     </div>
                   )}
 
-                  {/* Video Url Rendering */}
-                  {msg.videoUrl && (
-                    <div className="relative mt-4 mb-2 w-fit max-w-full">
-                      <React.Suspense fallback={<div className="w-full aspect-video bg-black/20 animate-pulse rounded-xl" />}>
-                        <CustomVideoPlayer src={msg.videoUrl} compact={true} />
-                      </React.Suspense>
-                    </div>
-                  )}
+
 
                   {/* Image Url Rendering */}
                   {msg.imageUrl && (

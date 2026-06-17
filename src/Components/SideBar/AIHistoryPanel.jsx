@@ -124,6 +124,7 @@ const AIHistoryPanel = ({
 }) => {
   const navigate = useNavigate();
   const panelRef = useRef(null);
+  const filterScrollRef = useRef(null);
   
   // Local states
   const [sessions, setSessions] = useState([]);
@@ -187,6 +188,61 @@ const AIHistoryPanel = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen, onClose]);
+
+  // Horizontal wheel scroll & drag-to-scroll for filters container
+  useEffect(() => {
+    const el = filterScrollRef.current;
+    if (!el) return;
+
+    // 1. Wheel event listener
+    const handleWheel = (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY * 0.85;
+      }
+    };
+
+    // 2. Drag-to-scroll listeners
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    const handleMouseDown = (e) => {
+      isDown = true;
+      startX = e.pageX - el.offsetLeft;
+      scrollLeft = el.scrollLeft;
+    };
+
+    const handleMouseLeave = () => {
+      isDown = false;
+    };
+
+    const handleMouseUp = () => {
+      isDown = false;
+    };
+
+    const handleMouseMove = (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - el.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      el.scrollLeft = scrollLeft - walk;
+    };
+
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    el.addEventListener('mousedown', handleMouseDown);
+    el.addEventListener('mouseleave', handleMouseLeave);
+    el.addEventListener('mouseup', handleMouseUp);
+    el.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      el.removeEventListener('wheel', handleWheel);
+      el.removeEventListener('mousedown', handleMouseDown);
+      el.removeEventListener('mouseleave', handleMouseLeave);
+      el.removeEventListener('mouseup', handleMouseUp);
+      el.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
 
   // Sync metadata helper with localStorage
   const updatePinnedChats = (newPinned) => {
@@ -536,7 +592,10 @@ const AIHistoryPanel = ({
 
         {/* Filter Tab Row */}
         {!showArchivedOnly && (
-          <div className="px-4 pb-2 border-b border-slate-100 dark:border-zinc-800/60 shrink-0 overflow-x-auto flex gap-1.5 scrollbar-none select-none">
+          <div 
+            ref={filterScrollRef}
+            className="px-4 pb-2 border-b border-slate-100 dark:border-zinc-800/60 shrink-0 overflow-x-auto flex flex-nowrap gap-1.5 scrollbar-none select-none cursor-grab active:cursor-grabbing"
+          >
             {FILTER_OPTIONS.map((opt) => {
               const active = activeFilter === opt.id;
               const config = TOOL_CONFIG[opt.id] || DEFAULT_TOOL_CONFIG;
@@ -738,7 +797,7 @@ const AIHistoryPanel = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               onClose();
-                              navigate(`/dashboard/case/${session.projectId._id || session.projectId}`);
+                              navigate(`/dashboard/cases/${session.projectId._id || session.projectId}`);
                             }}
                             className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 hover:bg-slate-200/80 dark:bg-zinc-800/40 dark:hover:bg-zinc-800 text-slate-500 dark:text-zinc-400 rounded-md border border-slate-200/50 dark:border-zinc-800/50 mt-1.5 w-fit max-w-full text-[9px] font-bold tracking-wide transition-colors group/case"
                             title="Click to view Case Workspace directly"

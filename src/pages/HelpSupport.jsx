@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 const FAQ_DATA = [
   {
-    category: 'AI Legal Copilot',
+    category: 'AI Legal Assistant',
     question: 'How do I prompt the Copilot for research?',
     answer: "Use natural legal language. For example, 'Find recent Supreme Court judgments on Section 302 IPC regarding circumstantial evidence' or 'Analyze this paragraph for potential defense arguments'."
   },

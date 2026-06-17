@@ -104,30 +104,6 @@ export const apiService = {
     }
   },
 
-  async generateVideo(prompt, duration = 5, quality = 'medium', aspectRatio = '16:9', modelId = 'veo-3.1-fast-generate-001', resolution = '1080p') {
-    try {
-      console.log(`[Frontend] Generating video for prompt: ${prompt}, Ratio: ${aspectRatio}, Model: ${modelId}, Res: ${resolution}`);
-      // Increased timeout to 900s (15 minutes) for video generation as it regularly takes > 5 minutes
-      const response = await apiClient.post('/video/generate', { prompt, duration, quality, aspectRatio, modelId, resolution }, { timeout: 900000 });
-      console.log("[Frontend] Video generation success:", response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Failed to generate video:", error);
-      throw error;
-    }
-  },
-
-  async downloadVideo(videoUrl) {
-    try {
-      console.log("[Frontend] Downloading video from proxy:", videoUrl);
-      const response = await apiClient.post('/video/download', { videoUrl }, { responseType: 'blob' });
-      return response.data;
-    } catch (error) {
-      console.error("Failed to download video proxy:", error);
-      throw error;
-    }
-  },
-
   // --- AI Social Agent (Phase 1) ---
   async getSocialAgentWorkspace(userId) {
     try {
@@ -534,37 +510,6 @@ export const apiService = {
     } catch (error) {
       console.error("Failed to fetch schedule:", error);
       return { success: false, items: [] };
-    }
-  },
-
-  // --- AI Ad Agent (Specific) ---
-  async configureAiAdAgent(data) {
-    try {
-      const response = await apiClient.post('/ai-ad/configure', data);
-      return response.data;
-    } catch (error) {
-      console.error("Failed to configure AI Ad Agent:", error);
-      throw error;
-    }
-  },
-
-  async getAiAdPosts() {
-    try {
-      const response = await apiClient.get('/ai-ad/posts');
-      return response.data;
-    } catch (error) {
-      console.error("Failed to fetch AI Ad Agent posts:", error);
-      return { success: false, posts: [] };
-    }
-  },
-
-  async getAiAdStatus() {
-    try {
-      const response = await apiClient.get('/ai-ad/status');
-      return response.data;
-    } catch (error) {
-      console.error("Failed to fetch AI Ad Agent status:", error);
-      return { success: false, status: "none" };
     }
   },
 
@@ -1142,46 +1087,7 @@ export const apiService = {
     }
   },
 
-  // --- Personal Assistant ---
-  async getPersonalTasks(params) {
-    try {
-      const response = await apiClient.get('/personal-assistant/tasks', { params });
-      return response.data;
-    } catch (error) {
-      console.error("Failed to fetch tasks:", error);
-      return [];
-    }
-  },
 
-  async createPersonalTask(data) {
-    try {
-      const response = await apiClient.post('/personal-assistant/tasks', data);
-      return response.data;
-    } catch (error) {
-      console.error("Failed to create task:", error);
-      throw error;
-    }
-  },
-
-  async updatePersonalTask(id, data) {
-    try {
-      const response = await apiClient.put(`/personal-assistant/tasks/${id}`, data);
-      return response.data;
-    } catch (error) {
-      console.error("Failed to update task:", error);
-      throw error;
-    }
-  },
-
-  async deletePersonalTask(id) {
-    try {
-      const response = await apiClient.delete(`/personal-assistant/tasks/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error("Failed to delete task:", error);
-      throw error;
-    }
-  },
 
   // --- AIBASE & Knowledge ---
   async getKnowledgeDocuments() {

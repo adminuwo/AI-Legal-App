@@ -30,18 +30,11 @@ const AboutAISA = ({ isOpen, onClose }) => {
     ];
 
     const features = [
-        { title: t('generateImage'), icon: <Image className="w-4 h-4" />, desc: t('createVisualsFromText') },
-        { title: t('generateVideo'), icon: <Video className="w-4 h-4" />, desc: t('textToCinematicVideo') },
         { title: t('webSearch'), icon: <Globe className="w-4 h-4" />, desc: t('liveWebDataAccess') },
         { title: t('deepSearch'), icon: <Search className="w-4 h-4" />, desc: t('researchComplexTopics') },
         { title: t('convertToAudio'), icon: <Headphones className="w-4 h-4" />, desc: t('textDocsToVoice') },
         { title: t('analyzeDocument'), icon: <FileText className="w-4 h-4" />, desc: t('chatWithPdfsDocs') },
-        { title: t('codeWriter'), icon: <Code className="w-4 h-4" />, desc: t('writeDebugCode') },
-        { title: t('editImage'), icon: <Wand2 className="w-4 h-4" />, desc: t('magicImageEditor') },
-        { title: t('aiCashFlow'), icon: <TrendingUp className="w-4 h-4" />, desc: t('liveAnalysisReports') },
-        { title: t('aiLegal'), icon: <LegalLogo size={16} />, desc: t('specializedAiLegalTools') },
-        { title: t('imageToVideo'), icon: <PlaySquare className="w-4 h-4" />, desc: t('imageToVideoMagic') },
-        { title: t('aiAds'), icon: <Megaphone className="w-4 h-4" />, desc: t('automateSocialMedia') }
+        { title: t('aiLegal'), icon: <LegalLogo size={16} />, desc: t('specializedAiLegalTools') }
     ];
 
     return (
@@ -108,7 +101,7 @@ const AboutAISA = ({ isOpen, onClose }) => {
                             className="text-3xl md:text-5xl font-black tracking-tighter mb-1 bg-clip-text text-transparent"
                             style={{ backgroundImage: isDarkMode ? 'linear-gradient(to bottom, #fff, rgba(255,255,255,0.6))' : 'linear-gradient(to bottom, #1e1b4b, #4338ca)' }}
                         >
-                            AISA<span className="text-blue-500" style={{ fontSize: '0.55em', verticalAlign: 'super', marginLeft: '1px' }}>™</span>
+                            AI LEGAL<span className="text-blue-500" style={{ fontSize: '0.55em', verticalAlign: 'super', marginLeft: '1px' }}>™</span>
                         </motion.h2>
                         
                         <motion.p 
@@ -221,7 +214,7 @@ const AboutAISA = ({ isOpen, onClose }) => {
                         <div className="relative z-10">
                             <h3 className="text-2xl font-bold mb-8">{t('builtForEveryone')}</h3>
                             <div className="flex flex-wrap justify-center gap-3">
-                                {[t('students'), t('professionals'), t('businesses'), t('creators'), t('everydayUsers')].map((label, i) => (
+                                {['Advocates', 'Lawyers', 'Legal Professionals', 'Solicitors', 'Judges'].map((label, i) => (
                                     <span key={i} className="px-6 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full text-xs font-bold tracking-wide transition-colors backdrop-blur-md">
                                         {label}
                                     </span>
