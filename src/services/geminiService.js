@@ -3,19 +3,18 @@ import { apis } from "../types";
 import { getUserData } from "../userStore/userData";
 import { getDeviceFingerprint } from "../utils/fingerprint";
 
-export const generateChatResponse = async (history, currentMessage, systemInstruction, attachments, language, abortSignal = null, mode = null, sessionId = null, projectId = null, userMsgId = null, aiMsgId = null, aspectRatio = null, modelId = null) => {
+export const generateChatResponse = async (history, currentMessage, systemInstruction, attachments, language, abortSignal = null, mode = null, sessionId = null, projectId = null, userMsgId = null, aiMsgId = null, aspectRatio = null, modelId = null, onChunk = null) => {
     try {
         const token = getUserData()?.token;
         const headers = {
-            'X-Device-Fingerprint': getDeviceFingerprint()
+            'X-Device-Fingerprint': getDeviceFingerprint(),
+            'Content-Type': 'application/json'
         };
         if (token && token !== 'undefined' && token !== 'null') {
             headers.Authorization = `Bearer ${token}`;
         }
 
-        // Language handling is now performed centrally in the backend ai.service.js
         const combinedSystemInstruction = (systemInstruction || '').trim();
-
         let images = [];
         let documents = [];
         let finalMessage = currentMessage;
@@ -25,30 +24,22 @@ export const generateChatResponse = async (history, currentMessage, systemInstru
                 if (attachment.url && attachment.url.startsWith('data:')) {
                     const base64Data = attachment.url.split(',')[1];
                     const mimeType = attachment.url.substring(attachment.url.indexOf(':') + 1, attachment.url.indexOf(';'));
-
                     if (attachment.type === 'image' || mimeType.startsWith('image/')) {
                         images.push({ mimeType, base64Data });
                     } else {
                         documents.push({ mimeType: mimeType || 'application/pdf', base64Data, name: attachment.name });
                     }
                 } else if (attachment.url) {
-                    // Include URL in images array if it's an image type
-                    const isImage = attachment.type === 'image' ||
-                        (attachment.name && /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(attachment.name)) ||
-                        (attachment.mimeType && attachment.mimeType.startsWith('image/'));
-
+                    const isImage = attachment.type === 'image' || (attachment.name && /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(attachment.name)) || (attachment.mimeType && attachment.mimeType.startsWith('image/'));
                     if (isImage) {
                         images.push({ url: attachment.url, name: attachment.name, mimeType: attachment.mimeType });
                     }
-
                     finalMessage += `\n[Shared File: ${attachment.name || 'Link'} - ${attachment.url}]`;
                 }
             });
         }
 
-        // Limit history to last 50 messages to prevent token overflow in unlimited chats
         const recentHistory = history.length > 50 ? history.slice(-50) : history;
-
         const payload = {
             content: finalMessage,
             history: recentHistory,
@@ -63,69 +54,66 @@ export const generateChatResponse = async (history, currentMessage, systemInstru
             aiMsgId: aiMsgId,
             ...(aspectRatio && { aspectRatio }),
             ...(modelId && { modelId }),
+            stream: !!onChunk
         };
 
-        // Deep Search runs a 3-step pipeline (Gemini plan → Tavily → Gemini synthesis)
-        // which can take 35–90s. Use 180s for search modes, 60s for everything else.
-        const isSearchMode = mode === 'DEEP_SEARCH' || mode === 'web_search' || mode === 'SEARCH';
-        const requestTimeout = isSearchMode ? 180000 : 60000;
+        if (onChunk) {
+            const response = await fetch(apis.chatAgent, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(payload),
+                signal: abortSignal
+            });
 
-        const result = await axios.post(apis.chatAgent, payload, {
-            headers: headers,
-            signal: abortSignal,
-            withCredentials: true,
-            timeout: requestTimeout
-        });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = "";
 
-        // Return full response data (includes reply and potentially conversion data)
-        return result.data;
-
+            let finalMeta = {};
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n');
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[DONE]') continue;
+                        try {
+                            const parsed = JSON.parse(data);
+                            if (parsed.done) {
+                                finalMeta = parsed;
+                            } else {
+                                const content = parsed.reply || parsed.chunk || "";
+                                fullText += content;
+                                onChunk(content);
+                            }
+                        } catch (e) { console.error("SSE Parse Error", e); }
+                    }
+                }
+            }
+            return { reply: fullText, ...finalMeta };
+        } else {
+            const result = await axios.post(apis.chatAgent, payload, { headers, signal: abortSignal, withCredentials: true, timeout: (mode === 'DEEP_SEARCH' || mode === 'web_search' || mode === 'SEARCH') ? 180000 : 60000 });
+            return result.data;
+        }
     } catch (error) {
         console.error("Gemini API Error:", error);
-
-        // Handle credit / plan errors
         if (error.response?.status === 403) {
             const code = error.response?.data?.code;
-            const message = error.response?.data?.message;
-
-            if (code === 'OUT_OF_CREDITS') {
-                // Fire event to show CreditUpsellPopup
-                window.dispatchEvent(new Event('out_of_credits'));
-                return { error: 'OUT_OF_CREDITS', message };
-            }
-            if (code === 'PREMIUM_ONLY') {
-                // Fire event to show PremiumUpsellModal
-                window.dispatchEvent(new CustomEvent('premium_required', { detail: { toolName: 'this feature' } }));
-                return { error: 'PREMIUM_ONLY', message };
-            }
+            if (code === 'OUT_OF_CREDITS') { window.dispatchEvent(new Event('out_of_credits')); return { error: 'OUT_OF_CREDITS' }; }
+            if (code === 'PREMIUM_ONLY') { window.dispatchEvent(new CustomEvent('premium_required', { detail: { toolName: 'this feature' } })); return { error: 'PREMIUM_ONLY' }; }
         }
-
-        if (error.response?.status === 429) {
-            const detail = error.response?.data?.details || error.response?.data?.error;
-            if (detail) return `System Busy (429): ${detail}`;
-            return "The A-Series system is currently busy (Quota limit reached). Please wait 60 seconds and try again.";
-        }
-        if (error.response?.status === 401) {
-            return "Please [Log In](/login) to your AISA™ account to continue chatting.";
-        }
-        if (error.response?.data?.error === "LIMIT_REACHED") {
-            return { error: "LIMIT_REACHED", reason: error.response.data.reason };
-        }
-        // Return backend error message if available
-        if (error.response?.data?.error) {
-            const details = error.response.data.details ? ` - ${error.response.data.details}` : '';
-            return `System Message: ${error.response.data.error}${details}`;
-        }
-        if (error.response?.data?.details) {
-            return `System Error: ${error.response.data.details}`;
-        }
+        if (error.response?.status === 429) return "The A-Series system is currently busy (Quota limit reached). Please wait 60 seconds and try again.";
+        if (error.response?.status === 401) return "Please [Log In](/login) to your AI LEGAL™ account to continue chatting.";
         return "Sorry, I am having trouble connecting to the A-Series network right now. Please check your connection.";
     }
 };
 
 /**
  * Generates context-aware follow-up prompts for a given user query.
- * Useful for "Smart Suggestions" after image generation or chat.
+ * Useful for "Smart Suggestions" after AI-powered legal research or chat.
  * @param {string} prompt - The original prompt
  * @param {string} type - 'image', 'video', or 'chat'
  * @returns {Promise<string[]>} List of 3 suggested prompts

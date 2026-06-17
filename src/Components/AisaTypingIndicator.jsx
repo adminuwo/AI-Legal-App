@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const AisaTypingIndicator = ({ visible = true, message = "AISA™ is thinking" }) => {
+const AisaTypingIndicator = ({ visible = true, message = "Thinking..." }) => {
   if (!visible) return null;
 
   return (
@@ -9,19 +9,18 @@ const AisaTypingIndicator = ({ visible = true, message = "AISA™ is thinking" }
       initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
-      className="flex items-center gap-2 opacity-80 py-1"
+      className="flex items-center gap-2 py-1 select-none"
     >
-      <span className="text-[11px] text-primary font-extrabold uppercase tracking-widest">
+      <span className="text-[12px] text-slate-500 dark:text-zinc-400 font-semibold leading-none">
         {message}
       </span>
-      <div className="flex gap-1 ml-1">
-        <div className="w-1 h-1 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '0ms' }} />
-        <div className="w-1 h-1 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '150ms' }} />
-        <div className="w-1 h-1 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '300ms' }} />
+      <div className="flex gap-1 ml-1.5 items-center">
+        <span className="w-1.5 h-1.5 bg-[#6D5DFC] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+        <span className="w-1.5 h-1.5 bg-[#6D5DFC] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+        <span className="w-1.5 h-1.5 bg-[#6D5DFC] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
       </div>
     </motion.div>
   );
 };
 
 export default AisaTypingIndicator;
-

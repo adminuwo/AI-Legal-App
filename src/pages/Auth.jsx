@@ -33,7 +33,7 @@ const Auth = () => {
         {/* Logo + Title */}
         <div className="mb-8 text-center">
           <div className="inline-block p-1 rounded-full bg-white/10 backdrop-blur-xl shadow-xl shadow-purple-900/40 mb-4 overflow-hidden border border-white/20">
-            <img src={logo} alt="AISA" className="w-10 h-10 object-contain" />
+            <img src={logo} alt="AI LEGAL™" className="w-10 h-10 object-contain" />
           </div>
 
           <h2 className="text-3xl font-bold text-white mb-2">
@@ -41,7 +41,7 @@ const Auth = () => {
           </h2>
 
           <p className="text-gray-400">
-            {isSignup ? <>Join AISA™ to unlock full access</> : <>Sign in to continue to AISA™</>}
+            {isSignup ? <>Join AI LEGAL™ to unlock full access</> : <>Sign in to continue to AI LEGAL™</>}
           </p>
         </div>
 

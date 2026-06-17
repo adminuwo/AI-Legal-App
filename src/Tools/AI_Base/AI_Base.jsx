@@ -24,7 +24,7 @@ const AiBase = () => {
                     </div>
                     <div>
                         <div className="flex items-center gap-3">
-                            <h1 className="text-3xl font-black text-maintext tracking-tight uppercase italic">AISA <span className="text-primary italic">BASE</span></h1>
+                            <h1 className="text-3xl font-black text-maintext tracking-tight uppercase italic">AI LEGAL™ <span className="text-primary italic">BASE</span></h1>
                             <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest rounded-full border border-primary/20">RAG Engine V2.0</span>
                         </div>
                         <p className="text-subtext text-sm font-bold mt-1 max-w-md">

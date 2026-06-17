@@ -60,7 +60,7 @@ const ShareModal = ({ isOpen, onClose, shareId, sessionTitle, sessionId }) => {
       ),
       color: 'bg-[#25D366]',
       action: () => {
-        const text = `Check out this chat on AISA: ${sessionTitle}\n\n${shareLink}`;
+        const text = `Check out this chat on AI LEGAL™: ${sessionTitle}\n\n${shareLink}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
       }
     },
@@ -77,7 +77,7 @@ const ShareModal = ({ isOpen, onClose, shareId, sessionTitle, sessionId }) => {
       icon: <Send className="w-5 h-5" />,
       color: 'bg-[#0088cc]',
       action: () => {
-        const text = `Check out this chat on AISA: ${sessionTitle}`;
+        const text = `Check out this chat on AI LEGAL™: ${sessionTitle}`;
         window.open(`https://t.me/share/url?url=${encodeURIComponent(shareLink)}&text=${encodeURIComponent(text)}`, '_blank');
       }
     }

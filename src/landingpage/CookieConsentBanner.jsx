@@ -144,7 +144,7 @@ const CookieConsentBanner = () => {
                                         <span className="sm:hidden">🍪</span> Cookie Consent
                                     </h3>
                                     <p className="text-[13px] text-gray-700 dark:text-gray-300 leading-relaxed mb-4 font-medium">
-                                        AISA™ uses cookies to improve your experience, store preferences, and analyze usage.
+                                        AI LEGAL™ uses cookies to improve your experience, store preferences, and analyze usage.
                                         Please choose an option below to continue to the platform.{' '}
                                         <button
                                             onClick={() => window.open('/cookie-policy', '_blank')}

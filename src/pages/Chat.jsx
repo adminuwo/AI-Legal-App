@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, Fragment } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Send, SendHorizontal, Bot, User, Sparkles, Plus, Monitor, ChevronDown, History, Paperclip, X, AlertCircle, FileText, Image as ImageIcon, Cloud, HardDrive, Edit2, Download, Mic, Wand2, Eye, FileSpreadsheet, Presentation, File as FileIcon, MoreVertical, Trash2, Check, Camera, Video, Copy, ThumbsUp, ThumbsDown, Share, Search, Undo2, Menu as MenuIcon, Volume2, Pause, Headphones, MessageCircle, ExternalLink, ZoomIn, ZoomOut, RotateCcw, Minus, Code, Globe, Sliders, PlayCircle, Brain, ImagePlus, PlaySquare, RefreshCcw, TrendingUp, Zap, Gavel, Navigation, Rocket, Megaphone, Scale, ArrowLeft, ChevronRight, Briefcase, Calendar, Users, FolderOpen, Save, Sun, Moon, LayoutDashboard } from 'lucide-react';
+import { Send, SendHorizontal, Bot, User, Sparkles, Plus, Monitor, ChevronDown, History, Paperclip, X, AlertCircle, FileText, Image as ImageIcon, Cloud, HardDrive, Edit2, Download, Mic, Wand2, Eye, FileSpreadsheet, Presentation, File as FileIcon, MoreVertical, Trash2, Check, Camera, Video, Copy, ThumbsUp, ThumbsDown, Share, Search, Undo2, Menu as MenuIcon, Volume2, Pause, Headphones, MessageCircle, ExternalLink, ZoomIn, ZoomOut, RotateCcw, Minus, Code, Globe, Sliders, PlayCircle, Brain, ImagePlus, PlaySquare, RefreshCcw, TrendingUp, Zap, Gavel, Navigation, Rocket, Megaphone, Scale, ArrowLeft, ChevronRight, Briefcase, Calendar, Users, FolderOpen, Save, Sun, Moon, LayoutDashboard, ArrowDown } from 'lucide-react';
 import LegalLogo from '../Tools/AI_Legal/components/LegalLogo';
 import CaseIntelligencePanel from '../Tools/AI_Legal/components/CaseIntelligencePanel';
 import { logo } from '../constants';
@@ -224,37 +224,37 @@ const FEEDBACK_PROMPTS = {
 const TOOL_PRICING = {
   chat: {
     models: [
-      { id: 'gemini-flash', name: 'AISA™ Flash', price: 0, speed: 'Fast', description: 'Free chat model' }
+      { id: 'gemini-flash', name: 'AI LEGAL™ Flash', price: 0, speed: 'Fast', description: 'Free chat model' }
     ]
   },
   image: {
     models: [
-      { id: 'gemini-3.1-flash-image-preview', name: 'AISA™ Gemini 3.1 Flash', price: 45, speed: 'Fast', description: 'Latest preview — fastest Gemini image generation' },
-      { id: 'gemini-3-pro-image-preview', name: 'AISA™ Gemini 3 Pro', price: 75, speed: 'Pro', description: 'Pro-grade scene understanding & generation' },
-      { id: 'gemini-2.5-flash-image', name: 'AISA™ Gemini 2.5 Flash', price: 30, speed: 'Stable', description: 'Stable & reliable production image generation' }
+      { id: 'gemini-3.1-flash-image-preview', name: 'AI LEGAL™ Gemini 3.1 Flash', price: 45, speed: 'Fast', description: 'Latest preview — fastest Gemini AI-powered legal research' },
+      { id: 'gemini-3-pro-image-preview', name: 'AI LEGAL™ Gemini 3 Pro', price: 75, speed: 'Pro', description: 'Pro-grade scene understanding & generation' },
+      { id: 'gemini-2.5-flash-image', name: 'AI LEGAL™ Gemini 2.5 Flash', price: 30, speed: 'Stable', description: 'Stable & reliable production AI-powered legal research' }
     ],
     editModels: [
-      { id: 'gemini-3.1-flash-image-preview', name: 'AISA™ Gemini 3.1 Flash', price: 45, speed: 'Fast', description: 'Latest preview model — fastest AI image editing' },
-      { id: 'gemini-3-pro-image-preview', name: 'AISA™ Gemini 3 Pro', price: 75, speed: 'Pro', description: 'Pro-grade image editing with rich scene understanding' },
-      { id: 'gemini-2.5-flash-image', name: 'AISA™ Gemini 2.5 Flash', price: 30, speed: 'Stable', description: 'Stable & reliable — production-ready image edits' }
+      { id: 'gemini-3.1-flash-image-preview', name: 'AI LEGAL™ Gemini 3.1 Flash', price: 45, speed: 'Fast', description: 'Latest preview model — fastest AI image editing' },
+      { id: 'gemini-3-pro-image-preview', name: 'AI LEGAL™ Gemini 3 Pro', price: 75, speed: 'Pro', description: 'Pro-grade image editing with rich scene understanding' },
+      { id: 'gemini-2.5-flash-image', name: 'AI LEGAL™ Gemini 2.5 Flash', price: 30, speed: 'Stable', description: 'Stable & reliable — production-ready image edits' }
     ]
   },
   video: {
     models: [
-      { id: 'veo-3.1-fast-generate-001', name: 'AISA™ Video Fast', price: '225/5S', speed: 'Fast', description: 'Quick high-quality video generation' },
-      { id: 'veo-3.1-generate-001', name: 'AISA™ Video Pro', price: '600/5S', speed: 'Cinema', description: 'Next-gen cinematic video synthesis' }
+      { id: 'veo-3.1-fast-generate-001', name: 'AI LEGAL™ Video Fast', price: '225/5S', speed: 'Fast', description: 'Quick high-quality video generation' },
+      { id: 'veo-3.1-generate-001', name: 'AI LEGAL™ Video Pro', price: '600/5S', speed: 'Cinema', description: 'Next-gen cinematic video synthesis' }
     ]
   },
   document: {
     models: [
-      { id: 'gemini-2.5-flash', name: 'AISA™ Flash', price: 0, speed: 'Fast', description: 'Basic document analysis' },
-      { id: 'gemini-pro', name: 'AISA™ Pro', price: 20, speed: 'Medium', description: 'Advanced document processing' },
-      { id: 'gpt4', name: 'AISA™ Premium', price: 30, speed: 'Medium', description: 'Premium document analysis' }
+      { id: 'gemini-2.5-flash', name: 'AI LEGAL™ Flash', price: 0, speed: 'Fast', description: 'Basic document analysis' },
+      { id: 'gemini-pro', name: 'AI LEGAL™ Pro', price: 20, speed: 'Medium', description: 'Advanced document processing' },
+      { id: 'gpt4', name: 'AI LEGAL™ Premium', price: 30, speed: 'Medium', description: 'Premium document analysis' }
     ]
   },
   voice: {
     models: [
-      { id: 'gemini-flash', name: 'AISA™ Flash', price: 0, speed: 'Fast', description: 'Standard voice recognition' }
+      { id: 'gemini-flash', name: 'AI LEGAL™ Flash', price: 0, speed: 'Fast', description: 'Standard voice recognition' }
     ]
   }
 };
@@ -415,17 +415,17 @@ const ImageViewer = ({ src, alt }) => {
 const getModeInfo = (mode) => {
   switch (mode) {
     case MODES.DEEP_SEARCH:
-      return { label: "AI Deep Search", icon: Search, color: "text-sky-500", bg: "bg-sky-500/10", border: "border-sky-500/20" };
+      return { label: "AI Precedents Search & Citations", icon: Search, color: "text-sky-500", bg: "bg-sky-500/10", border: "border-sky-500/20" };
     case MODES.WEB_SEARCH:
       return { label: "AI Web Search", icon: Globe, color: "text-cyan-500", bg: "bg-cyan-500/10", border: "border-cyan-500/20" };
     case MODES.IMAGE_GENERATION:
-      return { label: "AI Image Generation", icon: ImagePlus, color: "text-violet-500", bg: "bg-violet-500/10", border: "border-violet-500/20" };
+      return { label: "AI AI-Powered Legal Research", icon: ImagePlus, color: "text-violet-500", bg: "bg-violet-500/10", border: "border-violet-500/20" };
     case MODES.VIDEO_GENERATION:
       return { label: "AI Video Generation", icon: Video, color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/20" };
     case MODES.IMAGE_EDIT:
       return { label: "AI Magic Edit", icon: Wand2, color: "text-rose-500", bg: "bg-rose-500/10", border: "border-rose-500/20" };
     case MODES.CODING_HELP:
-      return { label: "AI Code Writer", icon: Code, color: "text-indigo-500", bg: "bg-indigo-500/10", border: "border-indigo-500/20" };
+      return { label: "AI Draft Maker", icon: Code, color: "text-indigo-500", bg: "bg-indigo-500/10", border: "border-indigo-500/20" };
     case MODES.DOCUMENT_CONVERT:
       return { label: "AI Doc Convert", icon: FileText, color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" };
     case MODES.FILE_ANALYSIS:
@@ -475,7 +475,7 @@ const Chat = () => {
     if ((user.email && user.email.toLowerCase() === 'admin@uwo24.com') || (user.role === 'admin')) {
       setIsAdminUser(true);
       setIsPremiumUser(true);
-      setUserPlanName('AISA Admin');
+      setUserPlanName('AI LEGAL™ Admin');
       return; // Skip server subscription check for admin
     }
 
@@ -504,12 +504,12 @@ const Chat = () => {
     if (isPremiumUser === null) return true; // still loading, allow optimistically
 
     // Lock Video features for Free users
-    if (['Generate Video', 'Image to Video', 'Image to Video Magic'].includes(toolName)) {
+    if (['Generate Video', 'Image to Video', 'Image to Case Prediction'].includes(toolName)) {
       if (!isPremiumUser) {
         window.dispatchEvent(new CustomEvent('premium_required', {
           detail: {
             toolName,
-            customMessage: `Video features are locked for free users. Please subscribe to an active plan to unlock Text-to-Video and Image-to-Video Magic Cards.`
+            customMessage: `Video features are locked for free users. Please subscribe to an active plan to unlock Text-to-Video and Image-to-Case Prediction Cards.`
           }
         }));
         return false;
@@ -681,6 +681,7 @@ const Chat = () => {
   const [waUploading, setWaUploading] = useState(false);
   const [waMsgContent, setWaMsgContent] = useState('');
   const [isMagicEditing, setIsMagicEditing] = useState(false);
+  const [showScrollDownBtn, setShowScrollDownBtn] = useState(false);
   const [isMagicImageModalOpen, setIsMagicImageModalOpen] = useState(false);
 
   // ─── Global Parallel Generation Store Sync ───────────────────────────────
@@ -1410,7 +1411,7 @@ const Chat = () => {
 
     if (toolUpdates.mode) setCurrentMode(toolUpdates.mode);
 
-    toast.success(`AISA switched to ${suggestion.intent.replace('legal_', '').replace('_', ' ')}! ✨`);
+    toast.success(`AI LEGAL™ switched to ${suggestion.intent.replace('legal_', '').replace('_', ' ')}! ✨`);
 
     setIntentSuggestion(null);
     isDetectionPausedRef.current = true; // Don't re-detect immediately after switch
@@ -2032,7 +2033,7 @@ const Chat = () => {
           conversion: {
             file: mp3Base64,
             blobUrl: audioUrl,
-            fileName: `AISA_voice_${Date.now()}.mp3`,
+            fileName: `AI LEGAL™_voice_${Date.now()}.mp3`,
             mimeType: 'audio/mpeg',
             fileSize: formattedSize,
             rawSize: rawBytes,
@@ -2246,7 +2247,7 @@ const Chat = () => {
           const imageMessage = {
             id: tempId, // Keep same ID
             role: 'model',
-            content: `🖼️ ${data.message || 'Video generation limit reached. Generated a preview image instead.'}`,
+            content: `🖼️ ${data.message || 'Case Prediction limit reached. Generated a preview image instead.'}`,
             imageUrl: data.imageUrl,
             timestamp: new Date(),
           };
@@ -2267,7 +2268,7 @@ const Chat = () => {
           const imageMessage = {
             id: tempId,
             role: 'model',
-            content: `🖼️ ${error.response.data.message || 'Video generation failed. Generated preview.'}`,
+            content: `🖼️ ${error.response.data.message || 'Case Prediction failed. Generated preview.'}`,
             imageUrl: error.response.data.imageUrl,
             timestamp: new Date(),
           };
@@ -2323,13 +2324,13 @@ const Chat = () => {
         mode: MODES.IMAGE_GENERATION
       };
 
-      // Show a message that image generation is in progress
+      // Show a message that AI-powered legal research is in progress
       const tempId = (Date.now() + 1).toString();
       const newMessage = {
         id: tempId,
         role: 'model',
         isGenerating: true,
-        content: `✨ **AISA generating...**\n🎨 Generating high-quality poster from your prompt: "${prompt}"\n\nIntelligently refining text detection, placement, and cinematic styling...`, // Use content
+        content: `✨ **AI LEGAL™ generating...**\n🎨 Generating high-quality poster from your prompt: "${prompt}"\n\nIntelligently refining text detection, placement, and cinematic styling...`, // Use content
         timestamp: new Date(),
         projectId: currentProjectId,
         mode: MODES.IMAGE_GENERATION
@@ -2394,7 +2395,7 @@ const Chat = () => {
 
           // Save AI response to backend
           if (activeSessionId && activeSessionId !== 'new') {
-            chatStorageService.saveMessage(activeSessionId, imageMessage, null, currentProjectId).catch(err => console.error("Error saving image generation results:", err));
+            chatStorageService.saveMessage(activeSessionId, imageMessage, null, currentProjectId).catch(err => console.error("Error saving AI-powered legal research results:", err));
           }
         }
       } catch (error) {
@@ -3733,9 +3734,10 @@ const Chat = () => {
             }, 300);
           }
 
-          // Increased threshold (250px) to be less sensitive to minor scroll movements or large images
-          const isNearBottom = scrollHeight - scrollTop - clientHeight < 350;
+          // Precise threshold (15px) to determine if user is reading or at the bottom
+          const isNearBottom = scrollHeight - scrollTop - clientHeight < 15;
           shouldAutoScrollRef.current = isNearBottom;
+          setShowScrollDownBtn(!isNearBottom);
           ticking.current = false;
         });
         ticking.current = true;
@@ -3743,12 +3745,22 @@ const Chat = () => {
     }
   };
 
+  const handleScrollToBottom = () => {
+    shouldAutoScrollRef.current = true;
+    scrollToBottom(true, 'smooth');
+    setShowScrollDownBtn(false);
+  };
+
   const scrollToBottom = (force = false, behavior = 'auto') => {
     if (chatContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 350;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 15;
 
-      shouldAutoScrollRef.current = isNearBottom;
+      if (force) {
+        shouldAutoScrollRef.current = true;
+      } else {
+        shouldAutoScrollRef.current = isNearBottom;
+      }
 
       if (force || isNearBottom) {
         const maxScrollTop = Math.max(0, scrollHeight - clientHeight);
@@ -3762,7 +3774,8 @@ const Chat = () => {
   };
 
   useEffect(() => {
-    // Do NOT auto-scroll while AI is streaming text word-by-word
+    // Do NOT auto-scroll while AI is streaming
+    if (gen.isGenerating) return;
     if (isStreamingRef.current) return;
 
     // If we just loaded a case workspace, restore its scroll position
@@ -3775,7 +3788,7 @@ const Chat = () => {
     }
 
     scrollToBottom();
-  }, [messages, isLoading, caseId]);
+  }, [messages, isLoading, caseId, gen.isGenerating]);
 
   const handleNewChat = async () => {
     // Proactive Guest Limit Check for new session creation
@@ -3783,7 +3796,7 @@ const Chat = () => {
     if (!token && sessions.length >= 5) {
       window.dispatchEvent(new CustomEvent('login_required', {
         detail: {
-          toolName: 'AISA™ Unlimited Chat',
+          toolName: 'AI LEGAL™ Unlimited Legal Chat',
           customMessage: "You've reached the guest limit of 5 sessions. Please sign in to create more chat sessions!"
         }
       }));
@@ -3930,7 +3943,7 @@ const Chat = () => {
     // PER-CHAT LOCK & DEBOUNCE
     // Bypass lock for 'new' sessions to avoid cross-chat blocking during creation
     if (activeSessionId !== 'new' && (chatLock.locked || (now - chatLock.lastSentTime < 800))) {
-      console.warn(`[AISA] Message blocked: chat ${activeSessionId} is already sending.`);
+      console.warn(`[AI LEGAL™] Message blocked: chat ${activeSessionId} is already sending.`);
       return;
     }
 
@@ -4073,7 +4086,7 @@ const Chat = () => {
         if (activeSessionId === 'new' && sessions.length >= 5) {
           window.dispatchEvent(new CustomEvent('login_required', {
             detail: {
-              toolName: 'AISA™ Unlimited Chat',
+              toolName: 'AI LEGAL™ Unlimited Legal Chat',
               customMessage: "You've reached the guest limit of 5 sessions. Please sign in to create more chat sessions!"
             }
           }));
@@ -4087,7 +4100,7 @@ const Chat = () => {
         if (activeSessionId !== 'new' && userMsgCount >= 10) {
           window.dispatchEvent(new CustomEvent('login_required', {
             detail: {
-              toolName: 'AISA™ Unlimited Chat',
+              toolName: 'AI LEGAL™ Unlimited Legal Chat',
               customMessage: "You've reached the guest limit of 10 chats per session. Please sign in to continue this conversation!"
             }
           }));
@@ -4384,7 +4397,7 @@ const Chat = () => {
       }
 
 
-      // Handle Image Generation Mode
+      // Handle AI-Powered Legal Research Mode
       if (isImageGeneration || toolOverride === 'text_to_image') {
         await handleGenerateImage(contentToSend, activeSessionId);
         return;
@@ -4494,6 +4507,8 @@ const Chat = () => {
 
       const updatedMessages = messages.filter(m => !m.isSystemLog).concat(userMsg);
       setMessages(updatedMessages, activeSessionId);
+      // User sent a new message -> always auto-scroll
+      shouldAutoScrollRef.current = true;
       // Double-attempt auto-scroll for user message to ensure it handles layout changes correctly
       setTimeout(() => scrollToBottom(true, 'smooth'), 50);
       setTimeout(() => scrollToBottom(true, 'smooth'), 400);
@@ -4669,7 +4684,7 @@ const Chat = () => {
         const effectiveLang = (currentMode === 'LEGAL_TOOLKIT') ? toolkitLanguage : currentLang;
 
         const SYSTEM_INSTRUCTION = `
-You are AISA™, the official AI assistant of the AISA™ platform. Powered by A-Series.
+You are AI LEGAL™, the official AI assistant of the AI LEGAL™ platform. Powered by A-Series.
 ${activeAgent.category ? `Your specialization is in ${activeAgent.category}.` : ''}
 
 ${currentCase ? `
@@ -4687,14 +4702,14 @@ ${currentCase.importantDates && currentCase.importantDates.length > 0 ? `- **Imp
 ` : ''}
 
 ### CRITICAL BRAND RULE:
-Whenever a user mentions "AISA", "AISA AI", "AISA app", "your image", "your video", "AISA image", "AISA video", or refers to AISA in third person, you MUST interpret it as referring to THIS platform (AISA™ brand identity), not a generic artificial intelligence.
+Whenever a user mentions "AI LEGAL™", "AI LEGAL™", "AI LEGAL™ app", "your image", "your video", "AI LEGAL™ image", "AI LEGAL™ video", or refers to AI LEGAL™ in third person, you MUST interpret it as referring to THIS platform (AI LEGAL™ brand identity), not a generic artificial intelligence.
 
 ### SELF-REFERENCE DETECTION & CONTENT GENERATION:
 1. If user says:
-   - "Generate AISA image", "Create image of AISA", "Make AISA logo", "AISA ka photo banao", "AISA ka video generate karo", "Your intro video banao", "AISA introduction video"
-   → You must generate content representing the official AISA™ brand.
+   - "Generate AI LEGAL™ image", "Create image of AI LEGAL™", "Make AI LEGAL™ logo", "AI LEGAL™ ka photo banao", "AI LEGAL™ ka video generate karo", "Your intro video banao", "AI LEGAL™ introduction video"
+   → You must generate content representing the official AI LEGAL™ brand.
 
-2. AISA Brand Identity:
+2. AI LEGAL™ Brand Identity:
    - Futuristic AI assistant
    - Glowing blue/purple neural brain logo
    - Modern, premium, intelligent
@@ -4704,14 +4719,14 @@ Whenever a user mentions "AISA", "AISA AI", "AISA app", "your image", "your vide
 
 3. If user asks for:
    - Image → Generate/Ask for a brand-based promotional visual
-   - Video → Generate/Ask for a cinematic AI intro script for AISA™
+   - Video → Generate/Ask for a cinematic AI intro script for AI LEGAL™
    - Logo → Generate/Ask for a modern AI tech logo concept
    - Poster → Promotional marketing poster content
    - Reel → Social media promotional script
 
-4. Never treat “AISA” as a random AI. Always treat it as THIS official platform.
+4. Never treat “AI LEGAL™” as a random AI. Always treat it as THIS official platform.
 
-5. If user intent is unclear, ask: "Are you referring to the official AISA™ platform?"
+5. If user intent is unclear, ask: "Are you referring to the official AI LEGAL™ platform?"
 
 ${PERSONA_INSTRUCTION}
 
@@ -4849,6 +4864,32 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
 
         const suggestedAiId = `ai-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
 
+        // ── Create the AI bubble immediately with empty content ──
+        // Real content will stream in via onChunk → gen.setPartialResponse
+        const streamingMsgId = suggestedAiId;
+        const streamingMsg = {
+          id: streamingMsgId,
+          role: 'model',
+          content: '',
+          mode: detectedMode,
+          timestamp: Date.now(),
+          projectId: currentProjectId,
+        };
+        // Check if user is already at the bottom before generation starts
+        const container = chatContainerRef.current;
+        const isAtBottomBeforeGen = container ? (container.scrollHeight - container.scrollTop - container.clientHeight < 15) : true;
+        shouldAutoScrollRef.current = isAtBottomBeforeGen;
+
+        setMessages((prev) => [...prev, streamingMsg], activeSessionId);
+        setTypingMessageId(streamingMsgId);
+        gen.setPartialResponse('', streamingMsgId, activeSessionId);
+        setTimeout(() => scrollToBottom(true, 'smooth'), 50);
+
+        // ── Stream chunks from backend ──
+        const streamOnChunk = (chunk) => {
+          gen.appendToken(chunk, streamingMsgId, activeSessionId);
+        };
+
         const aiResponseData = await generateChatResponse(
           messages,
           userMsg.content,
@@ -4863,11 +4904,12 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
           userMsg.id,
           suggestedAiId,
           imageAspectRatio,
-          imageModelId
+          imageModelId,
+          streamOnChunk  // ← real streaming callback
         );
 
-        // Store it for usage in the typewriter loop
-        const apiResponseId = suggestedAiId;
+        // Store it for usage in the response finalization loop
+        const apiResponseId = streamingMsgId;
 
         // --- REAL-TIME TITLE SYNC ---
         if (aiResponseData && aiResponseData.title) {
@@ -4903,8 +4945,8 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
           // Trigger LoginRequiredModal with custom message
           window.dispatchEvent(new CustomEvent('login_required', {
             detail: {
-              toolName: 'AISA™ Unlimited Chat',
-              customMessage: "You've reached the guest limit of 5 sessions and 10 chats per session. Sign in to unlock unlimited chat, image generation, and more!"
+              toolName: 'AI LEGAL™ Unlimited Legal Chat',
+              customMessage: "You've reached the guest limit of 5 sessions and 10 chats per session. Sign in to unlock unlimited chat, AI-powered legal research, and more!"
             }
           }));
           setIsLoading(false);
@@ -4936,8 +4978,10 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
         if (typeof aiResponseData === 'string') {
           aiResponseText = aiResponseData;
         } else if (aiResponseData && typeof aiResponseData === 'object') {
+          // For streaming mode: reply is empty, actual text is in gen store partialResponse
+          const streamedText = useGenerationStore.getState().generations[activeSessionId]?.partialResponse || '';
           // Compatibility with both 'reply' and 'data' properties from backend
-          aiResponseText = aiResponseData.reply || aiResponseData.data || "No response generated.";
+          aiResponseText = streamedText || aiResponseData.reply || aiResponseData.data || "No response generated.";
           conversionData = aiResponseData.conversion || null;
           isRealTimeResponse = aiResponseData.isRealTime || false;
           responseSources = aiResponseData.sources || [];
@@ -4983,58 +5027,27 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
           dynamicSuggestionsPromise = generateFollowUpPrompts(userMsg.content, detectedMode || 'chat');
         }
 
-        // Process response parts and add to messages
+        // Process response parts and finalize messages
         for (let i = 0; i < responseParts.length; i++) {
           const partContent = responseParts[i];
           if (!partContent) continue;
 
           const msgId = (i === 0 && typeof apiResponseId !== 'undefined') ? apiResponseId : (Date.now() + 1 + i).toString();
-          const modelMsg = {
-            id: msgId,
-            role: 'model',
-            content: '', // Start empty for typewriter effect
-            mode: detectedMode, // Set mode for tag rendering
-            isRealTime: isRealTimeResponse,
-            sources: responseSources,
-            error: !!aiResponseData?.error, // Track if this is an error bubble
-            timestamp: Date.now() + i * 100,
-            projectId: currentProjectId,
-            conversion: conversionData,
-            imageUrl: aiImageUrl,
-            videoUrl: aiVideoUrl,
-            detectedMode: detectedMode // ✅ Store detected mode so download button shows correctly (ZIP vs PDF)
-          };
 
-          // Add the empty message structure to UI
-          setMessages((prev) => [...prev, modelMsg], activeSessionId);
-          setTypingMessageId(msgId); // Mark this message as typing (local)
-          // Synchronized via the typewriter loop below
-
-          // Typewriter effect simulation
-          const words = partContent.split(' ');
-          let displayedContent = '';
-
-          // Decide speed based on length (shorter = slower, longer = faster)
-          const delay = words.length > 200 ? 2 : (words.length > 50 ? 5 : 8);
-
-          // Typewriter effect simulation — lock auto-scroll during streaming
-          isStreamingRef.current = true;
-
-          for (let j = 0; j < words.length; j++) {
-            // Check if generation was stopped by user (local ref OR global abort)
-            const globalAborted = gen.getAbortSignal()?.aborted;
-            if (!chatLock.locked || globalAborted) break;
-
-            displayedContent += (j === 0 ? '' : ' ') + words[j];
-
-            // UI is updated via the Global Generation Sync effect in real-time
-            // Also sync partial content to global store so it persists when navigating away
-            gen.setPartialResponse(displayedContent, msgId, activeSessionId);
-
-            // Wait before next word (skip if tab is in background to prevent browser throttling)
-            if (!document.hidden) {
-              await new Promise(resolve => setTimeout(resolve, delay));
-            }
+          // For i>0: multi-file split response — add new bubbles
+          if (i > 0) {
+            const extraMsg = {
+              id: msgId,
+              role: 'model',
+              content: partContent,
+              mode: detectedMode,
+              isRealTime: isRealTimeResponse,
+              sources: responseSources,
+              timestamp: Date.now() + i * 100,
+              projectId: currentProjectId,
+              detectedMode: detectedMode
+            };
+            setMessages((prev) => [...prev, extraMsg], activeSessionId);
           }
 
           // Streaming done — unlock auto-scroll
@@ -5047,8 +5060,22 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
 
           setTypingMessageId(null); // Clear typing status
 
-          // Add conversion data and media if available
-          const finalModelMsg = { ...modelMsg, content: partContent };
+          // Build final message with all metadata
+          const finalModelMsg = {
+            id: msgId,
+            role: 'model',
+            content: partContent,
+            mode: detectedMode,
+            isRealTime: isRealTimeResponse,
+            sources: responseSources,
+            error: !!aiResponseData?.error,
+            timestamp: Date.now() + i * 100,
+            projectId: currentProjectId,
+            conversion: conversionData,
+            imageUrl: aiImageUrl,
+            videoUrl: aiVideoUrl,
+            detectedMode: detectedMode
+          };
           if (i === 0) {
             if (conversionData) finalModelMsg.conversion = conversionData;
             if (aiVideoUrl) finalModelMsg.videoUrl = aiVideoUrl;
@@ -5238,7 +5265,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
 
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = filename || 'AISA-download.png';
+      link.download = filename || 'AI LEGAL™-download.png';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -5304,6 +5331,11 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
 
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [editContent, setEditContent] = useState("");
+  const [isDraftEditorOpen, setIsDraftEditorOpen] = useState(false);
+  const [editorMessage, setEditorMessage] = useState(null);
+  const [editorContent, setEditorContent] = useState("");
+  const [editorTitle, setEditorTitle] = useState("");
+  const [editorTab, setEditorTab] = useState("edit"); // "edit" | "preview"
 
   // Feedback State
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -5311,7 +5343,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
   const [feedbackCategory, setFeedbackCategory] = useState([]);
   const [activeMessageId, setActiveMessageId] = useState(null);
   const [feedbackDetails, setFeedbackDetails] = useState("");
-  const [loadingText, setLoadingText] = useState("AISA is thinking..."); // New state for loading status text
+  const [loadingText, setLoadingText] = useState("AI LEGAL™ is thinking..."); // New state for loading status text
   const [messageFeedback, setMessageFeedback] = useState({}); // { [msgId]: { type: 'up' | 'down', categories: [], details: '' } }
   const [downloadedMessages, setDownloadedMessages] = useState({}); // Tracks which messages have been downloaded
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
@@ -5367,8 +5399,8 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
         try {
           await navigator.share({
             files: [file],
-            title: file.name || 'AISA Document',
-            text: 'Converted Document from AISA'
+            title: file.name || 'AI LEGAL™ Document',
+            text: 'Converted Document from AI LEGAL™'
           });
           return;
         } catch (err) {
@@ -5398,7 +5430,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
         }
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: 'application/pdf' });
-        const filename = msg.conversion.fileName || 'AISA Document.pdf';
+        const filename = msg.conversion.fileName || 'AI LEGAL™ Document.pdf';
         const file = new window.File([blob], filename, { type: 'application/pdf' });
 
         if (isPregeneration) {
@@ -5435,8 +5467,8 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
             try {
               await navigator.share({
                 files: [file],
-                title: 'AISA AI Response',
-                text: msg && msg.content ? `${msg.content.substring(0, 150)}...` : 'AISA Document output'
+                title: 'AI LEGAL™ Response',
+                text: msg && msg.content ? `${msg.content.substring(0, 150)}...` : 'AI LEGAL™ Document output'
               });
               toast.success("PDF sent to share menu!", { id: shareToastId });
             } catch (shareErr) {
@@ -5516,7 +5548,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
         header.style.fontSize = '12px';
         header.style.color = '#888';
         header.style.fontWeight = 'bold';
-        header.innerText = 'AISA AI RESPONSE';
+        header.innerText = 'AI LEGAL™ RESPONSE';
 
         tempWrapper.appendChild(header);
 
@@ -5679,7 +5711,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
       }
       // ===== END SMART SLICING =====
 
-      const filename = `AISA Document.pdf`;
+      const filename = `AI LEGAL™ Document.pdf`;
       const blob = pdf.output('blob');
       const file = new File([blob], filename, { type: 'application/pdf', lastModified: new Date().getTime() });
 
@@ -5737,8 +5769,8 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
           try {
             await navigator.share({
               files: [file],
-              title: 'AISA AI Response',
-              text: msg && msg.content ? `${msg.content.substring(0, 150)}...` : 'AISA Document output'
+              title: 'AI LEGAL™ Response',
+              text: msg && msg.content ? `${msg.content.substring(0, 150)}...` : 'AI LEGAL™ Document output'
             });
             if (processToastId) toast.success("PDF sent to share menu!", { id: processToastId });
           } catch (shareErr) {
@@ -5891,7 +5923,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = "AISA_Code_Project.zip";
+      a.download = "AI LEGAL™_Code_Project.zip";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -5934,7 +5966,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
       header.style.fontSize = '12px';
       header.style.color = '#888';
       header.style.fontWeight = 'bold';
-      header.innerText = 'AISA AI RESPONSE';
+      header.innerText = 'AI LEGAL™ RESPONSE';
 
       tempWrapper.appendChild(header);
 
@@ -6028,7 +6060,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
       toast.loading("Uploading PDF...", { id: toastId });
       const blob = pdf.output('blob');
       const formData = new FormData();
-      formData.append('pdf', blob, 'AISA Document.pdf');
+      formData.append('pdf', blob, 'AI LEGAL™ Document.pdf');
 
       const { BASE_URL } = await import('../types');
       const uploadRes = await axios.post(`${BASE_URL}/api/chat/upload-pdf`, formData, {
@@ -6043,7 +6075,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
 
       // 3. Show in-app WhatsApp contact picker modal
       setWaPdfUrl(pdfUrl);
-      setWaMsgContent(`🤖 *AISA AI Response*\n\nYeh dekho meri AISA se baat: ${pdfUrl}`);
+      setWaMsgContent(`🤖 *AI LEGAL™ Response*\n\nYeh dekho meri AI LEGAL™ se baat: ${pdfUrl}`);
       setWaPhone('');
       setWaShareModal(true);
 
@@ -6196,8 +6228,100 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
   };
 
   const startEditing = (msg) => {
-    setEditingMessageId(msg.id);
-    setEditContent(msg.content || msg.text || "");
+    if (msg.role === 'user') {
+      setEditingMessageId(msg.id);
+      setEditContent(msg.content || msg.text || "");
+    } else {
+      setEditorMessage(msg);
+      setEditorContent(msg.content || msg.text || "");
+      const activeToolId = selectedLegalTool?.id || new URLSearchParams(window.location.search).get('tool');
+      const details = activeToolId ? { title: "Draft Maker" } : { title: "Legal Draft" }; // fallback
+      const currentSession = sessions?.find(s => s.sessionId === sessionId);
+      setEditorTitle(currentSession?.title || details.title || "Legal Draft");
+      setIsDraftEditorOpen(true);
+      setEditorTab("edit");
+    }
+  };
+
+  const handleSaveEditorChanges = async () => {
+    if (!editorMessage) return;
+    const updatedMsg = { ...editorMessage, content: editorContent, text: editorContent, edited: true };
+    const editedMsgIndex = messages.findIndex(m => m.id === editorMessage.id);
+
+    if (editedMsgIndex !== -1) {
+      const updatedMessages = [...messages];
+      updatedMessages[editedMsgIndex] = updatedMsg;
+      setMessages(updatedMessages);
+      
+      try {
+        await chatStorageService.updateMessage(sessionId, updatedMsg);
+        toast.success("Draft updated successfully!");
+        setIsDraftEditorOpen(false);
+      } catch (e) {
+        console.error("Save edit error:", e);
+        toast.error("Failed to save changes");
+      }
+    }
+  };
+
+  const handleSaveAsNewDraft = async () => {
+    if (!editorMessage) return;
+    const newMsgId = (Date.now() + 1).toString();
+    const newAiMsg = {
+      id: newMsgId,
+      role: 'model',
+      content: editorContent,
+      timestamp: new Date(),
+      toolUsed: editorMessage.toolUsed || 'Draft Maker',
+      activeTool: editorMessage.activeTool || 'legal_draft_maker',
+      mode: editorMessage.mode || 'LEGAL_TOOLKIT',
+      edited: true
+    };
+
+    setMessages(prev => [...prev, newAiMsg]);
+
+    try {
+      await chatStorageService.saveMessage(sessionId, newAiMsg, null, currentProjectId);
+      toast.success("Saved as new draft version!");
+      setIsDraftEditorOpen(false);
+    } catch (e) {
+      console.error("Save as new draft error:", e);
+      toast.error("Failed to save as new draft");
+    }
+  };
+
+  const handleExportDoc = () => {
+    const htmlContent = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+      <head><title>${editorTitle}</title>
+      <style>
+        body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5; }
+        h1, h2, h3 { font-family: Arial, Helvetica, sans-serif; }
+        p { margin-bottom: 12pt; }
+      </style>
+      </head>
+      <body>
+        ${editorContent.split('\n').map(line => {
+          if (line.startsWith('# ')) return `<h1>${line.substring(2)}</h1>`;
+          if (line.startsWith('## ')) return `<h2>${line.substring(3)}</h2>`;
+          if (line.startsWith('### ')) return `<h3>${line.substring(4)}</h3>`;
+          if (line.startsWith('- ') || line.startsWith('* ')) return `<li>${line.substring(2)}</li>`;
+          if (line.match(/^\d+\.\s/)) return `<li>${line.replace(/^\d+\.\s/, '')}</li>`;
+          return `<p>${line}</p>`;
+        }).join('\n')}
+      </body>
+      </html>
+    `;
+    const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${editorTitle || 'Draft'}.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Word document downloaded!");
   };
 
   const saveEdit = async (msg) => {
@@ -6254,9 +6378,9 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
       await chatStorageService.truncateMessagesAfter(sessionId, msg.id);
 
       const SYSTEM_INSTRUCTION = `
-You are AISA, an advanced AI assistant.
+You are AI LEGAL™, an advanced AI assistant.
 IMAGE GENERATION CAPABILITIES:
-If the user asks for an image (e.g., "generate", "create", "draw", "show me a pic", "image dikhao", "photo bhejo", "pic do"), tell them to use the Image Generation mode via the Magic Tools button. Do NOT attempt to generate images inline.
+If the user asks for an image (e.g., "generate", "create", "draw", "show me a pic", "image dikhao", "photo bhejo", "pic do"), tell them to use the AI-Powered Legal Research mode via the Magic Tools button. Do NOT attempt to generate images inline.
 `;
 
       const aiResponseData = await generateChatResponse(
@@ -6701,11 +6825,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
           </div>
         )}
 
-
-
-
-
-
+        {showFloatingNavbar && <div className="h-[72px] sm:h-[96px] w-full shrink-0" />}
 
         {/* <button className="flex items-center gap-2 text-subtext hover:text-maintext text-sm">
               <Monitor className="w-4 h-4" />
@@ -6720,7 +6840,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
           onScroll={handleScroll}
           className={`relative flex-1 aisa-scalable-text chatgpt-container z-20 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent ${((currentMode === 'LEGAL_TOOLKIT' && !showFloatingNavbar) || location.pathname === '/dashboard/cases') ? 'no-top-padding' : ''} ${((legalView === 'DASHBOARD' || legalView === 'PRECEDENTS') && currentMode === 'LEGAL_TOOLKIT')
             ? 'z-[30] h-full w-full overflow-hidden flex flex-col bg-slate-50 min-h-0'
-            : `overflow-y-auto ${showFloatingNavbar ? 'pt-[72px] sm:mt-0 sm:pt-24' : (currentMode === 'LEGAL_TOOLKIT' || location.pathname === '/dashboard/cases' ? 'pt-4' : 'pt-[72px] sm:mt-0 sm:pt-[76px]')} lg:pt-6 pb-64 md:pb-72`
+            : 'overflow-y-auto pt-4 pb-64 md:pb-72'
             }`}
           style={{
             overflowY: ((legalView === 'DASHBOARD' || legalView === 'PRECEDENTS') && currentMode === 'LEGAL_TOOLKIT') ? 'hidden' : 'auto',
@@ -6757,7 +6877,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                   onUseInArgument={handleUseInArgument}
                 />
               </motion.div>
-            ) : (legalView === 'DASHBOARD' || (!currentCase && location.pathname === '/dashboard/cases')) && currentMode === 'LEGAL_TOOLKIT' && selectedLegalTool?.id === 'legal_my_case' ? (
+            ) : (location.pathname === '/dashboard/cases' || (legalView === 'DASHBOARD' && currentMode === 'LEGAL_TOOLKIT' && selectedLegalTool?.id === 'legal_my_case')) ? (
               <motion.div
                 key="legal-dashboard"
                 initial={{ opacity: 0 }}
@@ -6874,7 +6994,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                 </div>
                               ) : (
                                 <div className="w-8 h-8 rounded-full flex items-center justify-center">
-                                  <img src={logo} alt="AISA" className="w-6 h-[18px] object-cover object-top" />
+                                  <img src={logo} alt="AI LEGAL™" className="w-6 h-[18px] object-cover object-top" />
                                 </div>
                               )}
                             </div>
@@ -7060,13 +7180,12 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
 
 
 
-                                    {/* [READ MORE LOGIC]: For long messages, we show a truncate and read more option */}
                                     <div className="relative group/msg-content">
                                       {msg.id === typingMessageId && !msg.content ? (
                                         <Skeleton />
                                       ) : (
                                         <div className="flex flex-col">
-                                          <div className={`collapsible-container ${msg.content && msg.content.length > 350 && msg.id !== typingMessageId && !expandedMessages[msg.id] ? 'collapsed-message' : ''}`}>
+                                          <div className="collapsible-container">
                                             <ReactMarkdown
                                               className="select-text"
                                               remarkPlugins={[remarkGfm]}
@@ -7269,7 +7388,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                                           <div className="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/60 to-transparent z-10 flex justify-between items-center opacity-100 sm:opacity-0 sm:group-hover/img-container:opacity-100 transition-opacity duration-500 ease-in-out">
                                                             <div className="flex items-center gap-2">
                                                               <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-                                                              <span className="text-[10px] font-bold text-white uppercase tracking-widest">AISA™ Generated Asset</span>
+                                                              <span className="text-[10px] font-bold text-white uppercase tracking-widest">AI LEGAL™ Generated Asset</span>
                                                             </div>
                                                           </div>
                                                         )}
@@ -7279,8 +7398,9 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                                         />
                                                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover/img-container:opacity-100 transition-opacity duration-500 ease-in-out pointer-events-none" />
                                                       </div>
+                                                      
                                                       <button
-                                                        onClick={() => handleDownload(props.src, `AISA_gen_${Date.now()}.png`)}
+                                                        onClick={() => handleDownload(props.src, `AI LEGAL™_gen_${Date.now()}.png`)}
                                                         disabled={isDownloading}
                                                         className="absolute bottom-4 right-4 z-20 flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl border border-white/20 text-white shadow-lg transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 disabled:opacity-50"
                                                       >
@@ -7304,28 +7424,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                             </ReactMarkdown>
                                           </div>
 
-                                          {(msg.content || msg.text) && (msg.content || msg.text).length > 350 && msg.id !== typingMessageId && (
-                                            <div className="flex justify-start w-full mt-2">
-                                              <button
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  setExpandedMessages(prev => ({ ...prev, [msg.id]: !prev[msg.id] }));
-                                                }}
-                                                className="read-more-btn"
-                                                title={expandedMessages[msg.id] ? 'Show less' : 'Read full response'}
-                                                aria-expanded={!!expandedMessages[msg.id]}
-                                              >
-                                                <span className="read-more-btn__text">
-                                                  {expandedMessages[msg.id]
-                                                    ? 'Show less'
-                                                    : `Read Full Response ↓`}
-                                                </span>
-                                                <ChevronDown
-                                                  className={`read-more-btn__icon ${expandedMessages[msg.id] ? 'rotated' : ''}`}
-                                                />
-                                              </button>
-                                            </div>
-                                          )}
+                                          
                                         </div>
                                       )}
                                       {msg.cashflowData && (
@@ -7454,7 +7553,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                             disabled={isDownloadingUrl === msg.imageUrl}
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              handleDownload(msg.imageUrl, 'AISA-generated.png');
+                                              handleDownload(msg.imageUrl, 'AI LEGAL™-generated.png');
                                             }}
                                             className={`p-2.5 rounded-xl shadow-lg border border-white/20 flex items-center justify-center transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 ${isDownloadingUrl === msg.imageUrl ? 'bg-zinc-600 cursor-wait' : 'bg-primary text-white hover:bg-primary/90'}`}
                                             title="Download High-Res"
@@ -7599,7 +7698,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
 
                                                 {/* PDF / ZIP Tools */}
                                                 <div className="flex items-center gap-1 border-l border-zinc-200 dark:border-zinc-800 ml-1 pl-1">
-                                                  {(msg.mode === MODES.LEGAL_TOOLKIT || msg.toolUsed?.toLowerCase().startsWith('legal_') || msg.toolUsed?.toLowerCase().includes('legal') || msg.toolUsed === 'Draft Maker') && (
+                                                  {(msg.toolUsed === 'legal_draft_maker' || msg.toolUsed === 'Draft Maker' || (selectedLegalTool?.id === 'legal_draft_maker' && msg.role !== 'user')) && (
                                                     <button
                                                       onClick={() => startEditing(msg)}
                                                       className="text-primary hover:text-primary transition-all p-1 hover:bg-primary/5 rounded flex items-center gap-1 active:scale-95 group/edit"
@@ -7871,12 +7970,12 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                   </>
 
                 )}
-                {gen.isGenerating && !gen.typingMessageId && (
+                {gen.isGenerating && !gen.typingMessageId && !typingMessageId && (
                   <div className="chatgpt-message-row ai-row group mb-6 sm:mb-8">
                     <div className="chatgpt-message-content select-text">
                       <div className="chatgpt-avatar-container w-8 h-8 rounded-full flex items-center justify-center shrink-0">
                         <div className="w-8 h-8 rounded-full flex items-center justify-center">
-                          <img src={logo} alt="AISA" className="w-6 h-[18px] object-cover object-top" />
+                          <img src={logo} alt="AI LEGAL™" className="w-6 h-[18px] object-cover object-top" />
                         </div>
                       </div>
                       <div className="chatgpt-text typing-bubble flex items-center">
@@ -7910,7 +8009,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
 
         {/* Welcome Screen - Integrated Hub */}
         <AnimatePresence>
-          {messages.length === 0 && !isSessionLoading && !isHydrating &&
+          {messages.length === 0 && !isSessionLoading && !isHydrating && location.pathname !== '/dashboard/cases' && !location.pathname.startsWith('/dashboard/case/') &&
             !currentCase &&
             (!currentProjectId || currentProjectId === 'default' || currentProjectId === 'all') &&
             currentMode !== 'LEGAL_TOOLKIT' && !activeLegalToolkit && !selectedLegalTool && !new URLSearchParams(window.location.search).get('tool') && (
@@ -7964,7 +8063,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                       }
 
                       if (id === 'image') {
-                        if (!checkPremiumTool('Image Generation')) return;
+                        if (!checkPremiumTool('AI-Powered Legal Research')) return;
                         setIsImageGeneration(true);
                         setActiveTool('image');
                         if (inputRef.current) { inputRef.current.focus(); }
@@ -7982,13 +8081,13 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                         if (inputRef.current) { inputRef.current.focus(); }
                         toast.success("Audio Mode Active");
                       } else if (id === 'code') {
-                        if (!checkPremiumTool('Code Writer')) return;
+                        if (!checkPremiumTool('Draft Maker')) return;
                         setIsCodeWriter(true);
                         setActiveTool('code');
                         if (inputRef.current) { inputRef.current.focus(); }
                         toast.success("Code Mode Active");
                       } else if (id === 'deep_search') {
-                        if (!checkPremiumTool('Deep Search')) return;
+                        if (!checkPremiumTool('Precedents Search & Citations')) return;
                         setIsDeepSearch(true);
                         setActiveTool('deep_search');
                         if (inputRef.current) { inputRef.current.focus(); }
@@ -8058,7 +8157,21 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
           <div className={`absolute bottom-0 left-0 right-0 z-[1001] pointer-events-none aisa-chat-input-container ${(tglState.sidebarOpen && window.innerWidth < 1024) ? 'hidden' : ''}`}>
             {/* Background solid layer to hide text scrolling behind/below input */}
             <div className="relative z-20 bg-slate-50 dark:bg-[#0b0c15] sm:bg-white sm:dark:bg-[#0b0c15]" style={{ padding: '0.5rem 1rem calc(1.75rem + env(safe-area-inset-bottom, 0px)) 1rem' }}>
-              <div className="max-w-4xl mx-auto w-full pointer-events-auto">
+              <div className="max-w-4xl mx-auto w-full pointer-events-auto relative">
+              <AnimatePresence>
+                {showScrollDownBtn && (
+                  <motion.button
+                    type="button"
+                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                    onClick={handleScrollToBottom}
+                    className="absolute left-1/2 -translate-x-1/2 -top-12 z-[1050] w-9 h-9 bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 rounded-full flex items-center justify-center shadow-lg border border-slate-200/60 dark:border-zinc-700 transition-all hover:scale-105 active:scale-95 pointer-events-auto"
+                  >
+                    <ArrowDown size={18} />
+                  </motion.button>
+                )}
+              </AnimatePresence>
 
 
                 <form
@@ -8266,11 +8379,11 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                           <div className="px-6 py-5 bg-slate-50/50 dark:bg-white/5 border-b border-slate-200/50 dark:border-white/5 shrink-0">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden border border-primary/20 shadow-inner">
-                                <img src={logo} alt="AISA" className="w-8 h-5.5 object-cover object-top" />
+                                <img src={logo} alt="AI LEGAL™" className="w-8 h-5.5 object-cover object-top" />
                               </div>
                               <div>
                                 <h3 className="text-[17px] font-black text-slate-800 dark:text-white uppercase tracking-tight leading-none">
-                                  AISA ™ Magic Tools
+                                  AI LEGAL™ ™ Magic Tools
                                 </h3>
                                 <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mt-1 uppercase tracking-widest">Advanced Suite</p>
                               </div>
@@ -8282,7 +8395,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                             <button
                               type="button"
                               onClick={() => {
-                                if (!checkPremiumTool('Generate Image')) return;
+                                if (!checkPremiumTool('AI-Powered Legal Research')) return;
                                 setIsToolsMenuOpen(false);
                                 const newMode = !isImageGeneration;
                                 setIsImageGeneration(newMode);
@@ -8293,7 +8406,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                 setIsCodeWriter(false);
                                 if (newMode) {
                                   setActiveTool('image');
-                                  toast.success("Image Generation Mode Enabled");
+                                  toast.success("AI-Powered Legal Research Mode Enabled");
                                 } else {
                                   setActiveTool(null);
                                 }
@@ -8305,8 +8418,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
-                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Generate Image</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
+                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">AI-Powered Legal Research</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Create unique AI art from your text.</p>
                               </div>
@@ -8338,7 +8451,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Generate Video</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Convert scenes into dynamic videos.</p>
@@ -8371,7 +8484,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Web Search</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Fast and accurate web queries.</p>
@@ -8381,7 +8494,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                             <button
                               type="button"
                               onClick={() => {
-                                if (!checkPremiumTool('Deep Search')) return;
+                                if (!checkPremiumTool('Precedents Search & Citations')) return;
                                 setIsToolsMenuOpen(false);
                                 setIsDeepSearch(!isDeepSearch);
                                 setIsWebSearch(false);
@@ -8392,7 +8505,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                 setIsCodeWriter(false);
                                 if (!isDeepSearch) {
                                   setActiveTool('deep_search');
-                                  toast.success("Deep Search Mode Enabled");
+                                  toast.success("Precedents Search & Citations Mode Enabled");
                                 } else {
                                   setActiveTool(null);
                                 }
@@ -8404,8 +8517,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
-                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Deep Search</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
+                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Precedents Search & Citations</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">In-depth analysis and data mining.</p>
                               </div>
@@ -8436,7 +8549,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Convert to Audio</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Natural-sounding text-to-speech.</p>
@@ -8471,7 +8584,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Convert Documents</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Format conversion and text extraction.</p>
@@ -8481,7 +8594,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                             <button
                               type="button"
                               onClick={() => {
-                                if (!checkPremiumTool('Code Writer')) return;
+                                if (!checkPremiumTool('Draft Maker')) return;
                                 setIsToolsMenuOpen(false);
                                 setIsCodeWriter(!isCodeWriter);
                                 setIsDeepSearch(false);
@@ -8493,7 +8606,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                 setIsMagicEditing(false);
                                 if (!isCodeWriter) {
                                   setActiveTool('code');
-                                  toast.success("Code Writer Mode Enabled");
+                                  toast.success("Draft Maker Mode Enabled");
                                 } else {
                                   setActiveTool(null);
                                 }
@@ -8505,8 +8618,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
-                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Code Writer</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
+                                  <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Draft Maker</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Generate multi-language code snippets.</p>
                               </div>
@@ -8549,7 +8662,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Edit Image</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Magic Image Editor.</p>
@@ -8587,7 +8700,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">AI CashFlow</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Live Analysis & Reports.</p>
@@ -8632,7 +8745,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">AI Legal</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">{t('aiLegalToolsCount')}</p>
@@ -8654,7 +8767,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">Image to Video</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Animate your images with AI magic.</p>
@@ -8678,7 +8791,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-0.5">
-                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AISA ™</span>
+                                  <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™ ™</span>
                                   <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">AIADS™</span>
                                 </div>
                                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Automate 30 days of social media content.</p>
@@ -8720,7 +8833,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                             setIsAttachMenuOpen(false);
                           }}
                           className="w-[32px] h-[32px] rounded-full flex items-center justify-center bg-slate-50 dark:bg-zinc-800 text-slate-500 hover:text-primary transition-all border border-slate-200/50 dark:border-zinc-700/50 shadow-sm relative z-[1003]"
-                          title="AISA ™ Magic Tools"
+                          title="AI LEGAL™ ™ Magic Tools"
                         >
                           <Brain className="w-5 h-5" />
                         </motion.button>
@@ -8788,7 +8901,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                     <div className="w-5 h-5 rounded-lg bg-primary dark:bg-primary flex items-center justify-center shadow-lg shadow-primary/40 text-white">
                                       <Search size={14} strokeWidth={3} />
                                     </div>
-                                    <span className="uppercase tracking-widest text-[9px] font-black">Deep Search</span>
+                                    <span className="uppercase tracking-widest text-[9px] font-black">Precedents Search & Citations</span>
                                   </div>
                                   <button
                                     type="button"
@@ -8825,7 +8938,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                   >
                                     <span className="text-[10px] font-extrabold opacity-90">{imageAspectRatio}</span>
                                     <span className="text-[10px] font-black truncate max-w-[60px] sm:max-w-[100px] tracking-tight">
-                                      {TOOL_PRICING.image.models.find(m => m.id === imageModelId)?.name.replace('AISA ', '') || 'Model'}
+                                      {TOOL_PRICING.image.models.find(m => m.id === imageModelId)?.name.replace('AI LEGAL™ ', '') || 'Model'}
 
                                     </span>
                                     <ChevronDown size={11} className={`transition-transform duration-300 ${isMagicSettingsOpen ? 'rotate-180' : ''}`} />
@@ -8928,7 +9041,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               )}
                               {isCodeWriter && (
                                 <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold border border-transparent backdrop-blur-md whitespace-nowrap shrink-0">
-                                  <Code size={12} strokeWidth={3} /> <span>Code Writer</span>
+                                  <Code size={12} strokeWidth={3} /> <span>Draft Maker</span>
                                   <button onClick={() => { setIsCodeWriter(false); setActiveTool(null); }} className="ml-1 hover:text-primary/80"><X size={12} /></button>
                                 </motion.div>
                               )}
@@ -9019,7 +9132,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                   >
                                     <span className="text-[10px] font-extrabold opacity-90">{imageAspectRatio}</span>
                                     <span className="text-[10px] font-black truncate max-w-[60px] sm:max-w-[100px] tracking-tight">
-                                      {TOOL_PRICING.image.models.find(m => m.id === imageModelId)?.name.replace('AISA ', '') || 'Model'}
+                                      {TOOL_PRICING.image.models.find(m => m.id === imageModelId)?.name.replace('AI LEGAL™ ', '') || 'Model'}
                                     </span>
                                     <ChevronDown size={11} className={`transition-transform duration-300 ${isMagicSettingsOpen ? 'rotate-180' : ''}`} />
                                   </button>
@@ -9218,6 +9331,186 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
       </AnimatePresence>
 
       <LoginRequiredModal />
+
+      {/* Draft Editor Modal */}
+      <Transition appear show={isDraftEditorOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-[1100]" onClose={() => setIsDraftEditorOpen(false)}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-xs" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-0 sm:p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full h-full sm:h-[90vh] sm:w-[90vw] sm:max-w-6xl bg-[#f8fafc] dark:bg-[#090b11] text-left align-middle shadow-2xl transition-all flex flex-col overflow-hidden sm:rounded-3xl border border-slate-200/50 dark:border-zinc-800/60">
+                  
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-6 py-4 bg-white dark:bg-[#0d0e16] border-b border-slate-200/60 dark:border-zinc-800/60 shrink-0">
+                    <div className="flex items-center gap-3 flex-1 min-w-0 mr-4">
+                      <input
+                        type="text"
+                        value={editorTitle}
+                        onChange={(e) => setEditorTitle(e.target.value)}
+                        className="text-lg font-black text-slate-800 dark:text-zinc-100 bg-transparent border-b border-transparent hover:border-slate-300 dark:hover:border-zinc-700 focus:border-primary focus:outline-none px-1 py-0.5 truncate flex-1 max-w-md cursor-text"
+                        title="Click to rename document"
+                        placeholder="Document Title"
+                      />
+                      <span className="aisa-badge-small shrink-0 !bg-primary/10 !text-primary !border !border-primary/20 !font-extrabold !px-2.5 !py-0.5 !rounded-full">
+                        Draft Maker
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      {/* Tabs */}
+                      <div className="flex bg-slate-100 dark:bg-zinc-800/80 p-0.5 rounded-xl border border-slate-200/30 dark:border-zinc-700/30">
+                        <button
+                          type="button"
+                          onClick={() => setEditorTab("edit")}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${editorTab === "edit" ? "bg-white dark:bg-zinc-700 text-slate-800 dark:text-white shadow-xs" : "text-slate-500 hover:text-slate-700 dark:text-zinc-400"}`}
+                        >
+                          <FileText className="w-3.5 h-3.5 text-primary" />
+                          <span>Edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditorTab("preview")}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${editorTab === "preview" ? "bg-white dark:bg-zinc-700 text-slate-800 dark:text-white shadow-xs" : "text-slate-500 hover:text-slate-700 dark:text-zinc-400"}`}
+                        >
+                          <Eye className="w-3.5 h-3.5 text-[#10b981]" />
+                          <span>Live Preview</span>
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsDraftEditorOpen(false)}
+                        className="p-1.5 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-400 hover:text-slate-600 rounded-full transition-colors cursor-pointer"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Body */}
+                  <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center bg-slate-50 dark:bg-[#07080d] select-text">
+                    <div className="w-full max-w-4xl min-h-full flex flex-col bg-white dark:bg-[#0d0e16] border border-slate-200/50 dark:border-zinc-800/40 shadow-md sm:rounded-2xl overflow-hidden p-6 sm:p-12 md:p-16 select-text">
+                      {editorTab === "edit" ? (
+                        <textarea
+                          value={editorContent}
+                          onChange={(e) => setEditorContent(e.target.value)}
+                          className="w-full h-full bg-transparent border-0 focus:ring-0 outline-none focus:outline-none text-slate-800 dark:text-zinc-100 font-serif text-[16px] sm:text-[18px] leading-[1.8] resize-none overflow-y-visible placeholder-slate-400 select-text"
+                          placeholder="Write your legal draft here..."
+                          style={{ minHeight: '100%', height: 'auto' }}
+                        />
+                      ) : (
+                        <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-slate-800 dark:text-zinc-100 select-text leading-[1.8] font-serif">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            urlTransform={(value) => value}
+                          >
+                            {editorContent || "*No content to preview*"}
+                          </ReactMarkdown>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 bg-white dark:bg-[#0d0e16] border-t border-slate-200/60 dark:border-zinc-800/60 shrink-0">
+                    {/* Left side actions (Export) */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mr-2">Export:</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const tempMsg = { ...editorMessage, content: editorContent };
+                          handlePdfAction('download', tempMsg);
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-500/10 rounded-xl transition-all border border-red-500/20 cursor-pointer"
+                        title="Download as PDF"
+                      >
+                        <FileIcon className="w-3.5 h-3.5" />
+                        <span>PDF Report</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleExportDoc}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-500/10 rounded-xl transition-all border border-blue-500/20 cursor-pointer"
+                        title="Download as Microsoft Word"
+                      >
+                        <FileText className="w-3.5 h-3.5" />
+                        <span>Word (.doc)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const blob = new Blob([editorContent], { type: 'text/plain;charset=utf-8' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `${editorTitle || 'Draft'}.txt`;
+                          document.body.appendChild(a);
+                          a.click();
+                          document.body.removeChild(a);
+                          URL.revokeObjectURL(url);
+                          toast.success("Text file downloaded!");
+                        }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-zinc-300 hover:bg-slate-500/10 rounded-xl transition-all border border-slate-500/20 cursor-pointer"
+                        title="Download as Plain Text"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Plain Text</span>
+                      </button>
+                    </div>
+
+                    {/* Right side actions (Save) */}
+                    <div className="flex items-center gap-3 justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setIsDraftEditorOpen(false)}
+                        className="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveAsNewDraft}
+                        className="px-4 py-2 border border-primary/30 text-primary hover:bg-primary/5 rounded-full text-sm font-bold transition-all cursor-pointer"
+                      >
+                        Save as New Draft
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveEditorChanges}
+                        className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-full text-sm font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+                      >
+                        Save Changes
+                      </button>
+                    </div>
+                  </div>
+
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
 
       {/* Feedback Modal */}
       <Transition appear show={feedbackOpen} as={Fragment}>

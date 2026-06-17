@@ -4,11 +4,11 @@ export const COOKIE_POLICY_DEFAULTS = [
         content: [
             {
                 subtitle: "Definition",
-                text: "Cookies are small text files that are placed on your device when you visit our website. They help us recognize you, remember your preferences, and provide a personalized experience on AISA™."
+                text: "Cookies are small text files that are placed on your device when you visit our website. They help us recognize you, remember your preferences, and provide a personalized experience on AI LEGAL™."
             },
             {
                 subtitle: "How We Use Them",
-                text: "We use cookies and similar technologies to maintain your login session, remember your language and theme preferences, and analyze how you interact with our platform to improve our services on AISA™."
+                text: "We use cookies and similar technologies to maintain your login session, remember your language and theme preferences, and analyze how you interact with our platform to improve our services on AI LEGAL™."
             },
             {
                 subtitle: "Cookie Duration",
@@ -21,7 +21,7 @@ export const COOKIE_POLICY_DEFAULTS = [
         content: [
             {
                 subtitle: "Essential Cookies (Required)",
-                text: "These cookies are necessary for AISA™ to function properly. They enable core features like user authentication, session management, and security. You cannot opt out of essential cookies."
+                text: "These cookies are necessary for AI LEGAL™ to function properly. They enable core features like user authentication, session management, and security. You cannot opt out of essential cookies."
             },
             {
                 subtitle: "Preference Cookies",
@@ -42,7 +42,7 @@ export const COOKIE_POLICY_DEFAULTS = [
         content: [
             {
                 subtitle: "Chat Session Storage",
-                text: "Your chat conversations with AISA™ are stored in your browser's local storage for quick access and offline capability. This allows you to resume conversations and view chat history without delays."
+                text: "Your chat conversations with AI LEGAL™ are stored in your browser's local storage for quick access and offline capability. This allows you to resume conversations and view chat history without delays."
             },
             {
                 subtitle: "User Preferences",
@@ -71,7 +71,7 @@ export const COOKIE_POLICY_DEFAULTS = [
             },
             {
                 subtitle: "Payment Processors",
-                text: "When you subscribe to AISA™, our payment partners may use cookies to process transactions securely and prevent fraud."
+                text: "When you subscribe to AI LEGAL™, our payment partners may use cookies to process transactions securely and prevent fraud."
             },
             {
                 subtitle: "Third-Party Control",
@@ -84,7 +84,7 @@ export const COOKIE_POLICY_DEFAULTS = [
         content: [
             {
                 subtitle: "Browser Controls",
-                text: "Most browsers allow you to control cookies through settings. You can block, delete, or receive warnings about cookies. Note that blocking essential cookies may prevent AISA™ from functioning properly."
+                text: "Most browsers allow you to control cookies through settings. You can block, delete, or receive warnings about cookies. Note that blocking essential cookies may prevent AI LEGAL™ from functioning properly."
             },
             {
                 subtitle: "Opt-Out Options",
@@ -113,11 +113,11 @@ export const COOKIE_POLICY_DEFAULTS = [
             },
             {
                 subtitle: "Platform Cookie Settings",
-                text: "Access your AISA™ cookie preferences from Profile > Settings > Privacy & Data > Cookie Preferences. Here you can enable/disable optional cookies and view which cookies are active."
+                text: "Access your AI LEGAL™ cookie preferences from Profile > Settings > Privacy & Data > Cookie Preferences. Here you can enable/disable optional cookies and view which cookies are active."
             },
             {
                 subtitle: "Impact of Disabling Cookies",
-                text: "Disabling cookies may limit your experience on AISA™. You may not be able to stay logged in, your preferences won't be saved, and some features may not work as intended."
+                text: "Disabling cookies may limit your experience on AI LEGAL™. You may not be able to stay logged in, your preferences won't be saved, and some features may not work as intended."
             }
         ]
     }
@@ -129,11 +129,11 @@ export const TERMS_OF_SERVICE_DEFAULTS = [
         content: [
             {
                 subtitle: "Agreement to Terms",
-                text: "By accessing or using AISA™, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using this service."
+                text: "By accessing or using AI LEGAL™, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using this service."
             },
             {
                 subtitle: "Eligibility",
-                text: "You must be at least 18 years old or the legal age in your country to use AISA™. Users under the legal age must have permission from a parent or guardian. By using our services, you represent and warrant that you meet this age requirement and have the legal capacity to enter into these terms."
+                text: "You must be at least 18 years old or the legal age in your country to use AI LEGAL™. Users under the legal age must have permission from a parent or guardian. By using our services, you represent and warrant that you meet this age requirement and have the legal capacity to enter into these terms."
             },
             {
                 subtitle: "Account Registration",
@@ -146,7 +146,7 @@ export const TERMS_OF_SERVICE_DEFAULTS = [
         content: [
             {
                 subtitle: "Permitted Use",
-                text: "AISA™ provides AI-powered intelligent assistance through specialized agents. You may use our services for lawful purposes including business operations, creative work, research, and personal productivity."
+                text: "AI LEGAL™ provides AI-powered intelligent assistance through specialized agents. You may use our services for lawful purposes including business operations, creative work, research, and personal productivity."
             },
             {
                 subtitle: "AI Agent Interactions",
@@ -154,7 +154,7 @@ export const TERMS_OF_SERVICE_DEFAULTS = [
             },
             {
                 subtitle: "Multimodal Features",
-                text: "You may interact with AISA™ via text, voice, and vision inputs. By using these features, you grant us the right to process your inputs to generate AI responses. Content is processed securely on AISA™ and in accordance with our Privacy Policy."
+                text: "You may interact with AI LEGAL™ via text, voice, and vision inputs. By using these features, you grant us the right to process your inputs to generate AI responses. Content is processed securely on AI LEGAL™ and in accordance with our Privacy Policy."
             },
             {
                 subtitle: "Prohibited Activities",
@@ -167,7 +167,7 @@ export const TERMS_OF_SERVICE_DEFAULTS = [
         content: [
             {
                 subtitle: "Subscription Plans",
-                text: "AISA™ operates on a flexible subscription model. You can subscribe to individual AI agents or bundled plans. Pricing and plan details are available on our website and may change with notice."
+                text: "AI LEGAL™ operates on a flexible subscription model. You can subscribe to individual AI agents or bundled plans. Pricing and plan details are available on our website and may change with notice."
             },
             {
                 subtitle: "Billing & Payments",
@@ -188,19 +188,19 @@ export const TERMS_OF_SERVICE_DEFAULTS = [
         content: [
             {
                 subtitle: "Our Content",
-                text: "All content, features, and functionality on AISA™, including but not limited to text, graphics, logos, AI models, and software, are owned by us or our licensors and protected by intellectual property laws."
+                text: "All content, features, and functionality on AI LEGAL™, including but not limited to text, graphics, logos, AI models, and software, are owned by us or our licensors and protected by intellectual property laws."
             },
             {
                 subtitle: "User Content",
-                text: "You retain ownership of content you input into AISA™. However, you grant us a worldwide, non-exclusive license to use, process, and store your content solely to provide and improve our services."
+                text: "You retain ownership of content you input into AI LEGAL™. However, you grant us a worldwide, non-exclusive license to use, process, and store your content solely to provide and improve our services."
             },
             {
                 subtitle: "AI-Generated Content",
-                text: "Content generated by AISA™ in response to your queries is provided to you for your use. We do not claim ownership of AI-generated outputs, but you acknowledge that similar outputs may be generated for other users."
+                text: "Content generated by AI LEGAL™ in response to your queries is provided to you for your use. We do not claim ownership of AI-generated outputs, but you acknowledge that similar outputs may be generated for other users."
             },
             {
                 subtitle: "Trademark",
-                text: "AISA™, our logo, and related marks are trademarks of our company. You may not use these marks without our prior written permission."
+                text: "AI LEGAL™, our logo, and related marks are trademarks of our company. You may not use these marks without our prior written permission."
             }
         ]
     },
@@ -209,23 +209,23 @@ export const TERMS_OF_SERVICE_DEFAULTS = [
         content: [
             {
                 subtitle: "AI Generated Content Disclaimer",
-                text: "AISA™ provides responses generated by artificial intelligence. AI outputs may contain inaccuracies, outdated information, or errors. Users must verify important information before relying on AI-generated responses. AISA™ is not responsible for decisions made based on AI outputs."
+                text: "AI LEGAL™ provides responses generated by artificial intelligence. AI outputs may contain inaccuracies, outdated information, or errors. Users must verify important information before relying on AI-generated responses. AI LEGAL™ is not responsible for decisions made based on AI outputs."
             },
             {
                 subtitle: "Service Availability",
-                text: "We strive to provide reliable services but do not guarantee uninterrupted availability. Services may be updated, modified, or discontinued at any time. AISA™ is provided 'as is' and 'as available' without warranties of any kind, express or implied."
+                text: "We strive to provide reliable services but do not guarantee uninterrupted availability. Services may be updated, modified, or discontinued at any time. AI LEGAL™ is provided 'as is' and 'as available' without warranties of any kind, express or implied."
             },
             {
                 subtitle: "AI Accuracy",
-                text: "While our AISA™ AI models are advanced and continually improving, we do not guarantee the accuracy, completeness, or reliability of AI-generated responses. You should verify important information independently."
+                text: "While our AI LEGAL™ AI models are advanced and continually improving, we do not guarantee the accuracy, completeness, or reliability of AI-generated responses. You should verify important information independently."
             },
             {
                 subtitle: "No Professional Advice",
-                text: "AISA™ does not provide legal, medical, financial, or other professional advice. AI-generated content is for informational purposes only and should not replace consultation with qualified professionals."
+                text: "AI LEGAL™ does not provide legal, medical, financial, or other professional advice. AI-generated content is for informational purposes only and should not replace consultation with qualified professionals."
             },
             {
                 subtitle: "Limitation of Liability",
-                text: "AISA™ is provided 'as is' without warranties. To the maximum extent permitted by law, AISA™ is not liable for damages, data loss, or decisions made using AI outputs, even if advised of the possibility of such damages."
+                text: "AI LEGAL™ is provided 'as is' without warranties. To the maximum extent permitted by law, AI LEGAL™ is not liable for damages, data loss, or decisions made using AI outputs, even if advised of the possibility of such damages."
             }
         ]
     },
@@ -258,11 +258,11 @@ export const PRIVACY_POLICY_DEFAULTS = [
         content: [
             {
                 subtitle: "Account Information",
-                text: "When you create an AISA™ account, we collect your name, email address, and authentication credentials to provide you with personalized AI assistance."
+                text: "When you create an AI LEGAL™ account, we collect your name, email address, and authentication credentials to provide you with personalized AI assistance."
             },
             {
                 subtitle: "Usage Data",
-                text: "We collect information about your interactions with our AISA™ AI agents, including chat sessions, queries, and preferences to improve your experience and our services."
+                text: "We collect information about your interactions with our AI LEGAL™ AI agents, including chat sessions, queries, and preferences to improve your experience and our services."
             },
             {
                 subtitle: "Multimodal Content",
@@ -279,11 +279,11 @@ export const PRIVACY_POLICY_DEFAULTS = [
         content: [
             {
                 subtitle: "Service Delivery",
-                text: "We use your data to provide contextual, intelligent AI responses, maintain chat history, and personalize your experience across all AISA™ features."
+                text: "We use your data to provide contextual, intelligent AI responses, maintain chat history, and personalize your experience across all AI LEGAL™ features."
             },
             {
                 subtitle: "Product Improvement",
-                text: "Your interactions help us enhance our AISA™ AI models, develop new features, and ensure high-quality reasoning and contextual understanding."
+                text: "Your interactions help us enhance our AI LEGAL™ AI models, develop new features, and ensure high-quality reasoning and contextual understanding."
             },
             {
                 subtitle: "Communication",
@@ -300,7 +300,7 @@ export const PRIVACY_POLICY_DEFAULTS = [
         content: [
             {
                 subtitle: "End-to-End Encryption",
-                text: "All communications between you and AISA™ are protected with enterprise-grade encryption to ensure complete privacy and data integrity."
+                text: "All communications between you and AI LEGAL™ are protected with enterprise-grade encryption to ensure complete privacy and data integrity."
             },
             {
                 subtitle: "Isolated Environments",
@@ -308,7 +308,7 @@ export const PRIVACY_POLICY_DEFAULTS = [
             },
             {
                 subtitle: "Secure Storage",
-                text: "Your data is stored on enterprise-grade AISA™ servers with strict access controls, regular security audits, and automated backup systems."
+                text: "Your data is stored on enterprise-grade AI LEGAL™ servers with strict access controls, regular security audits, and automated backup systems."
             },
             {
                 subtitle: "Data Retention",
@@ -325,7 +325,7 @@ export const PRIVACY_POLICY_DEFAULTS = [
             },
             {
                 subtitle: "AI Model Providers",
-                text: "We use advanced AI models to power AISA™. Your queries are processed securely, and no personal identifiable information is shared without encryption."
+                text: "We use advanced AI models to power AI LEGAL™. Your queries are processed securely, and no personal identifiable information is shared without encryption."
             },
             {
                 subtitle: "Service Providers",
@@ -371,7 +371,7 @@ export const PRIVACY_POLICY_DEFAULTS = [
             },
             {
                 subtitle: "Local Storage",
-                text: "Chat sessions and preferences are stored in your browser's local storage for quick access and AISA™ offline capabilities."
+                text: "Chat sessions and preferences are stored in your browser's local storage for quick access and AI LEGAL™ offline capabilities."
             },
             {
                 subtitle: "Cookie Management",

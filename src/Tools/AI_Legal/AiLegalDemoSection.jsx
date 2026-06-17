@@ -32,7 +32,7 @@ const LEGAL_STEPS = [
     glow: 'rgba(129,140,248,0.4)',
     bgAccent: 'rgba(30,58,138,0.3)',
     steps: [
-      { from: 'user', text: 'Hey AISA, please analyze my new Service Agreement for risks.' },
+      { from: 'user', text: 'Hey AI LEGAL™, please analyze my new Service Agreement for risks.' },
       { from: 'ai',   text: '🛡️ AILEGAL Node activated. Securely processing document...', typing: true, ms: 1000 },
       { from: 'ai',   text: '✅ Upload successful. Initializing deep clause scanning...', card: 'upload', ms: 1200 },
     ],
@@ -461,7 +461,7 @@ const AiLegalDemoSection = () => {
           <span style={{
             background: 'linear-gradient(135deg,#6366f1,#a855f7,#ec4899)',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-          }}>AISA™</span>{' '}
+          }}>AI LEGAL™</span>{' '}
           {t('seeAisaMajorFeatures').split(' ').slice(1).join(' ')}
         </h2>
         <p style={{

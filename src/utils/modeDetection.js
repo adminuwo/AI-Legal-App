@@ -63,7 +63,7 @@ export function detectMode(message = '', attachments = []) {
         return MODES.FILE_ANALYSIS;
     }
 
-    // Removed auto-detection of CODING_HELP to prevent "AI Code Writer" badge showing on normal messages containing coding words.
+    // Removed auto-detection of CODING_HELP to prevent "AI Draft Maker" badge showing on normal messages containing coding words.
 
     const hasWritingKeywords = WRITING_KEYWORDS.some(keyword =>
         lowerMessage.includes(keyword)
@@ -86,15 +86,15 @@ export function detectMode(message = '', attachments = []) {
 
 export function getModeName(mode) {
     const names = {
-        [MODES.NORMAL_CHAT]: 'AISA™ Chat',
-        [MODES.FILE_ANALYSIS]: 'AISA™ Analysis',
-        [MODES.CONTENT_WRITING]: 'AISA™ Writer',
-        [MODES.CODING_HELP]: 'AISA™ Coder',
-        [MODES.TASK_ASSISTANT]: 'AISA™ Assistant',
-        [MODES.DEEP_SEARCH]: 'AISA™ Deep Search',
-        [MODES.DOCUMENT_CONVERT]: 'AISA™ Convert',
-        [MODES.IMAGE_EDIT]: 'AISA™ Edit',
-        [MODES.LEGAL_TOOLKIT]: 'AISA™ Legal',
+        [MODES.NORMAL_CHAT]: 'AI LEGAL™ Chat',
+        [MODES.FILE_ANALYSIS]: 'AI LEGAL™ Analysis',
+        [MODES.CONTENT_WRITING]: 'AI LEGAL™ Writer',
+        [MODES.CODING_HELP]: 'AI LEGAL™ Coder',
+        [MODES.TASK_ASSISTANT]: 'AI LEGAL™ Assistant',
+        [MODES.DEEP_SEARCH]: 'AI LEGAL™ Precedents Search & Citations',
+        [MODES.DOCUMENT_CONVERT]: 'AI LEGAL™ Convert',
+        [MODES.IMAGE_EDIT]: 'AI LEGAL™ Edit',
+        [MODES.LEGAL_TOOLKIT]: 'AI LEGAL™ Legal',
         [MODES.IMAGE_GENERATION]: 'Image Generator',
         [MODES.VIDEO_GENERATION]: 'Video Generator',
         [MODES.CASHFLOW]: 'Deep Market Research',

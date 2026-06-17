@@ -2,21 +2,24 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, Outlet, Navigate, BrowserRouter, useNavigate, useLocation, Link } from 'react-router-dom';
 
 import Landing from './landingpage/Landing';
+import SplashScreen from './pages/SplashScreen';
+import Onboarding from './pages/Onboarding';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import VerificationForm from './pages/VerificationForm';
-import Chat from './pages/Chat';
+import LegalWorkspace from './pages/Workspace/LegalWorkspace';
 import Sidebar from './Components/SideBar/Sidebar.jsx';
 import AiPersonalAssistantDashboard from './Tools/AI_Personal_Assistant/Dashboard';
 import Pricing from './landingpage/Pricing';
 import SocialAgentPage from './Tools/AI_Social_Media/SocialAgentPage.jsx';
 import CreditUpsellPopup from './Components/CreditUpsellPopup';
 import SharedChat from './pages/SharedChat';
+import HomeDashboard from './pages/HomeDashboard';
 
 
 
 import { AppRoute, apis } from './types';
-import { Menu, Bell, Sun, Moon, LogIn, User, Gavel } from 'lucide-react';
+import { Menu, Bell, Sun, Moon, LogIn, User, Gavel, Scale } from 'lucide-react';
 import { useTheme } from './context/ThemeContext';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { toggleState, getUserData, clearUser, activeModeData, activeLegalToolData, legalViewData, userData, setUserData } from './userStore/userData';
@@ -30,6 +33,8 @@ import ResetPassword from './pages/ResetPassword.jsx';
 import PrivacyPolicy from './landingpage/PrivacyPolicy.jsx';
 import TermsOfService from './landingpage/TermsOfService.jsx';
 import CookiePolicy from './landingpage/CookiePolicy.jsx';
+import SettingsPage from './pages/Settings.jsx';
+import HelpSupport from './pages/HelpSupport.jsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { lazy, Suspense } from 'react';
 import { Toaster } from 'react-hot-toast';
@@ -58,7 +63,7 @@ const isAuthenticated = () => {
 // Always displays the landing page on root to satisfy Google OAuth Branding verification.
 // Users can explicitly enter the dashboard using CTA buttons.
 const HomeRedirect = () => {
-  return <Landing />;
+  return <SplashScreen />;
 };
 
 // ------------------------------
@@ -207,7 +212,7 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [profileMenuTab, setProfileMenuTab] = useState(null);
   const currentMode = useRecoilValue(activeModeData);
   const selectedLegalTool = useRecoilValue(activeLegalToolData);
   const legalView = useRecoilValue(legalViewData);
@@ -271,7 +276,7 @@ const DashboardLayout = () => {
         <Sidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
-          onOpenSettings={() => setIsProfileMenuOpen(true)}
+          onOpenSettings={(tab) => setProfileMenuTab(tab || 'personalization')}
         />
       )}
 
@@ -292,39 +297,7 @@ const DashboardLayout = () => {
                 <Menu className="w-6 h-6 stroke-[2.5]" />
               </motion.button>
 
-              <div className="flex items-center gap-2.5 pointer-events-auto bg-transparent backdrop-blur-md border border-transparent shadow-none rounded-2xl p-1.5 sm:p-2 transition-all duration-300">
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl text-primary transition-colors"
-                >
-                  {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-                </motion.button>
 
-                {token ? (
-                  <div className="relative profile-menu-container">
-                    <motion.button
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                      className="w-10 h-10 flex items-center justify-center bg-transparent rounded-xl border border-transparent text-primary overflow-hidden"
-                    >
-                      {user?.avatar ? (
-                        <img src={user.avatar} alt="P" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/account.png'; }} />
-                      ) : (
-                        <User size={20} />
-                      )}
-                    </motion.button>
-                  </div>
-                ) : (
-                  <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => navigate('/login')}
-                    className="px-4 h-10 flex items-center justify-center bg-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20"
-                  >
-                    Login
-                  </motion.button>
-                )}
-              </div>
             </div>
           </div>
         )}
@@ -339,13 +312,14 @@ const DashboardLayout = () => {
         </main>
       </div>
       <AnimatePresence>
-        {isProfileMenuOpen && (
+        {profileMenuTab && (
           <ProfileSettingsDropdown
-            onClose={() => setIsProfileMenuOpen(false)}
+            defaultTab={profileMenuTab}
+            onClose={() => setProfileMenuTab(null)}
             onLogout={() => {
               clearUser();
               navigate('/login');
-              setIsProfileMenuOpen(false);
+              setProfileMenuTab(null);
             }}
           />
         )}
@@ -452,6 +426,8 @@ const NavigateProvider = () => {
       <Routes>
         {/* Public Routes */}
         <Route path={AppRoute.LANDING} element={<HomeRedirect />} />
+        <Route path="/splash" element={<SplashScreen />} />
+        <Route path="/onboarding" element={<GuestRoute><Onboarding /></GuestRoute>} />
         <Route path={AppRoute.LOGIN} element={<GuestRoute><Login /></GuestRoute>} />
         <Route path={AppRoute.SIGNUP} element={<GuestRoute><Signup /></GuestRoute>} />
 
@@ -471,14 +447,14 @@ const NavigateProvider = () => {
           path={AppRoute.DASHBOARD}
           element={<DashboardLayout />}
         >
-          <Route index element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />
+          <Route index element={<HomeDashboard />} />
           <Route path="chat" element={<Navigate to="new" replace state={{ forceGlobal: true }} />} />
-          <Route path="chat/:sessionId" element={<Chat />} />
-          <Route path="cases" element={<Chat />} />
-          <Route path="case/:caseId" element={<Chat />} />
-          <Route path="social-agent" element={<ProtectedRoute><SocialAgentPage /></ProtectedRoute>} />
-          <Route path="ai-personal-assistant" element={<ProtectedRoute><AiPersonalAssistantDashboard /></ProtectedRoute>} />
-          <Route path="ai-base" element={<ProtectedRoute><Suspense fallback={<div className="flex h-full items-center justify-center">Loading AI Base...</div>}><AiBase /></Suspense></ProtectedRoute>} />
+          <Route path="chat/:sessionId" element={<LegalWorkspace />} />
+          <Route path="cases" element={<LegalWorkspace />} />
+          <Route path="case/:caseId" element={<LegalWorkspace />} />
+          <Route path="social-agent" element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />
+          <Route path="ai-personal-assistant" element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />
+          <Route path="ai-base" element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />
 
           <Route path="admin" element={
             <Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}>
@@ -490,6 +466,14 @@ const NavigateProvider = () => {
               <SecurityAndGuidelines />
             </Suspense>
           } />
+          <Route path="settings" element={<SettingsPage />} />
+          <Route path="knowledge-vault" element={<PlaceholderPage title="Knowledge Vault" />} />
+          <Route path="court-diary" element={<PlaceholderPage title="Court Diary" />} />
+          <Route path="templates" element={<PlaceholderPage title="Templates" />} />
+          <Route path="calculator" element={<PlaceholderPage title="Legal Calculator" />} />
+          <Route path="downloads" element={<PlaceholderPage title="Downloads" />} />
+          <Route path="bookmarks" element={<PlaceholderPage title="Bookmarks" />} />
+          <Route path="help-support" element={<HelpSupport />} />
         </Route>
 
 

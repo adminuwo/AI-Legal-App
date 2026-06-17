@@ -19,12 +19,12 @@ const FEATURES = [
     glow: 'rgba(99,102,241,0.5)',
     bgAccent: 'rgba(30,27,75,0.4)',
     type: 'title',
-    text: 'HOW AISA™ WORKS',
+    text: 'HOW AI LEGAL™ WORKS',
     steps: [],
   },
   {
     id: 'deepsearch',
-    label: 'Deep Search',
+    label: 'Precedents Search & Citations',
     icon: Search,
     color: '#60a5fa',
     glow: 'rgba(59,130,246,0.4)',
@@ -33,19 +33,19 @@ const FEATURES = [
       { from: 'user', text: 'Deep search: Latest breakthroughs in quantum computing 2025.' },
       { from: 'ai',   text: '🔍 DeepSearch Engine engaged — scanning 40M+ sources...', typing: true, ms: 1000 },
       { from: 'ai',   text: '🧠 Cross-referencing arXiv, Nature, IEEE & live web...', typing: true, ms: 900 },
-      { from: 'ai',   text: '✅ Deep Search Complete:\n• Google unveils 1M qubit chip "Willow-X".\n• IBM Quantum breaks error correction record.\n• 3 peer-reviewed papers synthesized.', card: 'search', ms: 1200 },
+      { from: 'ai',   text: '✅ Precedents Search & Citations Complete:\n• Google unveils 1M qubit chip "Willow-X".\n• IBM Quantum breaks error correction record.\n• 3 peer-reviewed papers synthesized.', card: 'search', ms: 1200 },
     ],
   },
   {
     id: 'imagegen',
-    label: 'Image Generation',
+    label: 'AI-Powered Legal Research',
     icon: ImageIcon,
     color: '#a78bfa',
     glow: 'rgba(139,92,246,0.4)',
     bgAccent: 'rgba(76,29,149,0.3)',
     steps: [
       { from: 'user', text: 'Generate an 8K cinematic neon city floating in space.' },
-      { from: 'ai',   text: '🎨 AISA Imagine™ activated — crafting prompt blueprint...', typing: true, ms: 900 },
+      { from: 'ai',   text: '🎨 AI LEGAL™ Imagine™ activated — crafting prompt blueprint...', typing: true, ms: 900 },
       { from: 'ai',   text: '⚡ Rendering with FLUX Ultra + VEO-3 pipeline...', typing: true, ms: 1200 },
       { from: 'ai',   text: '✅ 8K masterpiece generated.\n📐 Resolution: 7680×4320 · Style: Cinematic Noir', card: 'image', ms: 300 },
     ],
@@ -452,7 +452,7 @@ const DemoSection = () => {
         textAlign: 'center', marginBottom: '0.6rem',
         letterSpacing: '-0.03em', lineHeight: 1.1, zIndex: 10, position: 'relative',
       }}>
-        See AISA™{' '}
+        See AI LEGAL™{' '}
         <span style={{
           background: 'linear-gradient(135deg,#4F46E5,#7C3AED,#EC4899)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
@@ -538,7 +538,7 @@ const DemoSection = () => {
             color: isDarkMode ? 'rgba(148,163,184,0.5)' : '#475569', maxWidth: 220, margin: '0 auto',
             fontWeight: 500
           }}>
-            AISA™ — AI Workspace
+            AI LEGAL™ — AI Workspace
           </div>
           {/* Live badge */}
           <div style={{
@@ -650,7 +650,7 @@ const DemoSection = () => {
             color: isDarkMode ? 'rgba(148,163,184,0.3)' : '#475569', fontSize: '0.78rem',
             fontWeight: 500,
           }}>
-            Message AISA™…
+            Message AI LEGAL™…
           </div>
           <button style={{
             padding: '8px 16px', borderRadius: 10, border: 'none',

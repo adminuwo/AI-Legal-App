@@ -2,7 +2,7 @@ import {
   FileText, Shield, FileCheck, Scale, Binary, 
   Mail, PenTool, AlertTriangle, Edit3, Brain, 
   Library, Clock, CheckCircle, ArrowLeftRight, Lock, Sparkles,
-  MessageCircle, ArrowRight, X, ChevronDown, Zap, Maximize2, Minimize2, Gavel, Briefcase 
+  MessageCircle, ArrowRight, X, ChevronDown, Zap, Maximize2, Minimize2, Gavel, Briefcase, Search 
 } from 'lucide-react';
 import LegalLogo from '../components/LegalLogo';
 
@@ -78,6 +78,18 @@ export const PREMIUM_TOOLS = [
       'Submit a list or description of your evidence.',
       'AI checks admissibility under Section 65B and other laws.',
       'AI identifies gaps and suggests ways to strengthen proof.'
+    ]
+  },
+  {
+    id: 'legal_research',
+    name: 'Legal Research',
+    icon: Search,
+    desc: 'Research Workspace for Acts, Judgments & Precedents',
+    price: '₹699',
+    workflow: [
+      'Enter a legal topic, act, or section to research.',
+      'AI searches relevant statutes and case laws.',
+      'Receive detailed summaries and precedents.'
     ]
   },
   {

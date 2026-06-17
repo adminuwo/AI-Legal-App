@@ -483,7 +483,7 @@ const AiSocialMediaDashboard = ({ isOpen, onClose, userPlan, isPremium, isAdmin 
 
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = filename || `AISA_Gen_${Date.now()}.png`;
+      link.download = filename || `AI LEGAL™_Gen_${Date.now()}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -1325,11 +1325,11 @@ const AiSocialMediaDashboard = ({ isOpen, onClose, userPlan, isPremium, isAdmin 
   const handleVisualPostGeneration = async (entry, postFormat = 'single', aspectRatio = '1:1', carouselCount = 3) => {
     if (!workspace || !entry) return;
 
-    console.log("[AISA] Visual Gen - Plan check:", { isPremium, userPlan });
+    console.log("[AI LEGAL™] Visual Gen - Plan check:", { isPremium, userPlan });
 
     // Centralized Frontend Premium Gate for Visual Generation
     if (!isPremium && !isAdmin) {
-      console.log("[AISA] Blocking visual gen - Premium required");
+      console.log("[AI LEGAL™] Blocking visual gen - Premium required");
       window.dispatchEvent(new CustomEvent('premium_required', {
         detail: {
           toolName: 'AI Ads Visuals',
@@ -1364,7 +1364,7 @@ const AiSocialMediaDashboard = ({ isOpen, onClose, userPlan, isPremium, isAdmin 
       }
 
       const toastDuration = postFormat === 'carousel' ? 360000 : 120000;
-      toast.loading(`🤔 AISA™ generating post visual...${postFormat === 'carousel' ? ` (0/${carouselCount})` : ''}`, { id: toastId, duration: toastDuration });
+      toast.loading(`🤔 AI LEGAL™ generating post visual...${postFormat === 'carousel' ? ` (0/${carouselCount})` : ''}`, { id: toastId, duration: toastDuration });
 
       // Step 2: Poll for job completion (max 9 mins for single, 12 mins for carousel)
       const jobId = res.jobId;
@@ -2968,7 +2968,7 @@ const AiSocialMediaDashboard = ({ isOpen, onClose, userPlan, isPremium, isAdmin 
                 <div>
                   <div className="flex justify-between items-end mb-4">
                     <div>
-                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Image Generation</p>
+                      <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">AI-Powered Legal Research</p>
                       <h4 className="text-4xl font-black text-slate-800 dark:text-white">{usage.imageUsed} / {usage.imageLimit}</h4>
                     </div>
                     <span className={`text-xs font-black uppercase ${nearQuota ? 'text-red-500' : 'text-primary'}`}>

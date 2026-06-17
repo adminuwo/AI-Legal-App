@@ -329,7 +329,7 @@ const Hero = () => {
           >
             <div className="relative">
               <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <img src={logo} alt="AISA™"
+              <img src={logo} alt="AI LEGAL™"
                 style={{
                   height: window.innerWidth < 640 ? '32px' : '50px',
                   width: 'auto',
@@ -339,7 +339,7 @@ const Hero = () => {
                 className="drop-shadow-[0_0_40px_rgba(99,102,241,0.6)] relative transition-all duration-500"
               />
             </div>
-            <span aria-label="AISA™" style={{
+            <span aria-label="AI LEGAL™" style={{
               fontSize: window.innerWidth < 640 ? '0.6rem' : '0.75rem',
               fontWeight: 900,
               letterSpacing: '0.25em',
@@ -351,7 +351,7 @@ const Hero = () => {
               transition: 'all 0.3s',
               display: 'inline-block'
             }}>
-              AISA<span aria-hidden="true" style={{ fontSize: '0.55em', verticalAlign: 'super', marginLeft: '1px' }}>™</span>
+              AI LEGAL<span aria-hidden="true" style={{ fontSize: '0.55em', verticalAlign: 'super', marginLeft: '1px' }}>™</span>
             </span>
           </motion.div>
 
@@ -544,9 +544,9 @@ const Hero = () => {
           }}
         >
           <motion.button
-            whileHover={{ scale: 1.05, boxShadow: isDarkMode ? '0 20px 40px rgba(99, 102, 241, 0.5)' : '0 15px 35px rgba(79, 70, 229, 0.2)' }}
+            whileHover={{ y: -8, scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(user ? "/dashboard/chat/new" : "/login")}
             style={{
               padding: '16px 42px', borderRadius: '16px', border: 'none',
               background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
@@ -558,24 +558,6 @@ const Hero = () => {
             }}
           >
             {user ? t('existingUser') : t('exploreAisa')} <ArrowRight size={22} />
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.05, background: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(99, 102, 241, 0.12)' }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => window.location.href = import.meta.env.VITE_AI_MALL || 'https://aimall24.com'}
-            style={{
-              padding: '16px 42px', borderRadius: '16px',
-              background: isDarkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(99, 102, 241, 0.06)',
-              border: isDarkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(99, 102, 241, 0.2)',
-              color: isDarkMode ? '#fff' : '#0F172A', fontWeight: 800, fontSize: '1.1rem',
-              cursor: 'pointer', backdropFilter: 'blur(20px)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
-              transition: 'all 0.4s ease',
-              width: window.innerWidth < 640 ? '100%' : 'auto'
-            }}
-          >
-            {t('exploreAiMall')} <Zap size={22} />
           </motion.button>
         </motion.div>
       </div>

@@ -36,7 +36,7 @@ const FaqModal = ({ isOpen, onClose }) => {
         setSendStatus(null);
         try {
             await axios.post(apis.support, {
-                name: user?.name || "AISA User",
+                name: user?.name || "AI LEGAL™ User",
                 email: user?.email || "guest@uwo24.com",
                 issueType,
                 message: issueText,

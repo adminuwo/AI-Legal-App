@@ -394,7 +394,7 @@ const StackedCards = () => {
                     <Sparkles size={14} className="text-primary animate-pulse" />
                     <span className={`text-[10px] font-black tracking-[0.8em] uppercase leading-none mt-1 text-white/50`}>Specialized Lab Nodes</span>
                 </motion.div>
-                <h2 className="text-6xl font-black italic tracking-tighter uppercase mb-4 text-white leading-none">Two Core Wings of AISA™</h2>
+                <h2 className="text-6xl font-black italic tracking-tighter uppercase mb-4 text-white leading-none">Two Core Wings of AI LEGAL™</h2>
                 <p className="text-base font-medium tracking-tight text-gray-500">Unified Intelligence & Frontier Generative Engines.</p>
             </div>
 

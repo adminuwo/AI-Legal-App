@@ -141,7 +141,7 @@ const Pricing = () => {
         key: orderRes.key,
         amount: orderRes.order.amount,
         currency: "INR",
-        name: "AISA™",
+        name: "AI LEGAL™",
         description: `Upgrade to ${plan.planName}`,
         order_id: orderRes.order.id,
         handler: async function (response) {
@@ -202,7 +202,7 @@ const Pricing = () => {
         key: orderRes.key,
         amount: orderRes.order.amount,
         currency: "INR",
-        name: "AISA™",
+        name: "AI LEGAL™",
         description: `Buy ${pkg.credits} Credits`,
         order_id: orderRes.order.id,
         handler: async function (response) {
@@ -241,7 +241,7 @@ const Pricing = () => {
 
     const comparisonData = [
       {
-        feature: 'AISA Chat',
+        feature: 'AI LEGAL™ Chat',
         free: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
         creator: <span className="feature-badge">✓ {t('priority')}</span>,
         startuppro: <span className="feature-badge">✓ {t('priority')}</span>,
@@ -249,7 +249,7 @@ const Pricing = () => {
         enterprise: <span className="feature-badge">✓ {t('priority')}</span>,
       },
       {
-        feature: 'AISA Generate Image',
+        feature: 'AI LEGAL™-Powered Legal Research',
         free: <span className="flex items-center justify-center"><X size={20} className="cross-icon" /></span>,
         creator: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
         startuppro: <span className="feature-badge">✓ {t('ultraHD')}</span>,
@@ -257,7 +257,7 @@ const Pricing = () => {
         enterprise: <span className="feature-badge">✓ {t('ultraHD')}</span>,
       },
       {
-        feature: 'AISA Edit Image',
+        feature: 'AI LEGAL™ Edit Image',
         free: <span className="flex items-center justify-center"><X size={20} className="cross-icon" /></span>,
         creator: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
         startuppro: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
@@ -265,7 +265,7 @@ const Pricing = () => {
         enterprise: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
       },
       {
-        feature: 'AISA Generate Video',
+        feature: 'AI LEGAL™ Generate Video',
         free: <span className="flex items-center justify-center"><X size={20} className="cross-icon" /></span>,
         creator: <span className="feature-badge">✓ 1080p</span>,
         startuppro: <span className="feature-badge">✓ {t('fourKUltra')}</span>,
@@ -273,7 +273,7 @@ const Pricing = () => {
         enterprise: <span className="feature-badge">✓ {t('fourKUltra')}</span>,
       },
       {
-        feature: 'AISA Image -> Video Magic Card',
+        feature: 'AI LEGAL™ Image -> Case Prediction Card',
         free: <span className="flex items-center justify-center"><X size={20} className="cross-icon" /></span>,
         creator: <span className="flex items-center justify-center"><X size={20} className="cross-icon" /></span>,
         startuppro: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
@@ -281,7 +281,7 @@ const Pricing = () => {
         enterprise: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
       },
       {
-        feature: 'AISA Web Search',
+        feature: 'AI LEGAL™ Web Search',
         free: <span className="flex items-center justify-center"><X size={20} className="cross-icon" /></span>,
         creator: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
         startuppro: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
@@ -289,7 +289,7 @@ const Pricing = () => {
         enterprise: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
       },
       {
-        feature: 'AISA Deep Search',
+        feature: 'AI LEGAL™ Precedents Search & Citations',
         free: <span className="flex items-center justify-center"><X size={20} className="cross-icon" /></span>,
         creator: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
         startuppro: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
@@ -297,7 +297,7 @@ const Pricing = () => {
         enterprise: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
       },
       {
-        feature: 'AISA Code Writer',
+        feature: 'AI LEGAL™ Draft Maker',
         free: <span className="flex items-center justify-center"><X size={20} className="cross-icon" /></span>,
         creator: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
         startuppro: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
@@ -305,7 +305,7 @@ const Pricing = () => {
         enterprise: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
       },
       {
-        feature: 'AISA Convert to Audio',
+        feature: 'AI LEGAL™ Convert to Audio',
         free: <span className="flex items-center justify-center"><X size={20} className="cross-icon" /></span>,
         creator: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
         startuppro: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
@@ -313,7 +313,7 @@ const Pricing = () => {
         enterprise: <span className="flex items-center justify-center"><Check size={20} className="check-icon" /></span>,
       },
       {
-        feature: 'AISA Convert Documents',
+        feature: 'AI LEGAL™ Convert Documents',
         free: <span className="flex items-center justify-center"><X size={20} className="cross-icon" /></span>,
         creator: <span className="feature-badge">{t('advanced')}</span>,
         startuppro: <span className="feature-badge">{t('advanced')}</span>,
@@ -349,8 +349,8 @@ const Pricing = () => {
               {comparisonData.map((row, idx) => (
                 <tr key={idx}>
                   <td className="font-bold flex items-center gap-2">
-                    <span className="aisa-badge-small">AISA™</span>
-                    {row.feature.replace('AISA ', '')}
+                    <span className="aisa-badge-small">AI LEGAL™</span>
+                    {row.feature.replace('AI LEGAL™ ', '')}
                   </td>
                   {plans.map(plan => (
                     <td key={`${plan._id}-${row.feature}`}>
@@ -523,7 +523,7 @@ const Pricing = () => {
                   <li key={i}>
                     <Check size={16} />
                     <span className="flex items-center gap-1.5">
-                      <span className="aisa-badge-small" style={{ fontSize: '0.6rem', padding: '1px 4px', minWidth: '30px' }}>AISA™</span>
+                      <span className="aisa-badge-small" style={{ fontSize: '0.6rem', padding: '1px 4px', minWidth: '30px' }}>AI LEGAL™</span>
                       {feature.replace(/^AISA\s+/i, '')}
                     </span>
                   </li>

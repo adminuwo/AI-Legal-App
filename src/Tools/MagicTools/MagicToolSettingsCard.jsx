@@ -69,11 +69,11 @@ const MagicToolSettingsCard = ({ isOpen, onClose, toolType, config, onChange, pr
         switch(toolType) {
             case 'video': return 'Video Settings';
             case 'edit': return 'Image Editing';
-            case 'deepsearch': return 'Deep Search Settings';
+            case 'deepsearch': return 'Precedents Search & Citations Settings';
             case 'websearch': return 'Web Search Settings';
             case 'coding': return 'Code Builder Settings';
             case 'chat': return 'Chat Settings';
-            default: return 'Image Generation';
+            default: return 'AI-Powered Legal Research';
         }
     };
 
@@ -138,7 +138,7 @@ const MagicToolSettingsCard = ({ isOpen, onClose, toolType, config, onChange, pr
                                             className="px-3 py-1.5 rounded-xl bg-primary/5 border border-primary/20 flex items-center gap-1.5 text-primary transition-all hover:shadow-lg hover:shadow-primary/10"
                                             title="Prompt Library"
                                         >
-                                            <img src={logo} alt="AISA" className="w-3.5 h-3.5 object-contain" />
+                                            <img src={logo} alt="AI LEGAL™" className="w-3.5 h-3.5 object-contain" />
                                             <span className="text-[10px] font-black uppercase tracking-wider">Prompt Library</span>
                                         </motion.button>
                                     )}

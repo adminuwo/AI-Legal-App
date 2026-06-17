@@ -42,7 +42,7 @@ export const useChatGeneration = (chatId) => {
   const isGenerating = generation?.isGenerating ?? false;
   const partialResponse = generation?.partialResponse ?? '';
   const streamedTokens = generation?.streamedTokens ?? 0;
-  const loadingText = generation?.loadingText ?? 'AISA is thinking...';
+  const loadingText = generation?.loadingText ?? 'AI LEGAL™ is thinking...';
   const typingMessageId = generation?.typingMessageId ?? null;
   const generationError = generation?.error ?? null;
 

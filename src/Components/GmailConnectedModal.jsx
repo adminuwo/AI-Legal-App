@@ -6,7 +6,7 @@ const features = [
     {
         icon: Mail,
         title: 'Read Latest Emails',
-        desc: 'Ask AISA™ to summarize your inbox instantly.',
+        desc: 'Ask AI LEGAL™ to summarize your inbox instantly.',
         example: '"What are my 5 latest emails?"',
         color: 'from-blue-500/20 to-blue-500/5',
         iconColor: 'text-blue-400',
@@ -151,7 +151,7 @@ const GmailConnectedModal = ({ isOpen, onClose, onTryPrompt }) => {
                             {/* Quick Tip */}
                             <div className="p-4 rounded-2xl bg-primary/5 border border-primary/15 mb-5">
                                 <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                                    <span className="font-black text-primary">💡 Pro Tip:</span> Click any feature card above to instantly try it in the AISA™ chat, or just type naturally — AISA™ will understand what you need.
+                                    <span className="font-black text-primary">💡 Pro Tip:</span> Click any feature card above to instantly try it in the AI LEGAL™ chat, or just type naturally — AI LEGAL™ will understand what you need.
                                 </p>
                             </div>
 

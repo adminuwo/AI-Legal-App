@@ -99,7 +99,7 @@ export const useGenerationStore = create((set, get) => ({
       error: null,
       startedAt: null,
       completedAt: null,
-      loadingText: 'AISA is thinking...',
+      loadingText: 'AI LEGAL™ is thinking...',
       typingMessageId: null,
     };
   },
@@ -119,7 +119,7 @@ export const useGenerationStore = create((set, get) => ({
   // ── Mutations ─────────────────────────────────────────────────────────────
 
   /** Called when we START streaming for a chat */
-  startGeneration: (chatId, { loadingText = 'AISA is thinking...', typingMessageId = null } = {}) => {
+  startGeneration: (chatId, { loadingText = 'AI LEGAL™ is thinking...', typingMessageId = null } = {}) => {
     if (!chatId) return null;
     // Create a fresh AbortController
     const controller = new AbortController();
@@ -323,7 +323,7 @@ export const selectPartialResponse = (chatId) => (state) =>
   state.generations[chatId]?.partialResponse ?? '';
 
 export const selectLoadingText = (chatId) => (state) =>
-  state.generations[chatId]?.loadingText ?? 'AISA is thinking...';
+  state.generations[chatId]?.loadingText ?? 'AI LEGAL™ is thinking...';
 
 export const selectTypingMessageId = (chatId) => (state) =>
   state.generations[chatId]?.typingMessageId ?? null;

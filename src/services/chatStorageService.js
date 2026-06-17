@@ -78,10 +78,12 @@ const getAuthHeaders = () => {
 
 export const chatStorageService = {
 
-  async getSessions(projectId) {
+  async getSessions(projectId, queryText = "") {
     try {
       const params = {};
       if (projectId && projectId !== 'default' && projectId !== 'all') params.projectId = projectId;
+      if (projectId === 'all') params.all = 'true';
+      if (queryText) params.q = queryText;
       const response = await axios.get(`${API_BASE_URL}/chat`, {
         params,
         headers: getAuthHeaders(),

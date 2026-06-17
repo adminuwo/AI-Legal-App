@@ -520,6 +520,17 @@ export const useAILegalCRM = ({
           if (currentProjectId !== null) setCurrentProjectId(null);
           if (currentCase !== null) setCurrentCase(null);
           if (currentMode !== 'NORMAL_CHAT') setCurrentMode('NORMAL_CHAT');
+          
+          if (location.pathname.startsWith('/dashboard/case/')) {
+            navigate('/dashboard/cases', { replace: true });
+          } else {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('caseId')) {
+              params.delete('caseId');
+              const newSearch = params.toString();
+              navigate(`${location.pathname}${newSearch ? '?' + newSearch : ''}`, { replace: true });
+            }
+          }
         } else {
           console.error("Failed to fetch case details:", err);
         }

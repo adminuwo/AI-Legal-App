@@ -1,85 +1,68 @@
 export const logo = "/logo/Logo.svg";
-export const name = "AISA™";
+export const name = "AI LEGAL™";
 
 export const faqs = [
     {
         category: "General",
         questions: [
             {
-                question: "What is AISA™?",
-                answer: "AISA™ is the world's most powerful AI assistant, built to streamline human potential. It combines advanced reasoning with a multi-modal interface, allowing you to chat, create, analyze, and automate tasks in a single unified workspace."
+                question: "What is AI LEGAL™?",
+                answer: "AI LEGAL™ is a professional legal intelligence platform designed to empower legal professionals with advanced tools for comprehensive research, document analysis, and case preparation."
             },
             {
-                question: "How do I get started with AISA™?",
-                answer: "Simply create an account and log in. Once you're in the chat interface, you can start typing natural language commands. Use the '+' or menu button to explore specialized tools like Image Generation and File Analysis."
+                question: "How do I get started with AI LEGAL™?",
+                answer: "Simply create an account and log in. Once you're in the chat interface, you can start typing natural language legal queries. Use the specialized AI Legal agents in the menu for advanced tasks like Case Prediction and Contract Analysis."
             },
             {
-                question: "Is AISA™ free to use?",
-                answer: "AISA™ offers a generous free tier for everyday users. For professionals and power users requiring higher limits and priority access to our most advanced models, we offer premium subscription plans."
+                question: "Is AI LEGAL™ free to use?",
+                answer: "AI LEGAL™ offers a basic trial tier with access to standard research capabilities. For practicing attorneys and legal teams requiring high volume, advanced reasoning models, and case folder repositories, we offer premium subscription plans."
             }
         ]
     },
     {
-        category: "Creative AI",
+        category: "Legal Research & Drafting",
         questions: [
             {
-                question: "How does AISA™ Image Generation work?",
-                answer: "Our 'AISA™ Magic Tools' use state-of-the-art diffusion models. Just describe what you want to see—down to the lighting and art style—and AISA™ will generate a high-resolution image in seconds."
+                question: "How does AI-Powered Legal Research work?",
+                answer: "Our AI-Powered Legal Research agent leverages state-of-the-art legal LLMs and semantic retrieval. Describe your legal question, draft a prompt detailing jurisdictions and facts, and AI LEGAL™ will identify precedents and relevant statutory provisions."
             },
             {
-                question: "Can I edit images after they are generated?",
-                answer: "Yes, AISA™ features 'Magic Image Editor'. You can reference a previously generated image and ask AISA™ to change specific elements, like 'make the sky purple' or 'add a cat to the couch'."
+                question: "Can AI LEGAL™ draft legal documents?",
+                answer: "Absolutely. The Draft Maker allows you to generate high-quality contracts, legal notices, motions, and petitions by specifying your customized terms and facts."
             },
             {
-                question: "What is 'AI Video Magic'?",
-                answer: "AI Video Magic allows you to animate static images. By providing an image and a motion description, our AI can generate cinematic video clips, bringing your digital art to life."
-            },
-            {
-                question: "Can AISA™ write code for me?",
-                answer: "Absolutely. 'Code Writer Pro' is designed for developers. It can generate full boilerplate structures, debug existing functions, and even explain complex logic in over 50 programming languages."
+                question: "What is the Case Predictor?",
+                answer: "Case Predictor analyzes your case facts, key claims, and jurisdictional trends to assess probability of success and suggest strong legal arguments based on historical precedents."
             }
         ]
     },
     {
-        category: "Vision & Files",
+        category: "Document Analysis & Evidence",
         questions: [
             {
-                question: "What files can AISA™ analyze?",
-                answer: "AISA™ can process PDFs, DOCX files, Excel spreadsheets, and plain text. It can summarize long documents, extract data into tables, and even answer specific questions about the content."
+                question: "What documents can AI LEGAL™ analyze?",
+                answer: "AI LEGAL™ processes case files, brief transcripts, PDFs, DOCX, and scanned documents, using advanced extraction to summarize thousands of pages, build evidence profiles, and trace case timelines."
             },
             {
-                question: "Can AISA™ read text from images?",
-                answer: "Yes, 'Smart Scan' and 'Image Understanding' allow AISA™ to perform OCR (Optical Character Recognition) on photos, screenshots, and scanned documents, converting them into editable digital text."
+                question: "Can I analyze contracts for potential risks?",
+                answer: "Yes, the Contract Analyzer reviews uploads to flag hidden liabilities, termination rights, and critical clause mismatches, ranking them by risk level and suggesting mutual cap revisions."
             },
             {
-                question: "How do I convert a PDF to a Word document?",
-                answer: "Upload your PDF to the chat or use the 'File Conversion' tool in the menu. AISA™ will handle the formatting and provide a downloadable .docx file almost instantly."
+                question: "How secure are my uploaded legal documents?",
+                answer: "All uploads are encrypted using enterprise-grade AES-256 protocols. Your confidential case materials, briefs, and client data are stored in isolated, secure cloud environments and are never used to train base models."
             }
         ]
     },
     {
-        category: "Intelligence & Search",
+        category: "Intelligence & Security",
         questions: [
             {
-                question: "What is 'Deep Search'?",
-                answer: "Deep Search goes beyond standard search engines. It performs multi-layered analysis of live web data, cross-referencing multiple sources to provide a cited, comprehensive answer to complex research questions."
+                question: "What is the Legal Strategy Engine?",
+                answer: "The Strategy Engine maps out procedural timelines, evaluates opposing counsel arguments, and suggests counter-arguments based on historical court rulings and statutory exceptions."
             },
             {
-                question: "Does AISA™ have real-time access to the internet?",
-                answer: "Yes, AISA™ is connected to live web streams. It can provide updates on news, stock market trends, and real-time events that occurred just minutes ago."
-            }
-        ]
-    },
-    {
-        category: "Privacy & Security",
-        questions: [
-            {
-                question: "Is my data used to train the models?",
-                answer: "At AISA™, we prioritize your privacy. User data is strictly protected and is NOT used to train our base models without explicit consent. Business users can also opt for 'Zero Retention' mode."
-            },
-            {
-                question: "How secure is my personal information?",
-                answer: "We use enterprise-grade AES-256 encryption for data at rest and TLS 1.3 for data in transit. Your conversations and uploaded files are stored in secure, siloed environments."
+                question: "How does AI LEGAL™ ensure accuracy in citations?",
+                answer: "Our Deep Search citation engine cross-references live judicial databases to locate verifiable precedents and statutory sections, minimizing risks of hallucination."
             }
         ]
     }

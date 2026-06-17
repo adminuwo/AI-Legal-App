@@ -13,7 +13,7 @@ const LoginRequiredModal = () => {
 
     useEffect(() => {
         const handleLoginRequired = (e) => {
-            setToolName(e.detail?.toolName || 'AISA™ Magic Tools');
+            setToolName(e.detail?.toolName || 'AI LEGAL™ Magic Tools');
             setCustomMessage(e.detail?.customMessage || '');
             setIsOpen(true);
         };
@@ -88,10 +88,10 @@ const LoginRequiredModal = () => {
                             {customMessage || (
                                 <>
                                     Sign in to your{' '}
-                                    <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>AISA™</span>{' '}
+                                    <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>AI LEGAL™</span>{' '}
                                     account to unlock{' '}
                                     <span className="text-primary font-bold">
-                                        {toolName === 'AISA™ Magic Tools' ? 'Image Generation' : toolName}
+                                        {toolName === 'AI LEGAL™ Magic Tools' ? 'AI-Powered Legal Research' : toolName}
                                     </span>{' '}
                                     and other powerful AI magic tools.
                                 </>

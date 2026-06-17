@@ -7,12 +7,25 @@ import { useToast } from '../Components/Toast/ToastContext';
  * Provides handleToolUsage helper.
  */
 export const useLegalToolCredits = () => {
-    const { currentCredits, deductCredits, isLoading } = useCreditStore();
+    const { currentCredits, deductCredits, isLoading, syncCredits } = useCreditStore();
     const toast = useToast();
 
     const handleToolUsage = useCallback(async (toolName, cost = 50) => {
-        // 1. Initial check (optimistic)
-        if (currentCredits < cost) {
+        let activeCredits = currentCredits;
+
+        // 1. Initial check (optimistic). If local credits are insufficient, try syncing first.
+        if (activeCredits < cost) {
+            try {
+                const response = await syncCredits();
+                if (response && response.success) {
+                    activeCredits = response.credits;
+                }
+            } catch (error) {
+                console.error("[useLegalToolCredits] Failed to sync credits from backend:", error);
+            }
+        }
+
+        if (activeCredits < cost) {
             toast.error("Insufficient Credits");
             // Optionally open upgrade modal
             window.dispatchEvent(new CustomEvent('open_upgrade_modal'));
@@ -34,7 +47,7 @@ export const useLegalToolCredits = () => {
             }
             return false;
         }
-    }, [currentCredits, deductCredits, toast]);
+    }, [currentCredits, deductCredits, syncCredits, toast]);
 
     return {
         handleToolUsage,
@@ -42,3 +55,4 @@ export const useLegalToolCredits = () => {
         isLoading
     };
 };
+

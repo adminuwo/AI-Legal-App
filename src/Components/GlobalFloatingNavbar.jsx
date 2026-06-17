@@ -98,12 +98,12 @@ const GlobalFloatingNavbar = () => {
         <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => setTglState(prev => ({ ...prev, sidebarOpen: true }))}
-            className="lg:hidden w-10 h-10 flex items-center justify-center bg-white/40 dark:bg-black/20 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-2xl text-primary pointer-events-auto"
+            className="lg:hidden w-10 h-10 flex items-center justify-center bg-white border border-[#E5E7EB] shadow-sm rounded-xl text-[#111827] pointer-events-auto"
         >
-            <Menu className="w-6 h-6 stroke-[2.5]" />
+            <Menu className="w-5 h-5" />
         </motion.button>
 
-        <div className="hidden lg:flex items-center gap-2.5 pointer-events-auto bg-transparent backdrop-blur-md border border-transparent shadow-none rounded-2xl p-1.5 sm:p-2 transition-all duration-300">
+        <div className="hidden lg:flex items-center gap-2.5 pointer-events-auto bg-transparent p-1.5 sm:p-2 transition-all duration-300">
           
           {/* Theme Toggle Button - Hidden on mobile if sidebar is open */}
           {!(tglState.sidebarOpen && window.innerWidth < 1024) && (
@@ -111,10 +111,10 @@ const GlobalFloatingNavbar = () => {
               whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.1)' }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-primary/80 dark:text-primary transition-colors"
+              className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl text-[#6B7280] hover:text-[#111827] hover:bg-[#F9FAFB] border border-transparent hover:border-[#E5E7EB] transition-colors"
               title="Toggle Theme"
             >
-              {theme === 'dark' ? <Sun size={20} strokeWidth={2.5} /> : <Moon size={20} strokeWidth={2.5} />}
+              {theme === 'dark' ? <Sun size={18} strokeWidth={2} /> : <Moon size={18} strokeWidth={2} />}
             </motion.button>
           )}
 
@@ -125,7 +125,7 @@ const GlobalFloatingNavbar = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-transparent rounded-xl border border-transparent text-primary overflow-hidden"
+                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-white rounded-xl border border-[#E5E7EB] text-[#111827] overflow-hidden shadow-sm"
               >
                 {user?.avatar ? (
                   <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/account.png'; }} />
@@ -139,7 +139,7 @@ const GlobalFloatingNavbar = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/login')}
-              className="px-4 h-9 sm:h-10 flex items-center justify-center bg-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20"
+              className="px-4 h-9 sm:h-10 flex items-center justify-center bg-[#6D5DFC] text-white rounded-lg font-bold text-sm shadow-sm"
             >
               Login
             </motion.button>

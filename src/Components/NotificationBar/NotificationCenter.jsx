@@ -50,7 +50,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                         </div>
                         <div>
                             <h2 className="text-lg font-black text-maintext tracking-tight">Notifications</h2>
-                            <p className="text-[10px] text-subtext font-bold uppercase tracking-widest">AISA™ System Updates</p>
+                            <p className="text-[10px] text-subtext font-bold uppercase tracking-widest">AI LEGAL™ System Updates</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors text-subtext hover:text-maintext">
@@ -131,7 +131,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                                     <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-50" />
                                 </div>
                                 <h3 className="font-bold text-maintext">Your inbox is clear</h3>
-                                <p className="text-xs text-subtext mt-2 leading-relaxed">No new notifications from AISA™ at the moment. We'll alert you here for reminders or system updates.</p>
+                                <p className="text-xs text-subtext mt-2 leading-relaxed">No new notifications from AI LEGAL™ at the moment. We'll alert you here for reminders or system updates.</p>
                             </motion.div>
                         )}
                     </AnimatePresence>

@@ -171,17 +171,17 @@ const ImageViewer = ({ src, alt }) => {
 const getModeInfo = (mode) => {
   switch (mode) {
     case MODES.DEEP_SEARCH:
-      return { label: "AI Deep Search", icon: Search, color: "text-sky-500", bg: "bg-sky-500/10", border: "border-sky-500/20" };
+      return { label: "AI Precedents Search & Citations", icon: Search, color: "text-sky-500", bg: "bg-sky-500/10", border: "border-sky-500/20" };
     case MODES.WEB_SEARCH:
       return { label: "AI Web Search", icon: Globe, color: "text-cyan-500", bg: "bg-cyan-500/10", border: "border-cyan-500/20" };
     case MODES.IMAGE_GENERATION:
-      return { label: "AI Image Generation", icon: ImagePlus, color: "text-violet-500", bg: "bg-violet-500/10", border: "border-violet-500/20" };
+      return { label: "AI AI-Powered Legal Research", icon: ImagePlus, color: "text-violet-500", bg: "bg-violet-500/10", border: "border-violet-500/20" };
     case MODES.VIDEO_GENERATION:
       return { label: "AI Video Generation", icon: Video, color: "text-orange-500", bg: "bg-orange-500/10", border: "border-orange-500/20" };
     case MODES.IMAGE_EDIT:
       return { label: "AI Magic Edit", icon: Wand2, color: "text-rose-500", bg: "bg-rose-500/10", border: "border-rose-500/20" };
     case MODES.CODING_HELP:
-      return { label: "AI Code Writer", icon: Code, color: "text-indigo-500", bg: "bg-indigo-500/10", border: "border-indigo-500/20" };
+      return { label: "AI Draft Maker", icon: Code, color: "text-indigo-500", bg: "bg-indigo-500/10", border: "border-indigo-500/20" };
     case MODES.DOCUMENT_CONVERT:
       return { label: "AI Doc Convert", icon: FileText, color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" };
     case MODES.FILE_ANALYSIS:
@@ -299,7 +299,7 @@ const SharedChat = () => {
 
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = filename || 'AISA-download.png';
+      link.download = filename || 'AI LEGAL™-download.png';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -406,7 +406,7 @@ const SharedChat = () => {
                 {session?.title || "Shared Conversation"}
               </h1>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Shared via AISA™</span>
+                <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Shared via AI LEGAL™</span>
                 <span className="text-[10px] text-zinc-400">•</span>
                 <span className="text-[10px] text-zinc-400 flex items-center gap-1 font-medium">
                   <Calendar size={10} />
@@ -438,7 +438,7 @@ const SharedChat = () => {
               className="hidden sm:flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95"
             >
               <Rocket size={14} />
-              <span>Try AISA</span>
+              <span>Try AI LEGAL™</span>
             </button>
           </div>
         </div>
@@ -461,7 +461,7 @@ const SharedChat = () => {
                     </div>
                   ) : (
                     <div className="w-8 h-8 rounded-full flex items-center justify-center">
-                      <img src={logo} alt="AISA" className="w-6 h-[18px] object-cover object-top" />
+                      <img src={logo} alt="AI LEGAL™" className="w-6 h-[18px] object-cover object-top" />
                     </div>
                   )}
                 </div>
@@ -563,7 +563,7 @@ const SharedChat = () => {
                   {(msg.content || msg.text) && (
                     <div className={`chat-bubble-text break-words overflow-wrap-anywhere ${msg.role === 'model' ? 'prose prose-sm max-w-none' : ''}`}>
                       <div className="flex flex-col">
-                        <div className={`collapsible-container ${msg.content && msg.content.length > 350 && !expandedMessages[idx] ? 'collapsed-message' : ''}`}>
+                        <div className="collapsible-container">
                           <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
@@ -587,7 +587,7 @@ const SharedChat = () => {
                                         isLocked={isLocked}
                                         onClick={(e) => {
                                           e.preventDefault();
-                                          toast.error("Sign up or log in to AISA to use this interactive AI Legal tool.");
+                                          toast.error("Sign up or log in to AI LEGAL™ to use this interactive AI Legal tool.");
                                         }}
                                       />
                                     );
@@ -597,7 +597,7 @@ const SharedChat = () => {
                                     <button
                                       onClick={(e) => {
                                         e.preventDefault();
-                                        toast.error("Sign up or log in to AISA to use this interactive AI Legal tool.");
+                                        toast.error("Sign up or log in to AI LEGAL™ to use this interactive AI Legal tool.");
                                       }}
                                       className={`inline-flex mt-2 items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-bold shadow-sm transition-all hover:-translate-y-0.5 active:translate-y-0 ${isLocked ? 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20' : 'bg-gradient-to-r from-primary/10 to-primary-dark/10 border border-primary/20 text-primary hover:bg-primary/20 hover:border-primary/40'}`}
                                     >
@@ -723,7 +723,7 @@ const SharedChat = () => {
                                         <div className="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/60 to-transparent z-10 flex justify-between items-center opacity-100 sm:opacity-0 sm:group-hover/img-container:opacity-100 transition-opacity duration-500 ease-in-out">
                                           <div className="flex items-center gap-2">
                                             <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-                                            <span className="text-[10px] font-bold text-white uppercase tracking-widest">AISA™ Generated Asset</span>
+                                            <span className="text-[10px] font-bold text-white uppercase tracking-widest">AI LEGAL™ Generated Asset</span>
                                           </div>
                                         </div>
                                       )}
@@ -736,7 +736,7 @@ const SharedChat = () => {
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleDownload(props.src, `AISA_gen_${Date.now()}.png`);
+                                        handleDownload(props.src, `AI LEGAL™_gen_${Date.now()}.png`);
                                       }}
                                       className="absolute bottom-4 right-4 z-20 flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl border border-white/20 text-white shadow-lg transition-all duration-300 ease-in-out hover:scale-105 active:scale-95"
                                     >
@@ -753,28 +753,7 @@ const SharedChat = () => {
                         </div>
 
                         {/* Expand/Collapse Button */}
-                        {(msg.content || msg.text) && (msg.content || msg.text).length > 350 && (
-                          <div className="flex justify-start w-full mt-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedMessages(prev => ({ ...prev, [idx]: !prev[idx] }));
-                              }}
-                              className="read-more-btn"
-                              title={expandedMessages[idx] ? 'Show less' : 'Read full response'}
-                              aria-expanded={!!expandedMessages[idx]}
-                            >
-                              <span className="read-more-btn__text">
-                                {expandedMessages[idx]
-                                  ? 'Show less'
-                                  : `Read Full Response ↓`}
-                              </span>
-                              <ChevronDown
-                                className={`read-more-btn__icon ${expandedMessages[idx] ? 'rotated' : ''}`}
-                              />
-                            </button>
-                          </div>
-                        )}
+                        
                       </div>
                     </div>
                   )}
@@ -817,7 +796,7 @@ const SharedChat = () => {
                           disabled={isDownloadingUrl === msg.imageUrl}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDownload(msg.imageUrl, 'AISA-generated.png');
+                            handleDownload(msg.imageUrl, 'AI LEGAL™-generated.png');
                           }}
                           className={`p-2.5 rounded-xl shadow-lg border border-white/20 flex items-center justify-center transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 ${isDownloadingUrl === msg.imageUrl ? 'bg-zinc-600 cursor-wait' : 'bg-primary text-white hover:bg-primary/90'}`}
                           title="Download High-Res"

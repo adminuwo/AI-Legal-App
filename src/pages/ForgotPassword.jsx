@@ -54,163 +54,155 @@ const ForgotPassword = () => {
         }
     };
 
-    return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden selection:bg-primary/20 bg-[#f8fafc] dark:bg-[#020617] aisa-scalable-text">
-            {/* Background Blobs */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                <motion.div
-                    animate={{ x: [0, 80, 0], y: [0, 40, 0], scale: [1, 1.2, 1] }}
-                    transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-[-5%] right-[-5%] w-[50%] h-[50%] bg-primary/20 dark:bg-primary/10 blur-[140px] rounded-full"
-                />
-                <motion.div
-                    animate={{ x: [0, -80, 0], y: [0, -40, 0], scale: [1, 1.1, 1] }}
-                    transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute bottom-[-5%] left-[-5%] w-[50%] h-[50%] bg-primary/20 dark:bg-primary/10 blur-[140px] rounded-full"
-                />
-            </div>
-
-            <div className="relative w-full max-w-[440px] px-4 flex flex-col items-center">
-                {/* Canonical Logo - Scaled for all devices */}
-                <div className="w-full flex justify-center mb-6 shrink-0 z-[60]">
-                    <img
-                        src={logo}
-                        alt="AISA™ Logo"
-                        className="w-[70px] sm:w-[90px] h-auto object-contain brightness-110 drop-shadow-2xl"
-                    />
-                </div>
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    className="relative overflow-hidden bg-white/20 dark:bg-white/[0.02] backdrop-blur-3xl border border-white/40 dark:border-white/10 p-10 rounded-[3.5rem] shadow-2xl text-center ring-1 ring-white/20"
-                >
-                    {/* Header */}
-                    <div className="mb-10">
-                        <div className={`inline-flex items-center justify-center p-5 rounded-[2rem] mb-6 shadow-xl transition-all duration-500 ${step === 1 ? 'bg-primary shadow-primary/20' : 'bg-green-600 shadow-green-600/20'}`}>
-                            {step === 1 ? <ShieldCheck className="w-8 h-8 text-white" /> : <Key className="w-8 h-8 text-white" />}
-                        </div>
-                        <h2 className="text-3xl font-black text-slate-800 dark:text-white mb-2 tracking-tighter uppercase">
-                            {step === 1 ? 'Reset Password' : 'Verify & Reset'}
-                        </h2>
-                        <p className="text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
-                            {step === 1 ? "Enter your email to receive an OTP" : "Enter the OTP sent to your email"}
-                        </p>
-                    </div>
-
-                    <AnimatePresence mode="wait">
-                        {step === 1 ? (
-                            <motion.form
-                                key="step1"
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                                onSubmit={handleSendOTP}
-                                className="space-y-6"
-                                autoComplete="off"
-                            >
-                                <div className="relative group">
-                                    <div className="absolute inset-0 bg-white/30 dark:bg-slate-900/40 rounded-2xl blur-sm transition-all group-focus-within:bg-white/50 dark:group-focus-within:bg-slate-900/60" />
-                                    <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 group-focus-within:text-primary transition-colors z-10" />
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="Email Address"
-                                        className="relative w-full bg-white/20 dark:bg-slate-800/20 border border-white/30 dark:border-white/5 rounded-2xl py-4.5 pl-14 pr-4 text-slate-700 dark:text-white placeholder-slate-400/70 focus:outline-none focus:ring-1 focus:ring-white/50 dark:focus:ring-white/10 transition-all font-medium text-sm backdrop-blur-md"
-                                        required
-                                    />
-                                </div>
-
-                                <motion.button
-                                    whileHover={{ y: -5, scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full py-4.5 bg-primary rounded-3xl font-black text-sm uppercase tracking-widest text-white shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-3"
-                                >
-                                    {loading ? <Loader className="w-5 h-5 animate-spin" /> : <><span>Send OTP</span> <ArrowRight className="w-4 h-4" /></>}
-                                </motion.button>
-                            </motion.form>
-                        ) : (
-                            <motion.form
-                                key="step2"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                onSubmit={handleResetPassword}
-                                className="space-y-6 text-left"
-                                autoComplete="off"
-                            >
-                                <div>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-2">Verification Code</label>
-                                    <input
-                                        type="text"
-                                        name="otp"
-                                        autoComplete="one-time-code"
-                                        maxLength={6}
-                                        value={otp}
-                                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                                        placeholder="000000"
-                                        className="w-full text-center text-2xl tracking-[0.5em] py-4 bg-white/30 dark:bg-slate-900/40 border border-white/50 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-all text-slate-800 dark:text-white font-black placeholder:text-slate-400/20 backdrop-blur-md shadow-inner"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="relative group">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block ml-2">New Password</label>
-                                    <div className="relative">
-                                        <Key className="absolute left-5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400 group-focus-within:text-green-500 transition-colors z-10" />
-                                        <input
-                                            type={showPassword ? 'text' : 'password'}
-                                            name="new-password"
-                                            autoComplete="new-password"
-                                            value={newPassword}
-                                            onChange={(e) => setNewPassword(e.target.value)}
-                                            placeholder="••••••••"
-                                            className="w-full bg-white/20 dark:bg-slate-800/20 border border-white/30 dark:border-white/5 rounded-2xl py-4.5 pl-14 pr-12 text-slate-700 dark:text-white placeholder-slate-400/70 focus:outline-none focus:ring-1 focus:ring-white/50 dark:focus:ring-white/10 transition-all font-medium text-sm backdrop-blur-md"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-green-500 transition-colors z-10"
-                                        >
-                                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <motion.button
-                                    whileHover={{ y: -5, scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    type="submit"
-                                    disabled={loading}
-                                    className="w-full py-4.5 bg-green-600 rounded-3xl font-black text-sm uppercase tracking-widest text-white shadow-xl shadow-green-600/30 hover:shadow-green-600/50 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-3"
-                                >
-                                    {loading ? <Loader className="w-5 h-5 animate-spin" /> : <><span>Reset Password</span> <CheckCircle className="w-4 h-4" /></>}
-                                </motion.button>
-
-                                <button
-                                    type="button"
-                                    onClick={() => setStep(1)}
-                                    className="w-full text-center text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
-                                >
-                                    Change Email?
-                                </button>
-                            </motion.form>
-                        )}
-                    </AnimatePresence>
-
-                    <div className="mt-10 pt-8 border-t border-white/10 dark:border-slate-800/50">
-                        <Link to="/login" className="flex items-center justify-center gap-2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 font-black text-[10px] uppercase tracking-widest transition-all group">
-                            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-                            Back to Login
-                        </Link>
-                    </div>
-                </motion.div>
-            </div>
+  return (
+    <div className="min-h-screen w-screen flex flex-col md:flex-row bg-[#FFFFFF]">
+      {/* Left side - Branding (Hidden on mobile) */}
+      <div className="hidden md:flex md:w-[45%] bg-[#F9FAFB] border-r border-[#E5E7EB] flex-col items-center justify-center p-12">
+        <div className="max-w-md text-center flex flex-col items-center">
+          <div className="w-20 h-20 bg-[#6D5DFC] rounded-2xl flex items-center justify-center mb-8 shadow-sm">
+             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h2 className="text-3xl font-bold text-[#111827] mb-4">AI LEGAL™</h2>
+          <p className="text-[#6B7280] text-base leading-relaxed">The premium Legal Operating System designed exclusively for modern Advocates. Automate research, drafting, and analysis.</p>
         </div>
-    );
+      </div>
+
+      {/* Right side - Form */}
+      <div className="flex-1 flex flex-col justify-center px-6 md:px-16 py-12 relative overflow-y-auto custom-scrollbar">
+        <Link to="/login" className="absolute top-8 right-8 text-sm font-medium text-[#6B7280] hover:text-[#111827] flex items-center gap-2">
+          <ArrowLeft className="w-4 h-4" /> Back to Login
+        </Link>
+        
+        <div className="max-w-sm w-full mx-auto mt-8 md:mt-0">
+          <div className="mb-10 text-center md:text-left">
+            <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-6 shadow-sm border ${step === 1 ? 'bg-[#6D5DFC] border-[#6D5DFC]' : 'bg-[#4F8CFF] border-[#4F8CFF]'}`}>
+              {step === 1 ? <ShieldCheck className="w-6 h-6 text-white" /> : <Key className="w-6 h-6 text-white" />}
+            </div>
+            <h1 className="text-3xl font-bold text-[#111827] tracking-tight mb-2">
+              {step === 1 ? 'Reset Password' : 'Verify & Reset'}
+            </h1>
+            <p className="text-[#6B7280]">
+              {step === 1 ? "Enter your email to receive a verification code." : "Enter the verification code sent to your email."}
+            </p>
+          </div>
+
+          <AnimatePresence mode="wait">
+            {step === 1 ? (
+              <motion.form
+                key="step1"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                onSubmit={handleSendOTP}
+                className="space-y-5"
+                autoComplete="off"
+              >
+                <div>
+                  <label className="block text-sm font-medium text-[#111827] mb-1.5">Email Address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280]" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="advocate@firm.com"
+                      className="w-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-xl py-3 pl-12 pr-4 text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#6D5DFC] focus:ring-1 focus:ring-[#6D5DFC] transition-all"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 bg-[#6D5DFC] hover:bg-[#5b4be8] text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-sm mt-2"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <><span>Send Verification Code</span> <ArrowRight className="w-4 h-4" /></>
+                  )}
+                </button>
+              </motion.form>
+            ) : (
+              <motion.form
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                onSubmit={handleResetPassword}
+                className="space-y-5"
+                autoComplete="off"
+              >
+                <div>
+                  <label className="block text-sm font-medium text-[#111827] mb-1.5 text-center md:text-left">Verification Code</label>
+                  <input
+                    type="text"
+                    name="otp"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                    placeholder="000000"
+                    className="w-full text-center text-2xl tracking-[0.5em] py-4 bg-[#FFFFFF] border border-[#E5E7EB] rounded-xl focus:outline-none focus:border-[#4F8CFF] focus:ring-1 focus:ring-[#4F8CFF] transition-all text-[#111827] font-bold placeholder-[#D1D5DB]"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-[#111827] mb-1.5">New Password</label>
+                  <div className="relative">
+                    <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6B7280]" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      name="new-password"
+                      autoComplete="new-password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-xl py-3 pl-12 pr-12 text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#4F8CFF] focus:ring-1 focus:ring-[#4F8CFF] transition-all"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#111827]"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 bg-[#4F8CFF] hover:bg-[#3b78eb] text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-sm mt-2"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <><span>Reset Password</span> <CheckCircle className="w-4 h-4" /></>
+                  )}
+                </button>
+
+                <div className="text-center mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="text-sm font-medium text-[#6B7280] hover:text-[#111827] transition-colors"
+                  >
+                    Wrong email? Go back
+                  </button>
+                </div>
+              </motion.form>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ForgotPassword;

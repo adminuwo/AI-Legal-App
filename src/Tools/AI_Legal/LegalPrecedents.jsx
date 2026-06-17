@@ -352,7 +352,7 @@ const LegalPrecedents = ({ projectId: initialProjectId, onBack, cases = [], onSe
                         <motion.div
                             key={c._id}
                             whileHover={{ y: -3 }}
-                            className="case-card bg-card border border-border rounded-[20px] p-5 shadow-sm hover:shadow-lg hover:border-indigo-500/50 transition-colors duration-300 cursor-pointer flex flex-col justify-between"
+                            className="case-card bg-card border border-border rounded-[20px] p-5 shadow-sm hover:shadow-sm hover:border-indigo-500/50 transition-colors duration-300 cursor-pointer flex flex-col justify-between"
                             onClick={() => onCaseClick(c)}
                         >
                             <div>
@@ -407,7 +407,7 @@ const LegalPrecedents = ({ projectId: initialProjectId, onBack, cases = [], onSe
             </p>
             <button
                 onClick={onCreateCase}
-                className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-700 shadow-xl shadow-indigo-500/20 transition-all"
+                className="flex items-center gap-2 bg-indigo-600 text-slate-800 px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-700 shadow-sm shadow-indigo-500/20 transition-all"
             >
                 <Plus size={18} /> Create New Case
             </button>
@@ -440,9 +440,9 @@ const LegalPrecedents = ({ projectId: initialProjectId, onBack, cases = [], onSe
     };
 
     return (
-        <div className="precedent-module-container flex-1 flex flex-col min-h-0 bg-white dark:bg-[#0B1020] rounded-3xl overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl m-4">
+        <div className="precedent-module-container flex-1 flex flex-col min-h-0 bg-white ] rounded-3xl overflow-hidden border border-slate-200 shadow-sm m-4">
             {/* Header */}
-            <div className="precedent-header px-4 sm:px-8 py-4 sm:py-6 bg-white/90 dark:bg-[#0B1020]/90 border-b border-slate-200 dark:border-white/5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sticky top-0 z-20 backdrop-blur-md">
+            <div className="precedent-header px-4 sm:px-8 py-4 sm:py-6 bg-white/90 border-b border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4 sticky top-0 z-20">
                 <div className="flex items-start sm:items-center gap-3 sm:gap-4">
                     <motion.button
                         whileHover={{ scale: 1.1 }}
@@ -478,7 +478,7 @@ const LegalPrecedents = ({ projectId: initialProjectId, onBack, cases = [], onSe
                     </div>
                 </div>
 
-                <div className="mode-toggle flex bg-slate-50 dark:bg-[#131C31] p-1 rounded-xl border border-slate-200 dark:border-white/5 w-full sm:w-fit overflow-x-auto no-scrollbar">
+                <div className="mode-toggle flex bg-slate-50 ] p-1 rounded-xl border border-slate-200 w-full sm:w-fit overflow-x-auto no-scrollbar">
                     <button
                         onClick={() => { setMode('CURRENT'); if (!selectedProjectId) resetSelection(); }}
                         className={`px-3 sm:px-4 py-2 text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-lg transition-all flex items-center justify-center gap-2 flex-1 sm:flex-none whitespace-nowrap ${mode === 'CURRENT'
@@ -516,13 +516,13 @@ const LegalPrecedents = ({ projectId: initialProjectId, onBack, cases = [], onSe
                                                 onChange={(e) => setQuery(e.target.value)}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                                 placeholder={t('searchPlaceholder')}
-                                                className="w-full relative z-10 bg-white dark:bg-[#1A2540] border-2 border-slate-100 dark:border-white/5 focus:border-indigo-500 rounded-2xl px-4 sm:px-6 py-4 sm:py-5 pl-12 sm:pl-14 text-xs sm:text-sm font-medium text-slate-700 dark:text-[#F8FAFC] shadow-sm transition-all outline-none"
+                                                className="w-full relative z-10 bg-white ] border-2 border-slate-100 focus:border-indigo-500 rounded-2xl px-4 sm:px-6 py-4 sm:py-5 pl-12 sm:pl-14 text-xs sm:text-sm font-medium text-slate-700 ] shadow-sm transition-all outline-none"
                                             />
                                             <Search className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-subtext group-focus-within:text-indigo-500 transition-colors z-20" size={18} />
                                             <button
                                                 onClick={() => handleSearch()}
                                                 disabled={isLoading || !query}
-                                                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all z-20"
+                                                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-slate-800 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all z-20"
                                             >
                                                 {isLoading ? '...' : 'Search'}
                                             </button>
@@ -625,7 +625,7 @@ const PrecedentCard = ({ caseItem, onClick, onCopyCitation, t }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ y: -4 }}
-            className="precedent-card group bg-white dark:bg-[#1A2540] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-lg transition-colors duration-300"
+            className="precedent-card group bg-white ] border border-slate-200 rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-sm transition-colors duration-300"
             onClick={onClick}
         >
             <div className="precedent-card-body p-6">
@@ -651,7 +651,7 @@ const PrecedentCard = ({ caseItem, onClick, onCopyCitation, t }) => {
                     "{case_context.facts || caseItem.facts || caseItem.summary}"
                 </p>
 
-                <div className="precedent-reasoning-preview bg-slate-50 dark:bg-[#0B1020]/40 rounded-xl p-4 border border-slate-100 dark:border-white/5 mb-4">
+                <div className="precedent-reasoning-preview bg-slate-50 rounded-xl p-4 border border-slate-100 mb-4">
                     <div className="text-[9px] font-black text-maintext uppercase tracking-widest mb-1.5 flex items-center gap-1.5 opacity-70">
                         <Shield size={10} /> {t('legalReasoning')}
                     </div>
@@ -743,7 +743,7 @@ export const CaseDetailView = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="precedent-modal-overlay fixed inset-0 z-[9999] flex items-center justify-center p-0 sm:p-6 bg-background/80 backdrop-blur-sm"
+            className="precedent-modal-overlay fixed inset-0 z-[9999] flex items-center justify-center p-0 sm:p-6 bg-background/80"
         >
             <div className="absolute inset-0" onClick={onClose} />
 
@@ -752,13 +752,13 @@ export const CaseDetailView = ({
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.95, opacity: 0, y: 20 }}
                 transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                className="precedent-detail-modal relative w-full max-w-[1200px] h-full sm:h-[90vh] bg-white dark:bg-[#0B1020] rounded-0 sm:rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col border border-slate-200 dark:border-white/5"
+                className="precedent-detail-modal relative w-full max-w-[1200px] h-full sm:h-[90vh] bg-white ] rounded-0 sm:rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col border border-slate-200"
             >
                 {/* Header Section */}
-                <div className="precedent-modal-header px-6 sm:px-8 py-5 sm:py-6 bg-white dark:bg-[#131C31]/50 border-b border-slate-200 dark:border-white/5 flex justify-between items-center sticky top-0 z-20 backdrop-blur-md">
+                <div className="precedent-modal-header px-6 sm:px-8 py-5 sm:py-6 bg-white border-b border-slate-200 flex justify-between items-center sticky top-0 z-20">
                     <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20">
-                            <Gavel size={20} className="text-white" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 shadow-sm shadow-indigo-500/20">
+                            <Gavel size={20} className="text-slate-800" />
                         </div>
                         <div className="overflow-hidden">
                             <h2 className="text-lg sm:text-xl font-bold text-maintext truncate tracking-tight leading-tight mb-0.5 sm:mb-1">
@@ -789,7 +789,7 @@ export const CaseDetailView = ({
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="absolute inset-0 z-50 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center text-center p-8"
+                            className="absolute inset-0 z-50 bg-background/80 flex flex-col items-center justify-center text-center p-8"
                         >
                             <div className="relative mb-6">
                                 <div className="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-600 rounded-full animate-spin" />
@@ -809,7 +809,7 @@ export const CaseDetailView = ({
                     <div className="precedent-modal-main md:w-[65%] overflow-y-auto custom-scrollbar px-6 sm:px-8 py-6 sm:py-8 space-y-6 min-h-0 overscroll-contain">
 
                         {/* Case Facts */}
-                        <div className="bg-white dark:bg-[#1A2540] p-6 rounded-[20px] border border-slate-200 dark:border-white/5 shadow-sm">
+                        <div className="bg-white ] p-6 rounded-[20px] border border-slate-200 shadow-sm">
                             <Section
                                 title={t('caseFacts')}
                                 content={case_context.facts || caseItem.facts}
@@ -1159,12 +1159,12 @@ export const ReasoningSection = ({ content, t }) => {
 
 export const CaseSelectionModal = ({ isOpen, onClose, onSelect, cases, currentProjectId, title, onCreateNew }) => {
     return (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-background/80">
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-background rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-border"
+                className="bg-background rounded-3xl w-full max-w-md overflow-hidden shadow-sm border border-border"
             >
                 <div className="p-6 border-b border-border flex justify-between items-center bg-card">
                     <div>
@@ -1192,7 +1192,7 @@ export const CaseSelectionModal = ({ isOpen, onClose, onSelect, cases, currentPr
                             >
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${c._id === currentProjectId ? 'bg-card' : 'bg-card group-hover:bg-background'
                                     }`}>
-                                    <Briefcase size={18} className={c._id === currentProjectId ? 'text-indigo-400' : 'text-subtext group-hover:text-indigo-400'} />
+                                    <Briefcase size={18} className={c._id === currentProjectId ?'text-indigo-400' : 'text-subtext group-hover:text-indigo-400'} />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className={`text-sm font-black truncate ${c._id === currentProjectId ? 'text-indigo-300' : 'text-maintext group-hover:text-indigo-300'}`}>
@@ -1206,7 +1206,7 @@ export const CaseSelectionModal = ({ isOpen, onClose, onSelect, cases, currentPr
                                     </div>
                                 </div>
                                 {c._id === currentProjectId ? (
-                                    <div className="w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center text-white">
+                                    <div className="w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center text-slate-800">
                                         <Zap size={12} fill="white" />
                                     </div>
                                 ) : (

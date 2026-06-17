@@ -417,14 +417,14 @@ const MultiScheduleReminder = () => {
 
 
                                 <div>
-                                    <label className="text-xs font-bold text-gray-500 uppercase">Reminder Voice (AISA)</label>
+                                    <label className="text-xs font-bold text-gray-500 uppercase">Reminder Voice (AI LEGAL™)</label>
                                     <div className="relative mt-1">
                                         <select value={formData.voice} onChange={e => setFormData(prev => ({...prev, voice: e.target.value}))} className="w-full bg-gray-50 dark:bg-black/20 border border-border rounded-xl p-3 text-sm outline-none focus:border-primary transition-all appearance-none pr-10">
                                             <option value="none">None (Silent)</option>
-                                            <option value="en-US-female">AISA Female (USA)</option>
-                                            <option value="en-US-male">AISA Male (USA)</option>
-                                            <option value="hi-IN-female">AISA Female (Hindi/India)</option>
-                                            <option value="hi-IN-male">AISA Male (Hindi/India)</option>
+                                            <option value="en-US-female">AI LEGAL™ Female (USA)</option>
+                                            <option value="en-US-male">AI LEGAL™ Male (USA)</option>
+                                            <option value="hi-IN-female">AI LEGAL™ Female (Hindi/India)</option>
+                                            <option value="hi-IN-male">AI LEGAL™ Male (Hindi/India)</option>
                                         </select>
                                         <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                                     </div>

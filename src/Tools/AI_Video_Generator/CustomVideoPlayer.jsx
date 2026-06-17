@@ -287,10 +287,10 @@ const CustomVideoPlayer = ({ src, compact = false }) => {
             )}
 
 
-            {/* AISA Watermark Logo */}
+            {/* AI LEGAL™ Watermark Logo */}
             <img
                 src={logo}
-                alt="AISA Watermark"
+                alt="AI LEGAL™ Watermark"
                 className={`absolute transition-all duration-300 pointer-events-none z-[15] opacity-60 select-none drop-shadow-2xl ${compact
                     ? `right-2 w-6 ${showControls || !isPlaying ? 'bottom-12' : 'bottom-2'}`
                     : `right-4 sm:right-6 md:right-8 w-8 sm:w-10 md:w-12 ${showControls || !isPlaying ? 'bottom-16 sm:bottom-20 md:bottom-24' : 'bottom-2 sm:bottom-4 md:bottom-6'}`

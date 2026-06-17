@@ -73,7 +73,7 @@ const OnboardingModal = ({ isOpen, onClose, onComplete }) => {
                                     >
                                         <div>
                                             <h2 className="text-2xl font-black text-white mb-2">Initialize Your Neural Link</h2>
-                                            <p className="text-white/50">How should AISA address you in our sessions?</p>
+                                            <p className="text-white/50">How should AI LEGAL™ address you in our sessions?</p>
                                         </div>
                                         <div className="relative">
                                             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-400" />
@@ -156,7 +156,7 @@ const OnboardingModal = ({ isOpen, onClose, onComplete }) => {
                                     disabled={!form.name && step === 1 || !form.businessType && step === 2 || !form.goal && step === 3}
                                     className="flex-1 py-4 bg-white text-black rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-white/90 disabled:opacity-50 transition-all shadow-xl shadow-white/5"
                                 >
-                                    {step === 3 ? "Initialize AISA" : "Next Phase"}
+                                    {step === 3 ? "Initialize AI LEGAL™" : "Next Phase"}
                                     <ArrowRight className="w-5 h-5" />
                                 </button>
                             </div>

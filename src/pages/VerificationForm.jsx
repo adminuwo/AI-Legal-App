@@ -74,64 +74,52 @@ export default function VerificationForm() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden selection:bg-primary/20 bg-[#f8fafc] dark:bg-[#020617] aisa-scalable-text">
-            {/* Background Blobs */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                <motion.div
-                    animate={{ x: [0, 80, 0], y: [0, 40, 0], scale: [1, 1.2, 1] }}
-                    transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-[-5%] right-[-5%] w-[50%] h-[50%] bg-primary/20 dark:bg-primary/10 blur-[140px] rounded-full"
-                />
-                <motion.div
-                    animate={{ x: [0, -80, 0], y: [0, -40, 0], scale: [1, 1.1, 1] }}
-                    transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute bottom-[-5%] left-[-5%] w-[50%] h-[50%] bg-primary/20 dark:bg-primary/10 blur-[140px] rounded-full"
-                />
+        <div className="min-h-screen w-screen flex flex-col md:flex-row bg-[#FFFFFF]">
+            {/* Left side - Branding (Hidden on mobile) */}
+            <div className="hidden md:flex md:w-[45%] bg-[#F9FAFB] border-r border-[#E5E7EB] flex-col items-center justify-center p-12">
+                <div className="max-w-md text-center flex flex-col items-center">
+                    <div className="w-20 h-20 bg-[#6D5DFC] rounded-2xl flex items-center justify-center mb-8 shadow-sm">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                    </div>
+                    <h2 className="text-3xl font-bold text-[#111827] mb-4">AI LEGAL™</h2>
+                    <p className="text-[#6B7280] text-base leading-relaxed">The premium Legal Operating System designed exclusively for modern Advocates. Automate research, drafting, and analysis.</p>
+                </div>
             </div>
 
-            <div className="relative w-full max-w-[420px] px-4">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    className="relative overflow-hidden bg-white/20 dark:bg-white/[0.02] backdrop-blur-3xl border border-white/40 dark:border-white/10 p-10 rounded-[3.5rem] shadow-2xl text-center ring-1 ring-white/20"
-                >
-                    {/* Header */}
-                    <div className="mb-10">
-                        <div className="inline-flex items-center justify-center p-5 bg-primary rounded-[2rem] mb-6 shadow-xl shadow-primary/20">
-                            <Mail className="w-7 h-7 text-white" />
+            {/* Right side - Form */}
+            <div className="flex-1 flex flex-col justify-center px-6 md:px-16 py-12 relative overflow-y-auto custom-scrollbar">
+                <Link to={AppRoute.SIGNUP} className="absolute top-8 right-8 text-sm font-medium text-[#6B7280] hover:text-[#111827] flex items-center gap-2">
+                    <ArrowLeft className="w-4 h-4" /> Back to Signup
+                </Link>
+
+                <div className="max-w-sm w-full mx-auto mt-8 md:mt-0">
+                    <div className="mb-10 text-center md:text-left">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-[#6D5DFC] rounded-xl mb-6 shadow-sm">
+                            <Mail className="w-6 h-6 text-white" />
                         </div>
-                        <h2 className="text-3xl font-black text-slate-800 dark:text-white mb-2 tracking-tighter uppercase leading-tight">Verify Your Email</h2>
-                        <div className="flex flex-col items-center gap-1">
-                            <p className="text-slate-500 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em]">
-                                We've sent a 6-digit code to
-                            </p>
-                            <div className="flex items-center gap-2.5 px-3.5 py-1.5 bg-white/40 dark:bg-white/5 rounded-full border border-white/40 dark:border-white/10 mt-2">
-                                <span className="text-base font-bold text-slate-700 dark:text-white">{email}</span>
-                                <Link to="/signup" className="p-1 hover:bg-white/40 dark:hover:bg-white/10 rounded-full transition-colors text-primary">
-                                    <Pencil className="w-3.5 h-3.5" />
-                                </Link>
-                            </div>
+                        <h1 className="text-3xl font-bold text-[#111827] tracking-tight mb-2">Verify Your Email</h1>
+                        <p className="text-[#6B7280] text-sm">We've sent a 6-digit code to</p>
+                        <div className="flex items-center gap-2 mt-2 bg-[#F9FAFB] border border-[#E5E7EB] rounded-lg px-3 py-1.5 w-fit mx-auto md:mx-0">
+                            <span className="font-medium text-[#111827] text-sm">{email}</span>
+                            <Link to="/signup" className="text-[#6D5DFC] hover:text-[#5b4be8] transition-colors p-1">
+                                <Pencil className="w-4 h-4" />
+                            </Link>
                         </div>
                     </div>
 
-                    {/* Error Display */}
-                    <AnimatePresence mode="wait">
+                    <AnimatePresence>
                         {error && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-black uppercase tracking-widest flex items-center gap-2 justify-center backdrop-blur-md"
-                            >
-                                <AlertCircle className="w-4 h-4" />
-                                {error}
+                            <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-start gap-3">
+                                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                                <span>{error}</span>
                             </motion.div>
                         )}
                     </AnimatePresence>
 
-                    {/* Form */}
-                    <form onSubmit={handleVerify} className="space-y-8" autoComplete="off">
-                        <div className="relative">
+                    <form onSubmit={handleVerify} className="space-y-6" autoComplete="off">
+                        <div>
                             <input
                                 type="text"
                                 name="otp"
@@ -143,22 +131,16 @@ export default function VerificationForm() {
                                     const val = e.target.value.replace(/\D/g, '');
                                     if (val.length <= 6) setVerificationCode(val);
                                 }}
-                                placeholder="······"
-                                className="w-full text-center text-5xl tracking-[0.4em] py-7 bg-white/30 dark:bg-slate-900/40 border border-white/50 dark:border-white/10 rounded-[2rem] 
-                                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                                     transition-all text-slate-800 dark:text-white font-black placeholder:text-slate-400/50 placeholder:tracking-normal backdrop-blur-md shadow-inner"
+                                placeholder="000000"
+                                className="w-full text-center text-3xl tracking-[0.4em] py-5 bg-[#FFFFFF] border border-[#E5E7EB] rounded-xl focus:outline-none focus:border-[#6D5DFC] focus:ring-1 focus:ring-[#6D5DFC] transition-all text-[#111827] font-bold placeholder-[#D1D5DB]"
                                 autoFocus
                             />
                         </div>
 
-                        <motion.button
-                            whileHover={{ y: -5, scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                        <button
                             type="submit"
                             disabled={loading || verificationCode.length !== 6}
-                            className="w-full py-5 bg-primary rounded-[2rem] font-black text-sm uppercase tracking-widest text-white shadow-xl shadow-primary/30 
-                                 hover:shadow-primary/50 transition-all duration-300 
-                                 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 active:scale-95"
+                            className="w-full py-3.5 bg-[#6D5DFC] hover:bg-[#5b4be8] text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-sm"
                         >
                             {loading ? (
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -168,32 +150,21 @@ export default function VerificationForm() {
                                     <ArrowRight className="w-5 h-5" />
                                 </>
                             )}
-                        </motion.button>
+                        </button>
                     </form>
 
-                    <div className="mt-10 pt-8 border-t border-white/10 dark:border-slate-800/50 text-center">
-                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">
-                            Didn't receive the code?
-                        </p>
+                    <div className="mt-8 text-center">
+                        <p className="text-sm text-[#6B7280] mb-2">Didn't receive the code?</p>
                         <button
                             type="button"
                             onClick={handleResend}
                             disabled={resendLoading}
-                            className="text-primary hover:underline text-sm font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                            className="text-[#6D5DFC] font-semibold hover:text-[#5b4be8] transition-colors disabled:opacity-50 text-sm"
                         >
                             {resendLoading ? 'Sending...' : 'Request New Code'}
                         </button>
                     </div>
-                </motion.div>
-
-                {/* Back Link */}
-                <Link
-                    to={AppRoute.SIGNUP}
-                    className="mt-10 flex items-center justify-center gap-2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 font-black text-[10px] uppercase tracking-widest transition-all group"
-                >
-                    <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-                    Back to Signup
-                </Link>
+                </div>
             </div>
         </div>
     );

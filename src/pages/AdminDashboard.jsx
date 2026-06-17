@@ -1409,7 +1409,7 @@ const FeatureCreditsTab = () => {
             </div>
 
             {Object.entries(grouped).map(([category, items]) => {
-                const isAdvanceCategory = category === 'AISA Advance Feature';
+                const isAdvanceCategory = category === 'AI LEGAL™ Advance Feature';
                 const regularFeatures = isAdvanceCategory ? items.filter(f => !AI_ADS_FEATURES.includes(f.featureKey)) : items;
                 const aiAdsFeatures = isAdvanceCategory ? items.filter(f => AI_ADS_FEATURES.includes(f.featureKey)) : [];
 
@@ -1785,7 +1785,7 @@ const AdminDashboard = () => {
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-white/5 backdrop-blur-xl flex items-center justify-center shadow-lg border border-white/10 overflow-hidden">
-                            <img src={logo} alt="AISA" className="w-9 h-9 object-contain" />
+                            <img src={logo} alt="AI LEGAL™" className="w-9 h-9 object-contain" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-black text-maintext tracking-tight">{t('adminDashboard')}</h1>

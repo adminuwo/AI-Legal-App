@@ -48,7 +48,7 @@ const SlideShow = ({ type, themeColor, isDarkMode }) => {
   const cashflowSlides = [
     {
       title: "Global Market Explorer",
-      description: "Search and analyze 10,000+ Global & Indian stocks with AISA intelligence.",
+      description: "Search and analyze 10,000+ Global & Indian stocks with AI LEGAL™ intelligence.",
       visual: (
         <div className="w-full h-full flex flex-col p-6 space-y-4">
           <div className="bg-white/10 p-3 rounded-xl border border-white/10 flex items-center gap-3">
@@ -167,7 +167,7 @@ const SlideShow = ({ type, themeColor, isDarkMode }) => {
     },
     {
       title: "Active Intelligence Synthesis",
-      description: "AISA extracts hooks, USPs and creates viral social captions in seconds.",
+      description: "AI LEGAL™ extracts hooks, USPs and creates viral social captions in seconds.",
       visual: (
         <div className="w-full h-full flex flex-col justify-center p-8 space-y-4">
            <div className="bg-white/5 rounded-2xl p-4 border border-white/10 relative">
@@ -181,7 +181,7 @@ const SlideShow = ({ type, themeColor, isDarkMode }) => {
                     animate={{ opacity: 1 }} 
                     className="text-xs font-medium text-white/80 leading-relaxed italic"
                  >
-                    "Transforming your workspace has never been easier. Discover premium aesthetics with AISA... <motion.span animate={{ opacity: [0, 1] }} transition={{ repeat: Infinity }}>|</motion.span>"
+                    "Transforming your workspace has never been easier. Discover premium aesthetics with AI LEGAL™... <motion.span animate={{ opacity: [0, 1] }} transition={{ repeat: Infinity }}>|</motion.span>"
                  </motion.div>
                  <div className="flex flex-wrap gap-2 pt-2">
                     {['#Productivity', '#AIArt', '#ModernWork'].map(tag => (
