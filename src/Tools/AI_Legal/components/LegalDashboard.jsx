@@ -369,13 +369,13 @@ const LegalDashboard = ({
                 <table className="w-full border-collapse text-left text-sm text-slate-500">
                   <thead className="bg-[#FAFBFB] text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-[#ECECEC]">
                     <tr>
-                      <th scope="col" className="px-6 py-4 whitespace-nowrap">Case Name</th>
-                      <th scope="col" className="px-6 py-4 whitespace-nowrap">Case Type</th>
-                      <th scope="col" className="px-6 py-4 whitespace-nowrap">Court</th>
-                      <th scope="col" className="px-6 py-4 whitespace-nowrap">Next Hearing</th>
-                      <th scope="col" className="px-6 py-4 whitespace-nowrap">Status</th>
-                      <th scope="col" className="px-6 py-4 text-center whitespace-nowrap">Actions</th>
-                      <th scope="col" className="px-6 py-4 text-right whitespace-nowrap">Open Workspace</th>
+                      <th scope="col" className="w-[30%] px-4 py-3 whitespace-nowrap">Case Name</th>
+                      <th scope="col" className="w-[15%] px-4 py-3 whitespace-nowrap">Case Type</th>
+                      <th scope="col" className="w-[15%] px-4 py-3 whitespace-nowrap">Court</th>
+                      <th scope="col" className="w-[15%] px-4 py-3 whitespace-nowrap">Next Hearing</th>
+                      <th scope="col" className="w-[10%] px-4 py-3 whitespace-nowrap">Status</th>
+                      <th scope="col" className="w-[5%] px-4 py-3 text-center whitespace-nowrap">Actions</th>
+                      <th scope="col" className="w-[10%] px-4 py-3 text-right whitespace-nowrap">Open Workspace</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#ECECEC] bg-white">
@@ -383,7 +383,7 @@ const LegalDashboard = ({
                       const hearingDate = getNextHearingDate(c);
                       return (
                         <tr key={c._id} className="hover:bg-slate-50/50 transition-colors group">
-                          <td className="px-6 py-4.5 font-semibold text-[#111827] text-base whitespace-nowrap">
+                          <td className="px-4 py-3 font-semibold text-[#111827] text-base whitespace-nowrap">
                             <span className="flex items-center gap-2 whitespace-nowrap">
                               <span className="shrink-0">📁</span>
                               <span className="hover:text-[#6D5DFC] transition-colors cursor-pointer" onClick={() => handleOpenCase(c)}>
@@ -391,13 +391,13 @@ const LegalDashboard = ({
                               </span>
                             </span>
                           </td>
-                          <td className="px-6 py-4.5 text-slate-500 text-sm whitespace-nowrap">{c.caseType || 'General Dispute'}</td>
-                          <td className="px-6 py-4.5 text-slate-500 text-sm whitespace-nowrap">{c.courtName || 'District Court'}</td>
-                          <td className="px-6 py-4.5 text-slate-500 text-sm font-medium whitespace-nowrap">
+                          <td className="px-4 py-3 text-slate-500 text-sm whitespace-nowrap">{c.caseType || 'General Dispute'}</td>
+                          <td className="px-4 py-3 text-slate-500 text-sm whitespace-nowrap">{c.courtName || 'District Court'}</td>
+                          <td className="px-4 py-3 text-slate-500 text-sm font-medium whitespace-nowrap">
                             {hearingDate !== 'None' ? `🗓 ${hearingDate}` : 'None'}
                           </td>
-                          <td className="px-6 py-4.5 whitespace-nowrap">{renderStatusPill(c.status)}</td>
-                          <td className="px-6 py-4.5 text-center relative whitespace-nowrap">
+                          <td className="px-4 py-3 whitespace-nowrap">{renderStatusPill(c.status)}</td>
+                          <td className="px-4 py-3 text-center relative whitespace-nowrap">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -445,7 +445,7 @@ const LegalDashboard = ({
                               </>
                             )}
                           </td>
-                          <td className="px-6 py-4.5 text-right font-bold whitespace-nowrap">
+                          <td className="px-4 py-3 text-right font-bold whitespace-nowrap">
                             <button
                               onClick={() => handleOpenCase(c)}
                               className="text-[#6D5DFC] hover:text-[#5b4edb] hover:translate-x-0.5 transition-all text-xs font-bold inline-flex items-center gap-1"

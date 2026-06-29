@@ -4919,142 +4919,67 @@ Through Counsel
   };
 
   const renderArguments = () => {
-    const client = caseData.clientName || 'Rajesh Sharma';
-    const opponent = caseData.opponentName || 'Amit Verma';
-    const courtName = caseData.court || 'Delhi District Court';
+    const client = caseData.clientName || 'Client';
+    const opponent = caseData.opponentName || caseData.accused || 'Opponent';
+    const courtName = caseData.court || caseData.courtName || 'Court';
 
-    // Strategy parameters stored in JS object to avoid ESLint unescaped char warnings
+    const ci = caseData.caseIntelligence || {};
+    const petitionerArgs = caseData.arguments?.petitionerArguments?.length > 0
+      ? caseData.arguments.petitionerArguments
+      : (ci.arguments || []);
+    const respondentArgs = caseData.arguments?.respondentArguments?.length > 0
+      ? caseData.arguments.respondentArguments
+      : (ci.counterArguments || []);
+    const predictionsList = ci.counterArguments
+      ? ci.counterArguments.map((c, idx) => ({
+          id: `pred_${idx}`,
+          title: c.title || 'Potential Counter Objection',
+          description: c.description || '',
+          probability: 75,
+          type: c.category || 'Defense Challenge',
+          rebuttal: c.refutation || 'Rebuttal based on case facts.'
+        }))
+      : [];
+    const trialSeq = ci.strategy?.trialSequence?.length > 0
+      ? ci.strategy.trialSequence
+      : [{ step: 1, title: 'Establish Primary Claims', detail: caseData.summary || 'Present submitted facts', status: 'Primary' }];
+
     const strategyData = {
-      strengthScore: 88,
-      completenessScore: 94,
-      evidenceLinksCount: 7,
-      activeArgumentsCount: 6,
-      
-      petitionerArguments: [
-        {
-          id: "p1",
-          title: "Valid and Binding Written Agreement",
-          description: `A signed written loan agreement was executed on 10 April 2024. Under Section 10 of the Indian Contract Act, this constitutes a valid and binding contract between ${client} and ${opponent}.`,
-          supportingEvidence: ["Loan Agreement Deed (Ex. P-1)", "Executing Witnesses"],
-          supportingLaws: ["Indian Contract Act, 1872 - Sec 10 (Legality of Consent)"],
-          supportingTimelineEvents: ["10/04/2024 - Loan Agreement Executed"],
-          impact: "High",
-          category: "Contract Law"
-        },
-        {
-          id: "p2",
-          title: "Failure of Repayment and Default",
-          description: `Defendant failed to clear the outstanding balance of ₹15,00,000 by the agreed deadline of 15 April 2025. Bank statement records show no incoming transactions or ledger reconciliations.`,
-          supportingEvidence: ["HDFC Bank Statement (Ex. P-2)", "Default Notice"],
-          supportingLaws: ["Indian Contract Act, 1872 - Sec 73 (Compensation for breach)"],
-          supportingTimelineEvents: ["15/04/2025 - Repayment Deadline Missed"],
-          impact: "Critical",
-          category: "Financial Liability"
-        },
-        {
-          id: "p3",
-          title: "Service of Pre-litigation Legal Notice",
-          description: `A formal demand notice was served on 10 May 2025 under registered post. Refusal or failure to reply within 15 days establishes a presumption of liability.`,
-          supportingEvidence: ["Legal Notice Office Copy (Ex. P-3)", "Postal Dispatch Receipt"],
-          supportingLaws: ["General Clauses Act, 1897 - Sec 27 (Presumption of service)"],
-          supportingTimelineEvents: ["10/05/2025 - Demand Notice Served"],
-          impact: "Medium",
-          category: "Procedural Compliance"
-        }
-      ],
-
-      respondentArguments: [
-        {
-          id: "d1",
-          title: "Denial of Execution & Signature Forgery",
-          description: `Defendant claims they never signed the loan agreement, alleging signature forgery, and demands a forensic audit of the handwriting.`,
-          refutation: `The agreement was notarized in the presence of two independent executing witnesses who verified the signatures. Section 67 of the Indian Evidence Act applies.`,
-          impact: "High",
-          category: "Authenticity"
-        },
-        {
-          id: "d2",
-          title: "Limitation Period Expiry Defense",
-          description: `Defendant alleges that the recovery claim is barred by limitation as transaction dates are contested.`,
-          refutation: `The suit was filed on 10 December 2025, which is well within the 3-year limitation period starting from the default date (15 April 2025) as per Article 19 of the Limitation Act, 1963.`,
-          impact: "Critical",
-          category: "Statute of Limitations"
-        },
-        {
-          id: "d3",
-          title: "Partial Repayment in Cash Allegation",
-          description: `Defendant asserts they paid ₹5,00,000 in cash during a private meeting but lacks a stamped receipt or ledger entry.`,
-          refutation: `Section 92 of the Indian Evidence Act excludes oral evidence to contradict written contract terms. Any repayment must have written proof.`,
-          impact: "Medium",
-          category: "Discharge of Debt"
-        }
-      ],
-
-      predictions: [
-        {
-          id: "pred1",
-          title: "Objection on Document Admissibility",
-          description: `The defense will attempt to block the admission of the unsigned bank ledger under Section 65B of the Evidence Act.`,
-          probability: 85,
-          type: "Procedural Challenge",
-          rebuttal: "Ensure the Section 65B electronic record certificate is signed by the branch manager and filed concurrently."
-        },
-        {
-          id: "pred2",
-          title: "Allegation of Extortionate Interest Rates",
-          description: `Opponent will argue that the 18% delayed payment interest rate is penal and extortionate.`,
-          probability: 72,
-          type: "Interest Rate Claim",
-          rebuttal: "Cite landmark Supreme Court judgments upholding commercial interest rates up to 18% under Section 34 of CPC."
-        },
-        {
-          id: "pred3",
-          title: "Lack of Territorial Jurisdiction Challenge",
-          description: `The defense will claim the Delhi court lacks territorial jurisdiction because the agreement was signed in Noida.`,
-          probability: 60,
-          type: "Jurisdiction Objection",
-          rebuttal: "Point to Clause 14 of the contract which establishes exclusive jurisdiction in Delhi courts, and note the payment was to be received in Delhi."
-        }
-      ],
-
+      strengthScore: ci.caseStrength || caseData.intelligence?.strengthScore || 70,
+      completenessScore: 90,
+      evidenceLinksCount: (caseData.evidence || []).length,
+      activeArgumentsCount: petitionerArgs.length,
+      petitionerArguments: petitionerArgs.map((a, idx) => ({
+        id: a.id || `p_${idx}`,
+        title: a.title || 'Legal Claim',
+        description: a.description || '',
+        supportingEvidence: a.supportingEvidence || [],
+        supportingLaws: a.supportingLaws || [],
+        supportingTimelineEvents: a.supportingTimelineEvents || [],
+        impact: a.impact || 'High',
+        category: a.category || 'Legal Claim'
+      })),
+      respondentArguments: respondentArgs.map((a, idx) => ({
+        id: a.id || `d_${idx}`,
+        title: a.title || 'Opponent Objection',
+        description: a.description || '',
+        refutation: a.refutation || 'Our rebuttal',
+        impact: a.impact || 'High',
+        category: a.category || 'Defense'
+      })),
+      predictions: predictionsList,
       trialStrategy: {
-        sequence: [
-          { step: 1, title: "Establish Contract Execution", detail: `Lead with the notarized loan agreement and testimony of execution witnesses to defeat the forgery defense early.`, status: "Primary" },
-          { step: 2, title: "Demonstrate Non-Repayment via Bank Records", detail: `Present certified bank ledger showing zero inflows matching the demand timeline.`, status: "Crucial" },
-          { step: 3, title: "Establish Procedural Compliance", detail: `Submit registered post receipts to prove notice delivery, establishing legal service presumption.`, status: "Supportive" },
-          { step: 4, title: "Address Limitations Head-on", detail: `Point out default date relative to filing date in oral submissions before the opponent objects.`, status: "Pre-emptive" }
-        ],
-        avoidList: [
-          "Avoid discussing secondary verbal extensions of repayment times without written addendums.",
-          "Do not rely solely on copy documents; keep originals ready for inspection to counter secondary evidence objections."
-        ],
-        highImpactSubmissions: [
-          "Focus on Section 92 of Evidence Act to block oral claims of private cash repayment.",
-          "Submit Branch Manager's certified statement under Section 65B early."
-        ],
-        judicialConcerns: [
-          `The Judge will likely query whether the interest rate compound rules were explained to the borrower.`,
-          `The Court may inquire about Noida signing location vs Delhi jurisdiction.`
-        ]
+        sequence: trialSeq,
+        avoidList: ci.strategy?.avoidList || [],
+        highImpactSubmissions: ci.recommendations || [],
+        judicialConcerns: ci.strategy?.judicialConcerns || []
       },
-
       prepBinder: {
-        openingStatement: `Respected Your Honor, this is a clear-cut case of commercial debt recovery. The Plaintiff lent a sum of ₹15,00,000 on a written, notarized contract. The repayment date passed on 15 April 2025, and despite a legal notice, the Defendant has failed to return a single rupee. The defense of forgery is a standard delaying tactic with no forensic backing. We seek recovery in full with interest.`,
-        oralArguments: [
-          "The contract signed on 10 April 2024 is undisputed in law under Section 67 due to independent witness attestations.",
-          "No proof of cash repayment has been placed on record by the defense, which is barred under Section 92 of Evidence Act.",
-          "The suit is filed within 8 months of default, making the limitation defense legally absurd."
-        ],
-        crossExamination: [
-          "Are you aware that the agreement was signed in front of a Public Notary?",
-          "Can you produce any bank withdrawal slip or receipt proving the alleged ₹5,00,000 cash repayment?",
-          "Did you reply to the legal notice served on 10 May 2025?"
-        ],
-        judgeQuestions: [
-          { question: "Why is the Noida agreement being litigated in Delhi jurisdiction?", answer: "As per Clause 14, the parties agreed on exclusive Delhi jurisdiction. Furthermore, the loan amount was disbursed from and repayable to the Plaintiff's bank account in Delhi." },
-          { question: "Is the 18% interest rate standard?", answer: "Yes, in commercial loans. Section 34 of the CPC allows courts to award reasonable interest, and 18% is standard in business default clauses." }
-        ],
-        closingSubmission: "In summary, the written agreement is proved, default is confirmed by certified bank statements, and no legal defense is substantiated. We pray for a decree in favor of the Plaintiff."
+        openingStatement: ci.strategy?.closingSubmission || `Respected Your Honor, presenting claims for ${client} against ${opponent}.`,
+        oralArguments: petitionerArgs.map(a => a.title),
+        crossExamination: respondentArgs.map(a => `Regarding ${a.title}: Can you verify these facts?`),
+        judgeQuestions: (ci.strategy?.judicialConcerns || []).map(q => ({ question: q, answer: "Supported by facts on record." })),
+        closingSubmission: ci.strategy?.closingSubmission || "Praying for decree in favor of client."
       }
     };
 

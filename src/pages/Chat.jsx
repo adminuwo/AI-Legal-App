@@ -55,8 +55,6 @@ import { useTheme } from '../context/ThemeContext';
 // AI Legal Modular Components
 import ActionCard from '../Components/ActionCard';
 import { useAILegalCRM } from '../Tools/AI_Legal/hooks/useAILegalCRM';
-import LegalWorkspaceHeader from '../Tools/AI_Legal/components/LegalWorkspaceHeader';
-import LegalWorkspaceWelcome from '../Tools/AI_Legal/components/LegalWorkspaceWelcome';
 import useCaseWorkspaceStore from '../userStore/caseWorkspaceStore';
 import { SelectionToolbarProvider } from '../Components/SelectionToolbar/SelectionToolbarProvider';
 import useChatGeneration from '../userStore/useChatGeneration';
@@ -449,6 +447,41 @@ const getSessionLock = (chatId) => {
     _sendingLocks.set(chatId, { locked: false, lastSentTime: 0 });
   }
   return _sendingLocks.get(chatId);
+};
+
+const getToolTypingMessage = (tool) => {
+  const toolKey = String(tool || '').toLowerCase().trim();
+  if (toolKey.includes('my_case') || toolKey.includes('case assistant') || toolKey.includes('case_assistant')) {
+    return "Analyzing case details...";
+  }
+  if (toolKey.includes('contract_analyzer') || toolKey.includes('contract analyzer') || toolKey.includes('contract clauses')) {
+    return "Reviewing contract clauses...";
+  }
+  if (toolKey.includes('evidence_checker') || toolKey.includes('evidence analyst') || toolKey.includes('evidence_analyst') || toolKey.includes('evidence')) {
+    return "Analyzing evidence...";
+  }
+  if (toolKey.includes('research_assistant') || toolKey.includes('research assistant') || toolKey.includes('legal authorities')) {
+    return "Searching legal authorities...";
+  }
+  if (toolKey.includes('strategy_engine') || toolKey.includes('strategy engine') || toolKey.includes('legal strategy')) {
+    return "Developing legal strategy...";
+  }
+  if (toolKey.includes('argument_builder') || toolKey.includes('argument builder') || toolKey.includes('legal arguments')) {
+    return "Building legal arguments...";
+  }
+  if (toolKey.includes('case_predictor') || toolKey.includes('case predictor') || toolKey.includes('possible outcomes') || toolKey.includes('possible outcome')) {
+    return "Evaluating possible outcomes...";
+  }
+  if (toolKey.includes('legal_precedent') || toolKey.includes('legal precedent') || toolKey.includes('precedent') || toolKey.includes('legal_research') || toolKey.includes('research') || toolKey.includes('acts & judgments')) {
+    if (toolKey.includes('research_assistant') || toolKey.includes('research assistant')) {
+      return "Searching legal authorities...";
+    }
+    return "Searching relevant precedents...";
+  }
+  if (toolKey.includes('draft_maker') || toolKey.includes('draft maker') || toolKey.includes('legal draft')) {
+    return "Preparing legal draft...";
+  }
+  return "Thinking...";
 };
 
 // legacy shim
@@ -6946,20 +6979,6 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                   )}
                 </AnimatePresence>
 
-                {currentMode === 'LEGAL_TOOLKIT' && currentProjectId && (
-                  <LegalWorkspaceHeader
-                    currentCase={currentCase}
-                    isRenamingCase={isRenamingCase}
-                    renameValue={renameValue}
-                    setRenameValue={setRenameValue}
-                    handleRenameCase={handleRenameCase}
-                    setIsRenamingCase={setIsRenamingCase}
-                    handleDeleteCase={handleDeleteCase}
-                    handleBackToDashboard={handleBackToDashboard}
-                    selectedLegalTool={selectedLegalTool}
-                    activeTool={activeTool}
-                  />
-                )}
                 {isSessionLoading ? (
                   <div className="flex-1 flex items-center justify-center min-h-[50vh]">
                     <div className="flex flex-col items-center gap-4">
@@ -7013,19 +7032,15 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
 
                           <div className="chatgpt-message-content select-text">
                             {/* Avatar */}
-                            <div
-                              className="chatgpt-avatar-container w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                            >
-                              {msg.role === 'user' ? (
+                            {msg.role === 'user' && (
+                              <div
+                                className="chatgpt-avatar-container w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+                              >
                                 <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
                                   <User className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                                 </div>
-                              ) : (
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center">
-                                  <img src={logo} alt="AI LEGAL™" className="w-6 h-[18px] object-cover object-top" />
-                                </div>
-                              )}
-                            </div>
+                              </div>
+                            )}
 
                             <div className="flex-1 min-w-0 chatgpt-text select-text">
                               {/* Attachment Display */}
@@ -7189,9 +7204,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
 
 
 
-                                    <div className="relative group/msg-content">
                                       {msg.id === typingMessageId && !msg.content ? (
-                                        <AisaTypingIndicator visible={true} message={loadingText} />
+                                        <AisaTypingIndicator visible={true} message={getToolTypingMessage(msg.activeTool || selectedLegalTool?.id || loadingText)} />
                                       ) : (
                                         <div className="flex flex-col">
                                           <div className="collapsible-container">
@@ -7969,26 +7983,17 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                   </>
 
                 )}
-                {gen.isGenerating && !gen.typingMessageId && !typingMessageId && (
+                 {gen.isGenerating && !gen.typingMessageId && !typingMessageId && (
                   <div className="chatgpt-message-row ai-row group mb-6 sm:mb-8">
                     <div className="chatgpt-message-content select-text">
-                      <div className="chatgpt-avatar-container w-8 h-8 rounded-full flex items-center justify-center shrink-0">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center">
-                          <img src={logo} alt="AI LEGAL™" className="w-6 h-[18px] object-cover object-top" />
-                        </div>
-                      </div>
-                      <div className="chatgpt-text typing-bubble flex items-center">
+                      <div className="chatgpt-text flex items-center">
                         <AisaTypingIndicator
                           visible={true}
-                          message={loadingText}
+                          message={getToolTypingMessage(selectedLegalTool?.id || new URLSearchParams(window.location.search).get('tool') || loadingText)}
                         />
                       </div>
                     </div>
                   </div>
-                )}
-
-                {messages.length === 0 && !isSessionLoading && !isHydrating && currentCase && selectedLegalTool?.id === 'legal_my_case' && location.pathname !== '/dashboard/cases' && (
-                  <LegalWorkspaceWelcome currentCase={currentCase} />
                 )}
 
                 <AnimatePresence>
