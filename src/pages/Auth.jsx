@@ -4,10 +4,22 @@ import { Cpu, Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { AppRoute } from '../types';
 import { logo } from '../constants';
 
+const INDIAN_EXAMPLES = [
+  { name: 'Aditi Sharma', email: 'aditi.sharma@gmail.com' },
+  { name: 'Rahul Verma', email: 'rahul.verma@gmail.com' },
+  { name: 'Amit Patel', email: 'amit.patel@gmail.com' },
+  { name: 'Priya Singh', email: 'priya.singh@gmail.com' },
+  { name: 'Vikram Malhotra', email: 'vikram.malhotra@gmail.com' }
+];
+
 const Auth = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isSignup = location.pathname === AppRoute.SIGNUP;
+
+  const [placeholderExample] = useState(() => {
+    return INDIAN_EXAMPLES[Math.floor(Math.random() * INDIAN_EXAMPLES.length)];
+  });
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -58,7 +70,7 @@ const Auth = () => {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="John Doe"
+                    placeholder={`e.g. ${placeholderExample.name}`}
                     className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
                     required
                   />
@@ -75,7 +87,7 @@ const Auth = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
+                  placeholder={`e.g. ${placeholderExample.email}`}
                   className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"
                   required
                 />

@@ -801,12 +801,12 @@ export const CaseWorkspace = ({
 
     const handleAskAiAboutEvent = (event) => {
       if (!onAskAi) {
-        toast.error("AI Copilot is not available right now");
+        toast.error("AI Assistant is not available right now");
         return;
       }
       const prompt = `Explain the legal significance of the timeline event "${event.title}" on ${event.date} for the case "${caseData.name}". What are the immediate actions and evidence implications?`;
       onAskAi(prompt);
-      toast.success("Copilot analysis started! Check the Case Assistant panel on the right.");
+      toast.success("Assistant analysis started! Check the Case Assistant panel on the right.");
     };
 
     const handleGenerateDraft = (event) => {
@@ -4305,7 +4305,7 @@ Through Counsel
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-xs text-[#9CA3AF] font-bold">No draft letters found. Use AI Copilot or manually write drafts.</div>
+            <div className="text-center py-12 text-xs text-[#9CA3AF] font-bold">No draft letters found. Use AI Assistant or manually write drafts.</div>
           )}
         </div>
       </div>
@@ -4862,7 +4862,7 @@ Through Counsel
                 <div className="pb-3 border-b border-slate-100 shrink-0">
                   <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <MessageSquare size={14} className="text-[#6D5DFC]" />
-                    <span>Contract Negotiation AI Copilot</span>
+                    <span>Contract Negotiation AI Assistant</span>
                   </span>
                   <p className="text-[9px] text-slate-400 mt-0.5">Query contract liabilities, request clause modifications, or check safety conditions.</p>
                 </div>

@@ -42,6 +42,7 @@ import { getSubscriptionDetails } from '../services/pricingService';
 import IntentSuggestionBanner from '../Components/IntentSuggestionBanner';
 import { detectIntent, mapModeToToolState } from '../services/intentService';
 import LoginRequiredModal from '../Components/LoginRequiredModal';
+import { isSuperAdmin } from '../utils/isSuperAdmin';
 
 import FuturisticToolCards from '../landingpage/FuturisticToolCards';
 import ModernDashboard from '../landingpage/ModernDashboard';
@@ -506,10 +507,10 @@ const Chat = () => {
     }
 
     // Admin Access Rule
-    if ((user.email && user.email.toLowerCase() === 'admin@uwo24.com') || (user.role === 'admin')) {
+    if ((user.email && user.email.toLowerCase() === 'admin@uwo24.com') || (user.role === 'admin') || isSuperAdmin(user)) {
       setIsAdminUser(true);
       setIsPremiumUser(true);
-      setUserPlanName('AI LEGAL™ Admin');
+      setUserPlanName(isSuperAdmin(user) ? 'AI LEGAL™ Super Admin' : 'AI LEGAL™ Admin');
       return; // Skip server subscription check for admin
     }
 
@@ -524,7 +525,7 @@ const Chat = () => {
   }, []);
 
   const user = getUserData();
-  const isAdmin = user?.token && (user?.role === 'admin' || user?.email === 'admin@uwo24.com');
+  const isAdmin = user?.token && (user?.role === 'admin' || user?.email === 'admin@uwo24.com' || isSuperAdmin(user));
 
   const checkPremiumTool = (toolName) => {
     if (!user?.token) {
@@ -533,7 +534,7 @@ const Chat = () => {
     }
 
     // Admin Access Rule: Treat all tools as unlocked
-    if (user.email === 'admin@uwo24.com' || isAdminUser) return true;
+    if (user.email === 'admin@uwo24.com' || isAdminUser || isSuperAdmin(user)) return true;
 
     if (isPremiumUser === null) return true; // still loading, allow optimistically
 
@@ -3993,8 +3994,40 @@ const Chat = () => {
   };
 
 
+  const parseChatError = (error) => {
+    if (!navigator.onLine) {
+      return {
+        type: 'offline',
+        message: 'No Internet Connection\n\nPlease reconnect and try again.'
+      };
+    }
+
+    const message = error.message || String(error);
+    const status = error.response?.status || error.status;
+
+    if (message.includes('timeout') || message.includes('timed out') || error.code === 'ECONNABORTED') {
+      return {
+        type: 'timeout',
+        message: 'Request Timed Out\n\nThe AI is taking longer than expected. Please try again.'
+      };
+    }
+
+    if (status === 500 || status === 502 || status === 503 || status === 504 || message.includes('status: 500') || message.includes('status: 502') || message.includes('status: 503') || message.includes('status: 504')) {
+      return {
+        type: 'server',
+        message: 'AI Service Temporarily Unavailable\n\nPlease try again in a few moments.'
+      };
+    }
+
+    return {
+      type: 'general',
+      message: "⚠️ I couldn't process your request right now.\n\nPlease check your internet connection or try again in a moment."
+    };
+  };
+
   const handleSendMessage = async (e, overrideContent, toolOverride = null) => {
     if (e) e.preventDefault();
+    let streamingMsgId = null;
 
     // Prioritize the sessionId from URL params to avoid state-sync race conditions
     let activeSessionId = sessionId || 'new';
@@ -4019,6 +4052,68 @@ const Chat = () => {
 
     if (longTextPreview) setLongTextPreview(null);
     setIsAutoPreviewDisabled(false);
+
+    // --- Pre-flight Check & Offline Guard ---
+    const token = getUserData()?.token;
+    const jurisdiction = currentCase?.jurisdiction || currentCase?.country;
+    if (!activeSessionId) {
+      toast.error("Validation Error: Session ID is missing.");
+      chatLock.locked = false;
+      return;
+    }
+    if (currentMode === 'LEGAL_TOOLKIT' && !jurisdiction) {
+      toast.error("Validation Error: Jurisdiction context is missing for this case.");
+      chatLock.locked = false;
+      return;
+    }
+    if (!contentToSend && filePreviews.length === 0) {
+      toast.error("Validation Error: Prompt payload is invalid.");
+      chatLock.locked = false;
+      return;
+    }
+    if (!apis.chatAgent || !apis.chatAgent.startsWith('http')) {
+      toast.error("Validation Error: AI endpoint URL is incorrect.");
+      chatLock.locked = false;
+      return;
+    }
+
+    if (!navigator.onLine) {
+      // Immediately append user message
+      const displayContent = contentToSend;
+      const userMsg = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: displayContent || (filePreviews.length > 0 ? (isDocumentConvert ? "Convert this document" : "Analyze these files") : ""),
+        timestamp: Date.now(),
+        projectId: currentProjectId,
+        attachments: filePreviews.map(p => ({
+          url: p.url,
+          name: p.name,
+          type: p.type.startsWith('image/') ? 'image' :
+            p.type.includes('pdf') ? 'pdf' :
+              p.type.includes('word') || p.type.includes('document') ? 'docx' : 'file'
+        })),
+      };
+      setMessages(prev => prev.filter(m => !m.isSystemLog).concat(userMsg), activeSessionId);
+
+      // Append model error message
+      const suggestedAiId = `ai-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+      const errorMsg = {
+        id: suggestedAiId,
+        role: 'model',
+        content: 'No Internet Connection\n\nPlease reconnect and try again.',
+        error: true,
+        errorType: 'offline',
+        timestamp: Date.now() + 1,
+        projectId: currentProjectId,
+      };
+      setMessages(prev => [...prev, errorMsg], activeSessionId);
+      setInputValue('');
+      handleRemoveFile();
+      chatLock.locked = false;
+      setTimeout(() => scrollToBottom(true, 'smooth'), 50);
+      return;
+    }
 
     // --- LEGAL ACTION INTERCEPTORS ---
     if (currentMode === 'LEGAL_TOOLKIT' && currentCase) {
@@ -4927,7 +5022,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
 
         // ── Create the AI bubble immediately with empty content ──
         // Real content will stream in via onChunk → gen.setPartialResponse
-        const streamingMsgId = suggestedAiId;
+        streamingMsgId = suggestedAiId;
         const streamingMsg = {
           id: streamingMsgId,
           role: 'model',
@@ -4949,6 +5044,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
         // ── Stream chunks from backend ──
         const streamOnChunk = (chunk) => {
           gen.appendToken(chunk, streamingMsgId, activeSessionId);
+          scrollToBottom();
         };
 
         const aiResponseData = await generateChatResponse(
@@ -5222,14 +5318,27 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
       // Handle abort errors silently (user stopped generation)
       if (error.name === 'AbortError' || error.name === 'CanceledError') {
         console.log('Generation stopped by user');
-        gen.complete(); // Mark as completed (not error) in global store
-        // Keep partial response, don't show error
+        gen.complete(activeSessionId); // Mark as completed (not error) in global store
         return;
       }
 
       console.error("Chat Error:", error);
-      gen.fail(error); // Propagate error to global store
-      toast.error(`Error: ${error.message || "Failed to send message"}`);
+      gen.fail(activeSessionId, error); // Propagate error to global store
+      setTypingMessageId(null);
+
+      const errorDetails = parseChatError(error);
+      const finalErrorMsg = {
+        id: streamingMsgId || `ai-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+        role: 'model',
+        content: errorDetails.message,
+        error: true,
+        errorType: errorDetails.type,
+        timestamp: Date.now(),
+        projectId: currentProjectId,
+      };
+
+      setMessages(prev => prev.map(m => m.id === (streamingMsgId || finalErrorMsg.id) ? finalErrorMsg : m), activeSessionId);
+      setTimeout(() => scrollToBottom(true, 'smooth'), 50);
     } finally {
       setIsLoading(false);
 
@@ -6519,6 +6628,19 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
     await chatStorageService.updateMessage(sessionId, updatedMsg);
   };
 
+  const handleDismissMessage = (messageId) => {
+    setMessages(prev => prev.filter(m => m.id !== messageId), activeSessionId);
+  };
+
+  const handleRetryMessage = (errorMsg) => {
+    setMessages(prev => prev.filter(m => m.id !== errorMsg.id), activeSessionId);
+    const userMsgs = messages.filter(m => m.role === 'user');
+    if (userMsgs.length > 0) {
+      const lastUserMsg = userMsgs[userMsgs.length - 1];
+      handleSendMessage(null, lastUserMsg.content);
+    }
+  };
+
   const cancelEdit = () => {
     setEditingMessageId(null);
     setEditContent("");
@@ -7194,17 +7316,29 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                   </div>
                                 </div>
                               ) : (
-                                (msg.content || (msg.id === typingMessageId)) && (
+                                (msg.content || (msg.id === typingMessageId) || msg.error) && (
                                   <div id={`msg-text-${msg.id}`} className={`chat-bubble-text break-words overflow-wrap-anywhere ${msg.role === 'model' ? 'prose prose-sm max-w-none' : ''}`}>
-
-
-
-
-
-
-
-
-                                      {msg.id === typingMessageId && !msg.content ? (
+                                      {msg.error ? (
+                                        <div className="flex flex-col gap-3 p-4 bg-red-50/50 dark:bg-red-950/20 rounded-2xl border border-red-100 dark:border-red-900/30 w-full max-w-xl self-start">
+                                          <div className="text-red-600 dark:text-red-400 text-sm font-medium whitespace-pre-line">
+                                            {msg.content}
+                                          </div>
+                                          <div className="flex items-center gap-2 mt-1">
+                                            <button
+                                              onClick={() => handleRetryMessage(msg)}
+                                              className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-red-500/10 cursor-pointer"
+                                            >
+                                              Retry
+                                            </button>
+                                            <button
+                                              onClick={() => handleDismissMessage(msg.id)}
+                                              className="px-3.5 py-1.5 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                                            >
+                                              Dismiss
+                                            </button>
+                                          </div>
+                                        </div>
+                                      ) : msg.id === typingMessageId && !msg.content ? (
                                         <AisaTypingIndicator visible={true} message={getToolTypingMessage(msg.activeTool || selectedLegalTool?.id || loadingText)} />
                                       ) : (
                                         <div className="flex flex-col">

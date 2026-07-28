@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import useCreditStore from '../userStore/useCreditStore';
 import { useToast } from '../Components/Toast/ToastContext';
+import { getUserData } from '../userStore/userData';
+import { isSuperAdmin } from '../utils/isSuperAdmin';
 
 /**
  * Hook to manage credit deduction for AI Legal tools.
@@ -11,6 +13,10 @@ export const useLegalToolCredits = () => {
     const toast = useToast();
 
     const handleToolUsage = useCallback(async (toolName, cost = 50) => {
+        // SUPER_ADMIN: Unlimited access — never deduct credits
+        const user = getUserData();
+        if (isSuperAdmin(user)) return true;
+
         let activeCredits = currentCredits;
 
         // 1. Initial check (optimistic). If local credits are insufficient, try syncing first.
@@ -55,4 +61,5 @@ export const useLegalToolCredits = () => {
         isLoading
     };
 };
+
 

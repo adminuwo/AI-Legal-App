@@ -11,15 +11,30 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGoogleLogin } from '@react-oauth/google';
 import { logo } from '../constants';
 import { chatStorageService } from '../services/chatStorageService';
+import AuthErrorDialog from '../Components/AuthErrorDialog';
+import { parseAuthError } from '../utils/authErrorMapper';
 
 import loginBg from './login_bg.gif';
 
+
+const INDIAN_EMAILS = [
+  'aditi.sharma@gmail.com',
+  'rahul.verma@gmail.com',
+  'amit.patel@gmail.com',
+  'priya.singh@gmail.com',
+  'vikram.malhotra@gmail.com'
+];
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
   const setUserRecoil = useSetRecoilState(userDataAtom);
+
+  const [emailPlaceholder] = useState(() => {
+    const randomEmail = INDIAN_EMAILS[Math.floor(Math.random() * INDIAN_EMAILS.length)];
+    return `e.g. ${randomEmail}`;
+  });
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,6 +44,21 @@ const Login = () => {
   const [error, setError] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [socialVerifying, setSocialVerifying] = useState(null);
+
+  const [errorDetails, setErrorDetails] = useState(null);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+
+  const triggerError = (errObj) => {
+    const details = parseAuthError(errObj, 'login', navigate, (actionType) => {
+      if (actionType === 'focusEmail') {
+        document.querySelector("input[type='email']")?.focus();
+      } else if (actionType === 'focusPassword') {
+        document.querySelector("input[type='password']")?.focus();
+      }
+    });
+    setErrorDetails(details);
+    setShowErrorDialog(true);
+  };
 
   // Auto-accept cookies on login — user has agreed to platform use by signing in
   const autoAcceptCookies = () => {
@@ -89,30 +119,45 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
     setLoading(true);
-    setError(false);
+
+    if (!email.trim() || !password.trim()) {
+      setLoading(false);
+      triggerError("incomplete information");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setLoading(false);
+      triggerError("invalid email address");
+      return;
+    }
 
     try {
       const payload = { email, password };
       const res = await axios.post(apis.logIn, payload);
 
-      toast.success(t('successLogin'));
-      const from = location.state?.from || AppRoute.DASHBOARD;
-
+      toast.success("Welcome Back! You have successfully signed in.", {
+        icon: '👋',
+        style: {
+          borderRadius: '16px',
+          background: '#1F2937',
+          color: '#FFF',
+        }
+      });
       setUserData(res.data);
       setUserRecoil({ user: res.data });
       localStorage.setItem("userId", res.data.id);
       localStorage.setItem("token", res.data.token);
       autoAcceptCookies();
 
+      const from = location.state?.from || AppRoute.DASHBOARD;
       navigate(from, { replace: true });
       console.log("[LOGIN] Standard login success, initiating merge...");
       chatStorageService.mergeGuestChats();
     } catch (err) {
-      setError(true);
-      const errorMessage = err.response?.data?.error || err.message || t('serverError');
-      setMessage(errorMessage);
+      triggerError(err);
     } finally {
       setLoading(false);
     }
@@ -120,8 +165,6 @@ const Login = () => {
 
   const handleGoogleSuccess = async (tokenResponse) => {
     setGoogleLoading(true);
-    setError(false);
-    setMessage(null);
 
     try {
       // Get user info from Google using the access token
@@ -152,9 +195,7 @@ const Login = () => {
       console.log("[LOGIN] Google login success, initiating merge...");
       chatStorageService.mergeGuestChats();
     } catch (err) {
-      setError(true);
-      const errorMessage = err.response?.data?.error || 'Google login failed';
-      setMessage(errorMessage);
+      triggerError(err);
     } finally {
       setGoogleLoading(false);
     }
@@ -163,8 +204,7 @@ const Login = () => {
   const googleLogin = useGoogleLogin({
     onSuccess: handleGoogleSuccess,
     onError: () => {
-      setError(true);
-      setMessage('Google login was cancelled or failed');
+      triggerError('Google login was cancelled or failed');
     },
   });
 
@@ -172,40 +212,50 @@ const Login = () => {
   return (
     <div className="min-h-screen w-screen flex flex-col md:flex-row bg-[#FFFFFF]">
       {/* Left side - Branding (Hidden on mobile) */}
-      <div className="hidden md:flex md:w-[45%] bg-[#F9FAFB] border-r border-[#E5E7EB] flex-col items-center justify-center p-12">
-        <div className="max-w-md text-center flex flex-col items-center">
-          <div className="w-20 h-20 bg-[#6D5DFC] rounded-2xl flex items-center justify-center mb-8 shadow-sm">
-             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <div className="hidden md:flex md:w-[55%] relative overflow-hidden flex-col justify-between p-12">
+        {/* Background Image / GIF */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={loginBg} 
+            alt="Login Background" 
+            className="w-full h-full object-cover scale-[1.01] filter brightness-95" 
+          />
+          {/* Subtle overlay to enhance text contrast */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+        </div>
+
+        {/* Branding header */}
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-[#111827] mb-4">AI LEGAL™</h2>
-          <p className="text-[#6B7280] text-base leading-relaxed">The premium Legal Operating System designed exclusively for modern Advocates. Automate research, drafting, and analysis.</p>
+          <span className="text-xl font-bold text-white tracking-wider">AI LEGAL™</span>
+        </div>
+
+        {/* Legal Disclaimer / Subtitle */}
+        <div className="relative z-10 max-w-lg mb-8">
+          <h1 className="text-4xl font-extrabold text-white leading-tight mb-4 tracking-tight">The Legal Operating System for Modern Advocates.</h1>
+          <p className="text-gray-200 text-base leading-relaxed font-light">Join thousands of practitioners who automate research, analyze complex contracts, and draft briefs in minutes using our specialized intelligence engine.</p>
         </div>
       </div>
 
       {/* Right side - Form */}
-      <div className="flex-1 flex flex-col justify-center px-6 md:px-16 py-12 relative">
+      <div className="flex-1 flex flex-col justify-center px-6 md:px-16 py-12 relative overflow-y-auto custom-scrollbar">
         <Link to="/" className="absolute top-8 right-8 text-sm font-medium text-[#6B7280] hover:text-[#111827] flex items-center gap-2">
           <ArrowLeft className="w-4 h-4" /> Back to Home
         </Link>
         
-        <div className="max-w-sm w-full mx-auto">
+        <div className="max-w-sm w-full mx-auto mt-8 md:mt-0">
           <div className="mb-10 text-center md:text-left">
             <h1 className="text-3xl font-bold text-[#111827] tracking-tight mb-2">Welcome Back</h1>
-            <p className="text-[#6B7280]">Sign in to access your case workspace.</p>
+            <p className="text-[#6B7280]">Enter credentials to access your secure workspace.</p>
           </div>
 
-          <AnimatePresence>
-            {error && (
-              <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                <span>{message}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Error messages are handled by AuthErrorDialog modal */}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-[#111827] mb-1.5">Email Address</label>
               <div className="relative">
@@ -214,7 +264,7 @@ const Login = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="advocate@firm.com"
+                  placeholder={emailPlaceholder}
                   className="w-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-xl py-3 pl-12 pr-4 text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#6D5DFC] focus:ring-1 focus:ring-[#6D5DFC] transition-all"
                   required
                 />
@@ -319,6 +369,12 @@ const Login = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AuthErrorDialog
+        visible={showErrorDialog}
+        details={errorDetails}
+        onClose={() => setShowErrorDialog(false)}
+      />
     </div>
   );
 };

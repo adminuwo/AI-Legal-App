@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Lock, Eye, EyeOff, Loader, CheckCircle } from 'lucide-react';
 import axios from 'axios';
 import { apis } from '../types';
+import AuthErrorDialog from '../Components/AuthErrorDialog';
+import { parseAuthError } from '../utils/authErrorMapper';
 
 const ResetPassword = () => {
     const { token } = useParams();
@@ -15,11 +17,30 @@ const ResetPassword = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const [errorDetails, setErrorDetails] = useState(null);
+    const [showErrorDialog, setShowErrorDialog] = useState(false);
+
+    const triggerError = (errObj) => {
+        const details = parseAuthError(errObj, 'reset', navigate, (actionType) => {
+            if (actionType === 'focusPassword') {
+                document.querySelector("input[placeholder='••••••••']")?.focus();
+            }
+        });
+        setErrorDetails(details);
+        setShowErrorDialog(true);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (password !== confirmPassword) {
-            setError("Passwords don't match");
+            triggerError("passwords don't match");
+            return;
+        }
+
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            triggerError("weak password");
             return;
         }
 
@@ -28,7 +49,6 @@ const ResetPassword = () => {
         setError('');
 
         try {
-            // ideally use env var for API URL
             const response = await axios.post(`${apis.resetPassword}/${token}`, {
                 password,
                 confirmPassword
@@ -41,7 +61,7 @@ const ResetPassword = () => {
             }, 2000);
 
         } catch (err) {
-            setError(err.response?.data?.error || 'Something went wrong. Please try again.');
+            triggerError(err);
         } finally {
             setLoading(false);
         }
@@ -134,6 +154,11 @@ const ResetPassword = () => {
                     </form>
                 </div>
             </div>
+            <AuthErrorDialog
+                visible={showErrorDialog}
+                details={errorDetails}
+                onClose={() => setShowErrorDialog(false)}
+            />
         </div>
     );
 };

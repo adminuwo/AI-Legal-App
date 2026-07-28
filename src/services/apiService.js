@@ -11,16 +11,105 @@ const apiClient = axios.create({
   timeout: 180000, // 180 second timeout for complex AI/multi-doc processing
 });
 
-// Request interceptor for adding auth token
+const getLocaleForLanguage = (language) => {
+  const mapping = {
+    'English': 'en-IN',
+    'Hindi': 'hi-IN',
+    'Bengali': 'bn-IN',
+    'Telugu': 'te-IN',
+    'Marathi': 'mr-IN',
+    'Tamil': 'ta-IN',
+    'Gujarati': 'gu-IN',
+    'Kannada': 'kn-IN',
+    'Malayalam': 'ml-IN',
+    'Punjabi': 'pa-IN',
+    'Odia': 'or-IN',
+    'Assamese': 'as-IN',
+    'Urdu': 'ur-IN',
+    'Sanskrit': 'sa-IN',
+    'Konkani': 'gom-IN',
+    'Maithili': 'mai-IN',
+    'Dogri': 'doi-IN',
+    'Nepali': 'ne-IN',
+    'Bodo': 'brx-IN',
+    'Santali': 'sat-IN',
+    'Manipuri': 'mni-IN',
+    'Kashmiri': 'ks-IN',
+    'Sindhi': 'sd-IN',
+    // Bilingual Modes
+    'Bilingual': 'hi-IN', // English + Hindi
+    'English + Marathi': 'mr-IN',
+    'English + Tamil': 'ta-IN',
+    'English + Telugu': 'te-IN',
+    'English + Bengali': 'bn-IN',
+    'English + Gujarati': 'gu-IN',
+    'English + Kannada': 'kn-IN',
+    'English + Malayalam': 'ml-IN',
+    'English + Punjabi': 'pa-IN'
+  };
+  return mapping[language] || 'en-IN';
+};
+
+// Request interceptor for adding auth token and language parameters
 apiClient.interceptors.request.use(
   (config) => {
     const user = localStorage.getItem('user');
+    let userLang = 'English';
     if (user) {
-      const userData = JSON.parse(user);
-      if (userData.token) {
-        config.headers.Authorization = `Bearer ${userData.token}`;
+      try {
+        const userData = JSON.parse(user);
+        if (userData.token) {
+          config.headers.Authorization = `Bearer ${userData.token}`;
+        }
+        userLang = userData.personalizations?.general?.language || localStorage.getItem('ai_legal_lang') || 'English';
+      } catch (e) {
+        userLang = localStorage.getItem('ai_legal_lang') || 'English';
       }
+    } else {
+      userLang = localStorage.getItem('ai_legal_lang') || 'English';
     }
+
+    const userLocale = getLocaleForLanguage(userLang);
+    const activeWsId = localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID') || 'personal_practice';
+    const activeWsType = localStorage.getItem('AI_LEGAL_ACTIVE_WORKSPACE_TYPE') || (activeWsId === 'personal_practice' ? 'personal' : 'law_firm');
+
+    if (config.data && typeof config.data === 'object' && !(config.data instanceof FormData)) {
+      config.data.preferred_response_language = userLang;
+      config.data.language = userLang;
+      config.data.locale = userLocale;
+      if (!config.data.workspaceId) config.data.workspaceId = activeWsId;
+      if (!config.data.workspaceType) config.data.workspaceType = activeWsType;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Apply interceptors to global axios as well
+axios.interceptors.request.use(
+  (config) => {
+    const user = localStorage.getItem('user');
+    let userLang = 'English';
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        userLang = userData.personalizations?.general?.language || localStorage.getItem('ai_legal_lang') || 'English';
+      } catch (e) {
+        userLang = localStorage.getItem('ai_legal_lang') || 'English';
+      }
+    } else {
+      userLang = localStorage.getItem('ai_legal_lang') || 'English';
+    }
+
+    const userLocale = getLocaleForLanguage(userLang);
+
+    if (config.data && typeof config.data === 'object' && !(config.data instanceof FormData)) {
+      config.data.preferred_response_language = userLang;
+      config.data.language = userLang;
+      config.data.locale = userLocale;
+    }
+
     return config;
   },
   (error) => Promise.reject(error)

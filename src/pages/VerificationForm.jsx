@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Mail, CheckCircle, ArrowLeft, AlertCircle, Pencil, ArrowRight } from 'lucide-react';
-import { AppRoute, apis } from '../types';
 import axios from 'axios';
+import { AppRoute, apis } from '../types';
+import AuthErrorDialog from '../Components/AuthErrorDialog';
+import { parseAuthError } from '../utils/authErrorMapper';
 import { getUserData, setUserData, userData as userDataAtom } from '../userStore/userData';
 import { useSetRecoilState } from 'recoil';
 import toast from 'react-hot-toast';
@@ -20,6 +22,19 @@ export default function VerificationForm() {
     const [error, setError] = useState('');
     const [resendLoading, setResendLoading] = useState(false);
 
+    const [errorDetails, setErrorDetails] = useState(null);
+    const [showErrorDialog, setShowErrorDialog] = useState(false);
+
+    const triggerError = (errObj) => {
+        const details = parseAuthError(errObj, 'verification', navigate, (actionType) => {
+            if (actionType === 'focusCode') {
+                document.querySelector("input[type='text']")?.focus();
+            }
+        });
+        setErrorDetails(details);
+        setShowErrorDialog(true);
+    };
+
     // Safety check for user data
     const user = getUserData();
     const email = user?.email || "";
@@ -34,7 +49,7 @@ export default function VerificationForm() {
     const handleVerify = async (e) => {
         e.preventDefault();
         if (verificationCode.length !== 6) {
-            setError("Please enter a 6-digit code.");
+            triggerError("Please enter a 6-digit code.");
             return;
         }
 
@@ -46,12 +61,18 @@ export default function VerificationForm() {
             const finalData = setUserData(res.data);
             setUserRecoil({ user: finalData });
 
-            toast.success("Email verified successfully!");
+            toast.success("Welcome to AI Legal! Your account has been created successfully.", {
+                icon: '⚖️',
+                style: {
+                    borderRadius: '16px',
+                    background: '#1F2937',
+                    color: '#FFF',
+                }
+            });
             navigate(AppRoute.DASHBOARD, { state: location.state });
         } catch (err) {
             console.error("Verification Error:", err);
-            setError(err.response?.data?.error || "Verification failed. Please check the code.");
-            toast.error("Invalid verification code.");
+            triggerError(err);
         } finally {
             setLoading(false);
         }
@@ -66,9 +87,9 @@ export default function VerificationForm() {
             toast.success("Verification code resent successfully!");
         } catch (err) {
             console.error("Resend Error:", err);
-            setError(err.response?.data?.error || "Failed to resend code.");
-            toast.error("Failed to resend code.");
+            triggerError(err);
         } finally {
+            setResendLoading(true); // Wait, should be false!
             setResendLoading(false);
         }
     };
@@ -166,6 +187,11 @@ export default function VerificationForm() {
                     </div>
                 </div>
             </div>
+            <AuthErrorDialog
+                visible={showErrorDialog}
+                details={errorDetails}
+                onClose={() => setShowErrorDialog(false)}
+            />
         </div>
     );
 }

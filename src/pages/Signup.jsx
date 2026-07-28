@@ -11,12 +11,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGoogleLogin } from '@react-oauth/google';
 import { logo } from '../constants';
 import { chatStorageService } from '../services/chatStorageService';
+import AuthErrorDialog from '../Components/AuthErrorDialog';
+import { parseAuthError } from '../utils/authErrorMapper';
+
+const INDIAN_EXAMPLES = [
+  { name: 'Aditi Sharma', email: 'aditi.sharma@gmail.com' },
+  { name: 'Rahul Verma', email: 'rahul.verma@gmail.com' },
+  { name: 'Amit Patel', email: 'amit.patel@gmail.com' },
+  { name: 'Priya Singh', email: 'priya.singh@gmail.com' },
+  { name: 'Vikram Malhotra', email: 'vikram.malhotra@gmail.com' }
+];
 
 const Signup = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
   const setUserRecoil = useSetRecoilState(userDataAtom);
+
+  const [placeholderExample] = useState(() => {
+    return INDIAN_EXAMPLES[Math.floor(Math.random() * INDIAN_EXAMPLES.length)];
+  });
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,16 +42,44 @@ const Signup = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
+  const [errorDetails, setErrorDetails] = useState(null);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+
+  const triggerError = (errObj) => {
+    const details = parseAuthError(errObj, 'signup', navigate, (actionType) => {
+      if (actionType === 'focusEmail') {
+        document.querySelector("input[name='email']")?.focus();
+      } else if (actionType === 'focusPassword') {
+        document.querySelector("input[name='password']")?.focus();
+      } else if (actionType === 'focusName') {
+        document.querySelector("input[name='name']")?.focus();
+      }
+    });
+    setErrorDetails(details);
+    setShowErrorDialog(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
-    setPasswordError(null);
+
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      setIsLoading(false);
+      triggerError("incomplete information");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setIsLoading(false);
+      triggerError("invalid email address");
+      return;
+    }
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(password)) {
-      setPasswordError(t('passwordValidation'));
       setIsLoading(false);
+      triggerError("weak password");
       return;
     }
 
@@ -45,6 +87,14 @@ const Signup = () => {
       const payLoad = { name, email, password };
       const res = await axios.post(apis.signUp, payLoad);
 
+      toast.success("Welcome to AI Legal! Your account has been created successfully.", {
+        icon: '⚖️',
+        style: {
+          borderRadius: '16px',
+          background: '#1F2937',
+          color: '#FFF',
+        }
+      });
       setUserData(res.data);
       setUserRecoil({ user: res.data });
 
@@ -52,7 +102,7 @@ const Signup = () => {
       console.log("[SIGNUP] Standard signup success, initiating merge...");
       chatStorageService.mergeGuestChats();
     } catch (err) {
-      setError(err.response?.data?.error || "Registration failed.");
+      triggerError(err);
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +143,7 @@ const Signup = () => {
       chatStorageService.mergeGuestChats();
     } catch (err) {
       console.error('[Google Signup] Error:', err);
-      setError(err.response?.data?.error || 'Google signup failed');
+      triggerError(err);
     } finally {
       setGoogleLoading(false);
     }
@@ -103,7 +153,7 @@ const Signup = () => {
     onSuccess: handleGoogleSuccess,
     onError: (err) => {
       console.error('[Google Signup] Google OAuth Error:', err);
-      setError('Google signup was cancelled or failed');
+      triggerError('Google signup was cancelled or failed');
     },
   });
 
@@ -134,14 +184,7 @@ const Signup = () => {
             <p className="text-[#6B7280]">Join the premium network for modern advocates.</p>
           </div>
 
-          <AnimatePresence>
-            {(error || passwordError) && (
-              <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                <span>{error || passwordError}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Error messages are handled by AuthErrorDialog modal */}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -153,7 +196,7 @@ const Signup = () => {
                   name="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Advocate Name"
+                  placeholder={`e.g. ${placeholderExample.name}`}
                   className="w-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-xl py-3 pl-12 pr-4 text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#6D5DFC] focus:ring-1 focus:ring-[#6D5DFC] transition-all"
                   required
                 />
@@ -169,7 +212,7 @@ const Signup = () => {
                   name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="advocate@firm.com"
+                  placeholder={`e.g. ${placeholderExample.email}`}
                   className="w-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-xl py-3 pl-12 pr-4 text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#6D5DFC] focus:ring-1 focus:ring-[#6D5DFC] transition-all"
                   required
                 />
@@ -276,6 +319,11 @@ const Signup = () => {
           </div>
         </div>
       </div>
+      <AuthErrorDialog
+        visible={showErrorDialog}
+        details={errorDetails}
+        onClose={() => setShowErrorDialog(false)}
+      />
     </div>
   );
 };

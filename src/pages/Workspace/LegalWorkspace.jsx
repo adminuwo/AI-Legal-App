@@ -43,6 +43,7 @@ import { getSubscriptionDetails } from '../../services/pricingService';
 import IntentSuggestionBanner from '../../Components/IntentSuggestionBanner';
 import { detectIntent, mapModeToToolState } from '../../services/intentService';
 import LoginRequiredModal from '../../Components/LoginRequiredModal';
+import { isSuperAdmin } from '../../utils/isSuperAdmin';
 
 import FuturisticToolCards from '../../landingpage/FuturisticToolCards';
 import ModernDashboard from '../../landingpage/ModernDashboard';
@@ -590,7 +591,7 @@ const matchRoutingKeywords = (content) => {
 };
 
 const TOOL_CHIP_DETAILS = {
-  legal_my_case: { name: 'Copilot', icon: '⚖️' },
+  legal_my_case: { name: 'Assistant', icon: '⚖️' },
   legal_draft_maker: { name: 'Draft Maker', icon: '📝' },
   legal_contract_analyzer: { name: 'Contract Analyzer', icon: '📄' },
   legal_evidence_checker: { name: 'Evidence Analyst', icon: '🔍' },
@@ -910,10 +911,10 @@ const LegalWorkspace = () => {
     }
 
     // Admin Access Rule
-    if ((user.email && user.email.toLowerCase() === 'admin@uwo24.com') || (user.role === 'admin')) {
+    if ((user.email && user.email.toLowerCase() === 'admin@uwo24.com') || (user.role === 'admin') || isSuperAdmin(user)) {
       setIsAdminUser(true);
       setIsPremiumUser(true);
-      setUserPlanName('AI LEGAL™ Admin');
+      setUserPlanName(isSuperAdmin(user) ? 'AI LEGAL™ Super Admin' : 'AI LEGAL™ Admin');
       return; // Skip server subscription check for admin
     }
 
@@ -928,7 +929,7 @@ const LegalWorkspace = () => {
   }, []);
 
   const user = getUserData();
-  const isAdmin = user?.token && (user?.role === 'admin' || user?.email === 'admin@uwo24.com');
+  const isAdmin = user?.token && (user?.role === 'admin' || user?.email === 'admin@uwo24.com' || isSuperAdmin(user));
 
   const checkPremiumTool = (toolName) => {
     if (!user?.token) {
@@ -937,7 +938,7 @@ const LegalWorkspace = () => {
     }
 
     // Admin Access Rule: Treat all tools as unlocked
-    if (user.email === 'admin@uwo24.com' || isAdminUser) return true;
+    if (user.email === 'admin@uwo24.com' || isAdminUser || isSuperAdmin(user)) return true;
 
     if (isPremiumUser === null) return true; // still loading, allow optimistically
 
@@ -4934,7 +4935,7 @@ const LegalWorkspace = () => {
         let activeToolId = isLegalOverride ? toolOverride : (activeCaseId ? caseAiActiveTool : selectedLegalTool?.id);
         let activeToolName = isLegalOverride ?
           (toolOverride.replace('legal_', '').split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')) :
-          (activeCaseId ? (TOOL_CHIP_DETAILS[caseAiActiveTool]?.name || 'Copilot') : selectedLegalTool?.name);
+          (activeCaseId ? (TOOL_CHIP_DETAILS[caseAiActiveTool]?.name || 'Assistant') : selectedLegalTool?.name);
 
         // Smart Tool Routing: If in general case assistant but requesting a specific draft/notice
         if (activeToolId === 'legal_my_case' && !activeCaseId) {

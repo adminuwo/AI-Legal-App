@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 // Color and Icon configurations for AI Tools
 const TOOL_CONFIG = {
   legal_my_case: {
-    name: 'AI Copilot',
+    name: 'AI Assistant',
     emoji: '⚖️',
     color: '#a855f7', // Purple
     textClass: 'text-purple-600 dark:text-purple-400',
@@ -93,7 +93,7 @@ const TOOL_CONFIG = {
 };
 
 const DEFAULT_TOOL_CONFIG = {
-  name: 'AI Copilot',
+  name: 'AI Assistant',
   emoji: '⚖️',
   color: '#a855f7',
   textClass: 'text-purple-600 dark:text-purple-400',
@@ -103,7 +103,7 @@ const DEFAULT_TOOL_CONFIG = {
 
 const FILTER_OPTIONS = [
   { id: 'all', label: 'All' },
-  { id: 'legal_my_case', label: 'Copilot' },
+  { id: 'legal_my_case', label: 'Assistant' },
   { id: 'legal_draft_maker', label: 'Draft Maker' },
   { id: 'legal_research', label: 'Research' },
   { id: 'legal_contract_analyzer', label: 'Contracts' },
@@ -386,7 +386,7 @@ const AIHistoryPanel = ({
         if (session.projectId?.name) {
           fileContent += `Case: ${session.projectId.name} (Client: ${session.projectId.clientName || 'N/A'})\n`;
         }
-        fileContent += `Tool: ${session.activeTool || 'AI Copilot'}\n`;
+        fileContent += `Tool: ${session.activeTool || 'AI Assistant'}\n`;
         fileContent += `=========================================\n\n`;
 
         messages.forEach((msg) => {

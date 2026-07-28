@@ -5,7 +5,8 @@ import {
   LayoutGrid, Brain, Briefcase, Search, FileText, Library, 
   SearchCode, FileCheck, Gavel, Lightbulb, Scale, Calendar, 
   Users, Bell, User, Settings2, LogOut, ChevronRight, Binary,
-  Sun, Moon, Globe, ChevronDown, Bookmark, HelpCircle, Download
+  Sun, Moon, Globe, ChevronDown, Bookmark, HelpCircle, Download,
+  CreditCard, Shield
 } from 'lucide-react';
 import { useRecoilState } from 'recoil';
 import { userData } from '../../userStore/userData';
@@ -127,6 +128,8 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
   const renderDropdownContent = () => {
     const menuItems = [
       { name: 'My Profile', icon: User, action: 'profile' },
+      { name: 'Pricing & Plans', icon: CreditCard, path: '/legal-pricing' },
+      { name: 'Admin Portal', icon: Shield, path: '/dashboard/admin' },
       { name: 'Settings', icon: Settings2, path: '/dashboard/settings' },
       { isDivider: true },
       { name: 'Help & Support', icon: HelpCircle, path: '/dashboard/help-support' },

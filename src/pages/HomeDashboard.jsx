@@ -397,7 +397,7 @@ export default function HomeDashboard() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-3xl font-extrabold tracking-tight text-[#111827]">
-                  Good Morning, Advocate {userName}
+                  Welcome, Advocate {userName}
                 </h1>
                 {isSyncing && (
                   <RefreshCw size={14} className="text-[#6D5DFC] animate-spin" />

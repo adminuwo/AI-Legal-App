@@ -30,6 +30,7 @@ import ResetPassword from './pages/ResetPassword.jsx';
 import PrivacyPolicy from './landingpage/PrivacyPolicy.jsx';
 import TermsOfService from './landingpage/TermsOfService.jsx';
 import CookiePolicy from './landingpage/CookiePolicy.jsx';
+import LegalPricingPortal from './pages/LegalPricingPortal.jsx';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { lazy, Suspense } from 'react';
@@ -445,11 +446,13 @@ const NavigateProvider = () => {
         <Route path={AppRoute.FORGOT_PASSWORD} element={<ForgotPassword />} />
         <Route path={AppRoute.RESET_PASSWORD} element={<ResetPassword />} />
 
-        <Route path={AppRoute.PRIVACY_POLICY} element={<Landing />} />
-        <Route path={AppRoute.TERMS_OF_SERVICE} element={<Landing />} />
-        <Route path="/terms-of-service" element={<Navigate to={AppRoute.TERMS_OF_SERVICE} replace />} />
-        <Route path={AppRoute.COOKIE_POLICY} element={<Landing />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/cookie-policy" element={<CookiePolicy />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/legal-pricing" element={<LegalPricingPortal />} />
+        <Route path="/subscription-checkout" element={<LegalPricingPortal />} />
         <Route path="/share/:shareId" element={<SharedChat />} />
 
         {/* Dashboard (Protected) */}

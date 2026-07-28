@@ -6,15 +6,46 @@ import { AppRoute, apis } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { logo } from '../constants';
+import AuthErrorDialog from '../Components/AuthErrorDialog';
+import { parseAuthError } from '../utils/authErrorMapper';
+
+const INDIAN_EMAILS = [
+  'aditi.sharma@gmail.com',
+  'rahul.verma@gmail.com',
+  'amit.patel@gmail.com',
+  'priya.singh@gmail.com',
+  'vikram.malhotra@gmail.com'
+];
 
 const ForgotPassword = () => {
     const navigate = useNavigate();
+
+    const [emailPlaceholder] = useState(() => {
+        const randomEmail = INDIAN_EMAILS[Math.floor(Math.random() * INDIAN_EMAILS.length)];
+        return `e.g. ${randomEmail}`;
+    });
+
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [step, setStep] = useState(1); // 1: Email, 2: OTP & New Password
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+
+    const [errorDetails, setErrorDetails] = useState(null);
+    const [showErrorDialog, setShowErrorDialog] = useState(false);
+
+    const triggerError = (errObj) => {
+        const details = parseAuthError(errObj, 'forgot', navigate, (actionType) => {
+            if (actionType === 'focusEmail') {
+                document.querySelector("input[type='email']")?.focus();
+            } else if (actionType === 'focusPassword') {
+                document.querySelector("input[type='password']")?.focus();
+            }
+        });
+        setErrorDetails(details);
+        setShowErrorDialog(true);
+    };
 
     const handleSendOTP = async (e) => {
         e.preventDefault();
@@ -24,7 +55,7 @@ const ForgotPassword = () => {
             toast.success(response.data.message || "OTP sent successfully!");
             setStep(2);
         } catch (err) {
-            toast.error(err.response?.data?.error || 'Failed to send OTP. Please try again.');
+            triggerError(err);
         } finally {
             setLoading(false);
         }
@@ -33,7 +64,7 @@ const ForgotPassword = () => {
     const handleResetPassword = async (e) => {
         e.preventDefault();
         if (otp.length !== 6) {
-            toast.error("Please enter a valid 6-digit OTP.");
+            triggerError("Please enter a valid 6-digit OTP.");
             return;
         }
         setLoading(true);
@@ -48,7 +79,7 @@ const ForgotPassword = () => {
                 navigate(AppRoute.LOGIN);
             }, 2000);
         } catch (err) {
-            toast.error(err.response?.data?.error || 'Invalid OTP or session expired.');
+            triggerError(err);
         } finally {
             setLoading(false);
         }
@@ -107,7 +138,7 @@ const ForgotPassword = () => {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="advocate@firm.com"
+                      placeholder={emailPlaceholder}
                       className="w-full bg-[#FFFFFF] border border-[#E5E7EB] rounded-xl py-3 pl-12 pr-4 text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#6D5DFC] focus:ring-1 focus:ring-[#6D5DFC] transition-all"
                       required
                     />
@@ -201,6 +232,11 @@ const ForgotPassword = () => {
           </AnimatePresence>
         </div>
       </div>
+      <AuthErrorDialog
+        visible={showErrorDialog}
+        details={errorDetails}
+        onClose={() => setShowErrorDialog(false)}
+      />
     </div>
   );
 };

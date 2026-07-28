@@ -58,14 +58,29 @@ export const generateChatResponse = async (history, currentMessage, systemInstru
         };
 
         if (onChunk) {
-            const response = await fetch(apis.chatAgent, {
+            const timeoutMs = (mode === 'DEEP_SEARCH' || mode === 'web_search' || mode === 'SEARCH') ? 180000 : 60000;
+            let timeoutId;
+            const timeoutPromise = new Promise((_, reject) => {
+                const err = new Error('timeout');
+                err.code = 'ECONNABORTED';
+                timeoutId = setTimeout(() => reject(err), timeoutMs);
+            });
+
+            const fetchPromise = fetch(apis.chatAgent, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(payload),
                 signal: abortSignal
             });
 
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const response = await Promise.race([fetchPromise, timeoutPromise]);
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                const err = new Error(`HTTP error! status: ${response.status}`);
+                err.status = response.status;
+                throw err;
+            }
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let fullText = "";
@@ -82,6 +97,9 @@ export const generateChatResponse = async (history, currentMessage, systemInstru
                         if (data === '[DONE]') continue;
                         try {
                             const parsed = JSON.parse(data);
+                            if (parsed.error) {
+                                throw new Error(parsed.error);
+                            }
                             if (parsed.done) {
                                 finalMeta = parsed;
                             } else {
@@ -89,7 +107,12 @@ export const generateChatResponse = async (history, currentMessage, systemInstru
                                 fullText += content;
                                 onChunk(content);
                             }
-                        } catch (e) { console.error("SSE Parse Error", e); }
+                        } catch (e) {
+                            if (e.message && !e.message.includes("JSON")) {
+                                throw e;
+                            }
+                            console.error("SSE Parse Error", e);
+                        }
                     }
                 }
             }
@@ -102,12 +125,10 @@ export const generateChatResponse = async (history, currentMessage, systemInstru
         console.error("Gemini API Error:", error);
         if (error.response?.status === 403) {
             const code = error.response?.data?.code;
-            if (code === 'OUT_OF_CREDITS') { window.dispatchEvent(new Event('out_of_credits')); return { error: 'OUT_OF_CREDITS' }; }
-            if (code === 'PREMIUM_ONLY') { window.dispatchEvent(new CustomEvent('premium_required', { detail: { toolName: 'this feature' } })); return { error: 'PREMIUM_ONLY' }; }
+            if (code === 'OUT_OF_CREDITS') { window.dispatchEvent(new Event('out_of_credits')); throw error; }
+            if (code === 'PREMIUM_ONLY') { window.dispatchEvent(new CustomEvent('premium_required', { detail: { toolName: 'this feature' } })); throw error; }
         }
-        if (error.response?.status === 429) return "The A-Series system is currently busy (Quota limit reached). Please wait 60 seconds and try again.";
-        if (error.response?.status === 401) return "Please [Log In](/login) to your AI LEGAL™ account to continue chatting.";
-        return "Sorry, I am having trouble connecting to the A-Series network right now. Please check your connection.";
+        throw error;
     }
 };
 

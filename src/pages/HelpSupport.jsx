@@ -5,11 +5,13 @@ import {
   Star, Bug, Sparkles, FileText, ArrowUpRight, Scale, MessageCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import axios from 'axios';
+import { apis } from '../types';
 
 const FAQ_DATA = [
   {
     category: 'AI Legal Assistant',
-    question: 'How do I prompt the Copilot for research?',
+    question: 'How do I prompt the Assistant for research?',
     answer: "Use natural legal language. For example, 'Find recent Supreme Court judgments on Section 302 IPC regarding circumstantial evidence' or 'Analyze this paragraph for potential defense arguments'."
   },
   {
@@ -45,7 +47,7 @@ const FAQ_DATA = [
   {
     category: 'Subscription',
     question: 'What features are included in the Pro Plan?',
-    answer: "The Pro Plan offers unlimited AI Copilot messages, priority document indexing, advanced notice templates, and multi-device trusted sessions."
+    answer: "The Pro Plan offers unlimited AI Assistant messages, priority document indexing, advanced notice templates, and multi-device trusted sessions."
   },
   {
     category: 'Billing (future)',
@@ -122,24 +124,69 @@ const HelpSupport = () => {
   }, [searchQuery]);
 
   // Form Submissions
-  const handleBugSubmit = (e) => {
+  const handleBugSubmit = async (e) => {
     e.preventDefault();
     if (!bugForm.title.trim() || !bugForm.description.trim()) {
       toast.error('Please fill in the bug title and description.');
       return;
     }
-    toast.success('Bug report submitted successfully! Our engineering team will look into it. 🐞');
-    setBugForm({ title: '', description: '', screenshot: null });
+
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const payload = {
+      name: user.name || 'Enterprise Advocate',
+      email: user.email || 'advocate@ai-legal.in',
+      userId: user._id || null,
+      issueType: 'Bug Report',
+      title: bugForm.title,
+      message: bugForm.description,
+      category: currentPage || 'Support Center',
+      priority: 'Medium',
+      device: browserInfo || 'Web Browser',
+      appVersion: 'v1.2.0 (Build 402)',
+      status: 'pending'
+    };
+
+    try {
+      const headers = user.token ? { Authorization: `Bearer ${user.token}` } : {};
+      await axios.post(apis.support, payload, { headers });
+      toast.success('Bug report submitted successfully! Our engineering team will look into it. 🐞');
+      setBugForm({ title: '', description: '', screenshot: null });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to submit bug report. Please try again.');
+    }
   };
 
-  const handleFeatureSubmit = (e) => {
+  const handleFeatureSubmit = async (e) => {
     e.preventDefault();
     if (!featureForm.title.trim() || !featureForm.description.trim() || !featureForm.benefit.trim()) {
       toast.error('Please fill in all feature request fields.');
       return;
     }
-    toast.success('Feature request submitted! Thank you for helping shape AI LEGAL. 💡');
-    setFeatureForm({ title: '', description: '', benefit: '' });
+
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const payload = {
+      name: user.name || 'Enterprise Advocate',
+      email: user.email || 'advocate@ai-legal.in',
+      userId: user._id || null,
+      issueType: 'Feature Request',
+      title: featureForm.title,
+      message: featureForm.description,
+      whyNeeded: featureForm.benefit,
+      category: 'General',
+      priority: 'Normal',
+      status: 'Review'
+    };
+
+    try {
+      const headers = user.token ? { Authorization: `Bearer ${user.token}` } : {};
+      await axios.post(apis.support, payload, { headers });
+      toast.success('Feature request submitted! Thank you for helping shape AI LEGAL. 💡');
+      setFeatureForm({ title: '', description: '', benefit: '' });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to submit feature request. Please try again.');
+    }
   };
 
   const handleFeedbackSubmit = (e) => {
