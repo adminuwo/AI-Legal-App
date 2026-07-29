@@ -805,9 +805,9 @@ const AdminDashboard = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[
-                      { id: 'advocate_basic', name: 'AI Legal Basic', monthly: 999, yearly: 9990, credits: 100, badge: 'Advocate' },
-                      { id: 'advocate_pro', name: 'AI Legal Professional', monthly: 1499, yearly: 14990, credits: 300, badge: 'Popular', popular: true },
-                      { id: 'lawfirm_basic', name: 'Firm Standard', monthly: 499, yearly: 4990, credits: 500, badge: 'Law Firm' },
+                      { id: 'advocate_basic', name: 'AI Legal™ Basic', monthly: 499, yearly: 4990, credits: 100, badge: 'Advocate' },
+                      { id: 'advocate_pro', name: 'AI Legal™ Professional', monthly: 999, yearly: 9990, credits: 300, badge: 'Popular', popular: true },
+                      { id: 'lawfirm_basic', name: 'AI Legal™ Firm Basic', monthly: 499, yearly: 4990, credits: 500, badge: 'Law Firm' },
                     ].map(p => (
                       <div key={p.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs relative">
                         {p.popular && <span className="absolute top-4 right-4 bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded-md">POPULAR</span>}
@@ -906,9 +906,18 @@ const AdminDashboard = () => {
               onChange={(e) => setNewPlanId(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-900"
             >
-              <option value="advocate_basic">AI Legal Basic (₹999/mo)</option>
-              <option value="advocate_pro">AI Legal Professional (₹1,499/mo)</option>
-              <option value="lawfirm_basic">Firm Standard (₹499/mo)</option>
+              <option value="advocate_basic">AI Legal™ Basic (₹499/mo)</option>
+              <option value="advocate_pro">AI Legal™ Professional (₹999/mo)</option>
+              <option value="advocate_premium">AI Legal™ Premium (₹2,399/mo)</option>
+              <option value="student_basic">Student Basic (₹499/mo)</option>
+              <option value="student_pro">Student Pro (₹999/mo)</option>
+              <option value="student_premium">Student Premium (₹2,399/mo)</option>
+              <option value="firm_basic">Firm Basic (₹499/mo)</option>
+              <option value="firm_pro">Firm Pro (₹999/mo)</option>
+              <option value="firm_premium">Firm Premium (₹2,399/mo)</option>
+              <option value="combo_student_advocate">Combo: Student + Advocate (₹1,199/mo)</option>
+              <option value="combo_advocate_firm">Combo: Advocate + Firm (₹1,499/mo)</option>
+              <option value="combo_all_access">Combo: All Access Pass (₹2,399/mo)</option>
               <option value="FREE">Free Tier</option>
             </select>
             <div className="flex items-center gap-2 pt-2">
