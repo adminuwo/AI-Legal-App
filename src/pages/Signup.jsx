@@ -87,7 +87,7 @@ const Signup = () => {
       const payLoad = { name, email, password };
       const res = await axios.post(apis.signUp, payLoad);
 
-      toast.success("Welcome to AI Legal! Your account has been created successfully.", {
+      toast.success("Welcome to AI Legal™! Your account has been created successfully.", {
         icon: '⚖️',
         style: {
           borderRadius: '16px',

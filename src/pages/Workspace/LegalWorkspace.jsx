@@ -526,7 +526,7 @@ const getToolDetails = (toolId) => {
   };
 
   return tools[toolId] || {
-    title: "AI Legal Assistant",
+    title: "AI Legal™ Assistant",
     emoji: "⚖️",
     icon: Scale,
     desc: "Your AI-powered general legal assistant for research, drafting, and case intelligence.",
@@ -603,7 +603,7 @@ const TOOL_CHIP_DETAILS = {
 };
 
 const CASE_ASSISTANT_TOOLS = [
-  { id: 'legal_my_case', name: 'AI Legal Assistant', icon: '⚖️' },
+  { id: 'legal_my_case', name: 'AI Legal™ Assistant', icon: '⚖️' },
   { id: 'legal_draft_maker', name: 'Draft Maker', icon: '📝' },
   { id: 'legal_evidence_checker', name: 'Evidence Analyst', icon: '🔍' },
   { id: 'legal_contract_analyzer', name: 'Contract Analyzer', icon: '📄' },
@@ -8409,7 +8409,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                         setIsDocumentConvert(false);
                         if (newMode) {
                           setActiveTool('legal');
-                          toast.success("AI Legal Enabled ⚖️");
+                          toast.success("AI Legal™ Enabled ⚖️");
                         } else {
                           setActiveTool(null);
                         }
@@ -8422,7 +8422,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className="aisa-badge-small !bg-primary !text-white !font-black !px-2 !rounded-md">AI LEGAL™</span>
-                          <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">AI Legal</span>
+                          <span className="text-[14.5px] font-extrabold text-slate-800 dark:text-white leading-none">AI Legal™</span>
                         </div>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-tight">{t('aiLegalToolsCount')}</p>
                       </div>

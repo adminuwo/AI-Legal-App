@@ -14,7 +14,7 @@ const Onboarding = () => {
       icon: <Scale className="w-12 h-12 text-[#6D5DFC]" strokeWidth={1.5} />
     },
     {
-      title: "Why AI Legal?",
+      title: "Why AI Legal™?",
       description: "Automate research, draft court-ready documents, and analyze evidence in seconds, not hours.",
       icon: <Zap className="w-12 h-12 text-[#4F8CFF]" strokeWidth={1.5} />
     },

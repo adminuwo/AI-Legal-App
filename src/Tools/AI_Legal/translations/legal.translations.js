@@ -38,7 +38,7 @@ export const legalTranslations = {
         save: "Save",
         cite: "Cite",
         startChat: "Start Chat",
-        myCase: "My Case",
+        myCase: "My Matter",
         draftMaker: "Draft Maker",
         contractAnalyzer: "Contract Analyzer",
         strategyEngine: "Strategy Engine",
@@ -207,7 +207,7 @@ export const legalTranslations = {
         save: "सहेजें (Save)",
         cite: "साइट (Cite)",
         startChat: "चैट शुरू करें (Start Chat)",
-        myCase: "मेरा मामला (My Case)",
+        myCase: "मेरा मामला (My Matter)",
         draftMaker: "ड्राफ्ट मेकर (Draft Maker)",
         contractAnalyzer: "अनुबंध विश्लेषक (Contract Analyzer)",
         strategyEngine: "रणनीति इंजन (Strategy Engine)",
@@ -220,7 +220,7 @@ export const legalTranslations = {
         hinglish: "हिंग्लिश",
 
         // AI Legal Professional Toolkit (Hindi)
-        legalToolkitTitle: "एआई लीगल",
+        legalToolkitTitle: "AI Legal™",
         legalProfessionalToolkit: "प्रोफेशनल टूलकिट",
         advancedSuitesDesc: "कानूनी विशेषज्ञता के लिए उन्नत एआई-संचालित पेशेवर सूट।",
         generalLegalChat: "सामान्य कानूनी चैट",

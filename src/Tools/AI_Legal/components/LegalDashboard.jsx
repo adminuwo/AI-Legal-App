@@ -144,7 +144,7 @@ const LegalDashboard = ({
           </motion.button>
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111827]">
-              My Cases
+              My Matters
             </h1>
             <p className="text-xs text-[#6B7280] font-medium mt-1">
               Browse, search, sort, and manage all your litigation case folders.

@@ -15,7 +15,7 @@ const FAQ_DATA = [
     answer: "Use natural legal language. For example, 'Find recent Supreme Court judgments on Section 302 IPC regarding circumstantial evidence' or 'Analyze this paragraph for potential defense arguments'."
   },
   {
-    category: 'My Cases',
+    category: 'My Matters',
     question: 'Can I share cases with my junior advocates?',
     answer: "Yes, you can invite team members to collaborate on specific cases, share documents, and exchange notes in real-time."
   },
@@ -181,7 +181,7 @@ const HelpSupport = () => {
     try {
       const headers = user.token ? { Authorization: `Bearer ${user.token}` } : {};
       await axios.post(apis.support, payload, { headers });
-      toast.success('Feature request submitted! Thank you for helping shape AI LEGAL. 💡');
+      toast.success('Feature request submitted! Thank you for helping shape AI Legal™. 💡');
       setFeatureForm({ title: '', description: '', benefit: '' });
     } catch (err) {
       console.error(err);
@@ -213,7 +213,7 @@ const HelpSupport = () => {
       <div className="border-b border-slate-100 pb-6">
         <div className="flex items-center gap-3 text-[#6D5DFC] mb-2">
           <Scale className="w-8 h-8" />
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">AI LEGAL Support Center</h1>
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight">AI Legal™ Support Center</h1>
         </div>
         <p className="text-xs font-semibold text-slate-400 mt-1">Get immediate assistance, search FAQs, report issues, and share feedback.</p>
       </div>
@@ -581,7 +581,7 @@ const HelpSupport = () => {
           <span className="text-xs font-extrabold text-slate-700 block">AI LEGAL™</span>
           <span className="text-[10px] font-semibold text-slate-400 block">Advocate Edition</span>
           <span className="text-[10px] font-semibold text-slate-400 block">Version 1.2.0</span>
-          <span className="text-[9px] font-semibold text-slate-400 block">© 2026 AI LEGAL</span>
+          <span className="text-[9px] font-semibold text-slate-400 block">© 2026 AI Legal™</span>
         </div>
 
       </footer>

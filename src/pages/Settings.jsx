@@ -195,7 +195,7 @@ const SettingsPage = () => {
       {/* Search Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 shrink-0">
         <div>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">AI LEGAL Settings</h1>
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight">AI Legal™ Settings</h1>
           <p className="text-xs font-semibold text-slate-400 mt-1">Configure workspace parameters, styling, and AI agent triggers.</p>
         </div>
         <div className="relative w-full sm:w-80">
@@ -267,7 +267,7 @@ const SettingsPage = () => {
                   >
                     <option value="/dashboard">Main Dashboard</option>
                     <option value="/dashboard/chat/new">AI Legal Assistant</option>
-                    <option value="/dashboard/cases">My Cases</option>
+                    <option value="/dashboard/cases">My Matters</option>
                   </select>
                 </div>
 
@@ -745,7 +745,7 @@ const SettingsPage = () => {
                 </button>
 
                 <button 
-                  onClick={() => toast.success("Bug report logged. Thank you for making AI LEGAL better! 🐞")}
+                  onClick={() => toast.success("Bug report logged. Thank you for making AI Legal™ better! 🐞")}
                   className="p-4 border border-slate-100 rounded-xl hover:bg-slate-50/50 transition-colors flex items-center justify-between group text-left"
                 >
                   <div className="flex items-center gap-3">
@@ -774,7 +774,7 @@ const SettingsPage = () => {
               {/* Licensing & versioning */}
               <div className="border-t border-slate-100 pt-6 space-y-4 bg-[#F9FAFB]/50 p-6 rounded-2xl border border-slate-100">
                 <div className="flex justify-between items-center flex-wrap gap-2 text-xs font-bold text-slate-700">
-                  <span>AI LEGAL (Advocate Edition)</span>
+                  <span>AI Legal™ (Advocate Edition)</span>
                   <span className="text-[#6D5DFC]">v1.2.0</span>
                 </div>
                 <div className="text-[10px] font-semibold text-slate-400 space-y-2">

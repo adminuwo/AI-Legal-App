@@ -3675,7 +3675,7 @@ export const CaseWorkspace = ({
     const runResearchAnalysis = async () => {
       setIsRegeneratingResearch(true);
       setResearchRegenSteps([
-        "Connecting to AI Legal Co-Counsel Engine...",
+        "Connecting to AI Legal™ Co-Counsel Engine...",
         "Scanning case summary and active timeline events...",
         "Extracting keywords: recovery, Limitation Act, Section 65B...",
         "Searching Supreme Court & High Court digital database repositories...",
@@ -3693,7 +3693,7 @@ export const CaseWorkspace = ({
       setIsRegeneratingResearch(false);
       setConversationalSearchResults(null);
       setResearchSearchQuery('');
-      toast.success("AI Legal Research Workspace refreshed successfully!");
+      toast.success("AI Legal™ Research Workspace refreshed successfully!");
     };
 
     const handleSavePrecedentToBackend = (judgment) => {
@@ -3742,7 +3742,7 @@ export const CaseWorkspace = ({
             <div>
               <h2 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
                 <BookOpen size={18} className="text-[#6D5DFC]" />
-                <span>AI Legal Research Engine</span>
+                <span>AI Legal™ Research Engine</span>
               </h2>
               <p className="text-xs text-slate-400 mt-1 font-medium">Automatic context-aware legal research synced with active documents.</p>
             </div>
@@ -4848,7 +4848,7 @@ Through Counsel
                 <div className="bg-indigo-50/30 border border-indigo-100 p-3.5 rounded-xl flex items-start gap-2.5 text-[10px] text-indigo-950 font-medium">
                   <Sparkles size={14} className="text-[#6D5DFC] shrink-0 mt-0.5" />
                   <p className="leading-relaxed">
-                    <strong>AI Legal Note:</strong> Accepting these changes will automatically enforce fixed simple interest terms, neutralizing the compound calculation vulnerability and bringing the draft in line with Supreme Court guidelines in <em>Kailash Nath Associates vs DDA</em>.
+                    <strong>AI Legal™ Note:</strong> Accepting these changes will automatically enforce fixed simple interest terms, neutralizing the compound calculation vulnerability and bringing the draft in line with Supreme Court guidelines in <em>Kailash Nath Associates vs DDA</em>.
                   </p>
                 </div>
               </div>

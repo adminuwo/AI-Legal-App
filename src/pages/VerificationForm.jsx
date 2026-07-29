@@ -61,7 +61,7 @@ export default function VerificationForm() {
             const finalData = setUserData(res.data);
             setUserRecoil({ user: finalData });
 
-            toast.success("Welcome to AI Legal! Your account has been created successfully.", {
+            toast.success("Welcome to AI Legal™! Your account has been created successfully.", {
                 icon: '⚖️',
                 style: {
                     borderRadius: '16px',

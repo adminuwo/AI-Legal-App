@@ -401,15 +401,15 @@ const LegalPrecedents = ({ projectId: initialProjectId, onBack, cases = [], onSe
             <div className="w-24 h-24 bg-card rounded-full flex items-center justify-center mb-6">
                 <Briefcase size={48} className="text-subtext" />
             </div>
-            <h3 className="text-2xl font-black text-maintext mb-2">No Cases Found</h3>
+            <h3 className="text-2xl font-black text-maintext mb-2">No Matters Found</h3>
             <p className="text-subtext max-w-sm mb-8 font-medium">
-                You haven't created any case workspaces yet. Create your first case to start using AI Legal Precedents.
+                You haven't created any matter workspaces yet. Create your first matter to start using AI Legal™ Precedents.
             </p>
             <button
                 onClick={onCreateCase}
                 className="flex items-center gap-2 bg-indigo-600 text-slate-800 px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-700 shadow-sm shadow-indigo-500/20 transition-all"
             >
-                <Plus size={18} /> Create New Case
+                <Plus size={18} /> Create New Matter
             </button>
         </div>
     );

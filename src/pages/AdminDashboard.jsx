@@ -807,7 +807,7 @@ const AdminDashboard = () => {
                     {[
                       { id: 'advocate_basic', name: 'AI Legal Basic', monthly: 999, yearly: 9990, credits: 100, badge: 'Advocate' },
                       { id: 'advocate_pro', name: 'AI Legal Professional', monthly: 1499, yearly: 14990, credits: 300, badge: 'Popular', popular: true },
-                      { id: 'lawfirm_basic', name: 'Firm Standard', monthly: 2999, yearly: 29990, credits: 500, badge: 'Law Firm' },
+                      { id: 'lawfirm_basic', name: 'Firm Standard', monthly: 499, yearly: 4990, credits: 500, badge: 'Law Firm' },
                     ].map(p => (
                       <div key={p.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs relative">
                         {p.popular && <span className="absolute top-4 right-4 bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded-md">POPULAR</span>}
@@ -908,7 +908,7 @@ const AdminDashboard = () => {
             >
               <option value="advocate_basic">AI Legal Basic (₹999/mo)</option>
               <option value="advocate_pro">AI Legal Professional (₹1,499/mo)</option>
-              <option value="lawfirm_basic">Firm Standard (₹2,999/mo)</option>
+              <option value="lawfirm_basic">Firm Standard (₹499/mo)</option>
               <option value="FREE">Free Tier</option>
             </select>
             <div className="flex items-center gap-2 pt-2">
