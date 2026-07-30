@@ -2849,13 +2849,26 @@ const Chat = () => {
 
     const langMap = {
       'Hindi': 'hi-IN',
-      'English': 'en-US',
-      'Spanish': 'es-ES',
-      'French': 'fr-FR',
-      'German': 'de-DE',
-      'Japanese': 'ja-JP'
+      'English': 'en-IN',
+      'Marathi': 'mr-IN',
+      'Tamil': 'ta-IN',
+      'Telugu': 'te-IN',
+      'Bengali': 'bn-IN',
+      'Gujarati': 'gu-IN',
+      'Kannada': 'kn-IN',
+      'Punjabi': 'pa-IN',
+      'Malayalam': 'ml-IN',
+      'Urdu': 'ur-IN',
+      'Hinglish': 'hi-IN',
+      'Auto': '',
+      'Auto Detect': '',
+      'auto': ''
     };
-    recognition.lang = langMap[currentLang] || 'en-US';
+    const activeLang = (currentMode === 'LEGAL_TOOLKIT' && toolkitLanguage) ? toolkitLanguage : currentLang;
+    const targetSpeechLang = langMap[activeLang] !== undefined ? langMap[activeLang] : (langMap[currentLang] || '');
+    if (targetSpeechLang) {
+      recognition.lang = targetSpeechLang;
+    }
     recognition.continuous = false;
     recognition.interimResults = true;
 

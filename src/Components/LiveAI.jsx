@@ -399,12 +399,11 @@ const LiveAI = ({ onClose, language }) => {
             const responseText = (typeof response === 'object') ? (response.reply || response) : response;
             setAiResponse(responseText);
 
-            // AUTO-SWITCH MIC LANGUAGE based on AI response
+            // AUTO-SWITCH MIC LANGUAGE: preserve active language if detected in response
             const isHindiResponse = /[\u0900-\u097F]/.test(responseText);
-            const nextLang = isHindiResponse ? 'hi-IN' : 'en-US';
-            if (nextLang !== micLang) {
-                console.log(`🌐 [LiveAI] Auto-switching Mic language to: ${nextLang}`);
-                setMicLang(nextLang);
+            if (isHindiResponse && micLang !== 'hi-IN') {
+                console.log(`🌐 [LiveAI] Auto-switching Mic language to: hi-IN`);
+                setMicLang('hi-IN');
             }
 
             // startTypewriter(responseText); // Removed
