@@ -368,23 +368,26 @@
       transition: all 0.2s ease;
       letter-spacing: 0.2px;
     }
-    .cta-primary {
-      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-      color: #fff;
+    .cta-primary, .cta-secondary {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%) !important;
+      color: #fff !important;
       box-shadow: 0 4px 14px rgba(200,163,77,0.35);
+      border: none !important;
     }
-    .cta-primary:hover {
+    .cta-primary:hover, .cta-secondary:hover {
       opacity: 0.93;
       transform: translateY(-1px);
       box-shadow: 0 6px 20px rgba(200,163,77,0.45);
     }
-    .cta-secondary {
-      background: var(--surface2);
-      color: var(--text);
-      border: 1.5px solid var(--border);
+    .cta-subscribed {
+      background: #10B981 !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35) !important;
+      cursor: default !important;
+      opacity: 1 !important;
+      font-weight: 800 !important;
     }
-    .cta-secondary:hover { background: var(--border); }
-    .cta-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .cta-btn:disabled { cursor: not-allowed; transform: none; }
 
     /* ── COMBO CARDS ── */
     .combo-grid {
@@ -1339,6 +1342,7 @@
   let currentCycle = 'monthly';
   let authToken = null;
   let userInfo = {};
+  let userActivePlanId = null;
   let isProcessing = false;
 
   // ═══════════════════════════════════════════════
@@ -1428,6 +1432,15 @@
       const yearlySaving = currentCycle === 'yearly' ? (plan.monthly * 12 - plan.yearly) : 0;
       const tagText = plan.tag || (plan.popular ? 'MOST POPULAR' : '');
 
+      const normActive = (userActivePlanId || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const normPlan = (plan.id || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const isSubscribed = Boolean(normActive && normPlan && normActive === normPlan);
+
+      const ctaBtnClass = isSubscribed ? 'cta-btn cta-subscribed' : 'cta-btn cta-primary';
+      const ctaBtnContent = isSubscribed 
+        ? '✓ Subscribed' 
+        : `${plan.popular ? '⭐ ' : ''}${plan.buttonText || 'Subscribe'} — ₹${price.toLocaleString('en-IN')}/${currentCycle === 'yearly' ? 'yr' : 'mo'}`;
+
       html += `
         <div class="plan-card ${plan.popular ? 'popular' : ''}">
           ${tagText ? `<div class="popular-ribbon">${plan.popular ? '⭐ ' : ''}${tagText}</div>` : ''}
@@ -1478,11 +1491,11 @@
 
           <div class="plan-cta">
             <button 
-              class="cta-btn ${plan.popular ? 'cta-primary' : 'cta-secondary'}" 
-              onclick="handleSelectPlan('${plan.id}', '${plan.name}', ${price})"
+              class="${ctaBtnClass}" 
+              ${isSubscribed ? 'disabled' : `onclick="handleSelectPlan('${plan.id}', '${plan.name}', ${price})"`}
               id="btn-${plan.id}"
             >
-              ${plan.popular ? '⭐ ' : ''}${plan.buttonText || 'Subscribe'} — ₹${price.toLocaleString('en-IN')}/${currentCycle === 'yearly' ? 'yr' : 'mo'}
+              ${ctaBtnContent}
             </button>
           </div>
         </div>
@@ -1506,9 +1519,14 @@
     showLoading('Creating secure payment order...');
 
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (authToken) {
+        headers['Authorization'] = 'Bearer ' + authToken;
+      }
+
       const orderRes = await apiFetch('/api/subscription/create-order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify({ planId, billingCycle: currentCycle })
       });
       const orderData = await orderRes.json();
