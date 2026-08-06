@@ -51,6 +51,7 @@ const LegalWorkspace = lazy(() => import('./pages/Workspace/LegalWorkspace'));
 const HomeDashboard = lazy(() => import('./pages/HomeDashboard'));
 const SettingsPage = lazy(() => import('./pages/Settings'));
 const HelpSupport = lazy(() => import('./pages/HelpSupport'));
+const AiToolsPage = lazy(() => import('./pages/AiToolsPage'));
 
 const isAuthenticated = () => {
   const tokenStr = localStorage.getItem('token');
@@ -481,6 +482,12 @@ const NavigateProvider = () => {
             </Suspense>
           } />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="profile" element={<SettingsPage />} />
+          <Route path="tools" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Tools...</div>}>
+              <AiToolsPage />
+            </Suspense>
+          } />
           <Route path="knowledge-vault" element={<PlaceholderPage title="Knowledge Vault" />} />
           <Route path="court-diary" element={<PlaceholderPage title="Court Diary" />} />
           <Route path="templates" element={<PlaceholderPage title="Templates" />} />

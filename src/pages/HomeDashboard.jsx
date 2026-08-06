@@ -4,17 +4,23 @@ import {
   FileText, Search, Briefcase, Plus, Gavel, Calendar, 
   Clock, AlertTriangle, CheckCircle2, RefreshCw, Edit2, 
   Trash2, Archive, ChevronRight, X, ArrowUpRight, TrendingUp,
-  Sparkles, Info, Users, ShieldCheck, BookOpen, User, MoreVertical, Activity
+  Sparkles, Info, Users, ShieldCheck, BookOpen, User, MoreVertical, Activity,
+  Binary, Scale
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { userData } from '../userStore/userData';
+import { userData, selectedRoleState } from '../userStore/userData';
 import { apiService } from '../services/apiService';
 import toast from 'react-hot-toast';
+
+import ExperienceRoleSelector from '../Components/ExperienceRoleSelector';
+import StudentDashboardSection from '../Components/StudentDashboardSection';
+import LawFirmDashboardSection from '../Components/LawFirmDashboardSection';
 
 export default function HomeDashboard() {
   const navigate = useNavigate();
   const currentUser = useRecoilValue(userData);
+  const selectedRole = useRecoilValue(selectedRoleState) || 'advocate';
   const userName = currentUser?.user?.name || "Advocate";
 
   // State Management
@@ -28,6 +34,8 @@ export default function HomeDashboard() {
   const [isNewCaseModalOpen, setIsNewCaseModalOpen] = useState(false);
   const [editingCase, setEditingCase] = useState(null);
   const [activeMenuCaseId, setActiveMenuCaseId] = useState(null);
+  const [isBannerVisible, setIsBannerVisible] = useState(true);
+  const [isProductGuideOpen, setIsProductGuideOpen] = useState(false);
 
   // Form States
   const [newCaseForm, setNewCaseForm] = useState({
@@ -393,11 +401,11 @@ export default function HomeDashboard() {
       {isLoading ? renderLoadingSkeletons() : (
         <>
           {/* 1. Header Greeting & Primary Action */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 pb-8 border-b border-[#F3F4F6]">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-[#F3F4F6]">
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-3xl font-extrabold tracking-tight text-[#111827]">
-                  Welcome, Advocate {userName}
+                  Welcome, {selectedRole === 'student' ? 'Student' : selectedRole === 'law_firm' ? 'Law Firm' : 'Advocate'} {userName}
                 </h1>
                 {isSyncing && (
                   <RefreshCw size={14} className="text-[#6D5DFC] animate-spin" />
@@ -421,6 +429,7 @@ export default function HomeDashboard() {
             </button>
           </div>
 
+
           {error && (
             <div className="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl flex items-center gap-3 text-xs">
               <AlertTriangle className="text-rose-500 shrink-0" size={16} />
@@ -428,22 +437,35 @@ export default function HomeDashboard() {
             </div>
           )}
 
-          {/* 2. Today's Overview Statistics Ribbon */}
-          <div className="mb-12">
+          {selectedRole === 'student' ? (
+            <StudentDashboardSection user={currentUser?.user} />
+          ) : selectedRole === 'law_firm' ? (
+            <LawFirmDashboardSection user={currentUser?.user} cases={cases} />
+          ) : (
+            <>
+              {/* 2. Today's Overview Statistics Ribbon */}
+              <div className="mb-12">
             <h2 className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wider mb-4">Today&apos;s Overview</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { label: "Active Cases", value: totalActiveCases, icon: Briefcase },
-                { label: "Today's Hearings", value: totalTodaysHearingsCount, icon: Gavel, alert: totalTodaysHearingsCount > 0 },
-                { label: "Pending Drafts", value: totalPendingDrafts, icon: FileText },
-                { label: "Pending Research", value: totalPendingResearch, icon: Search }
+                { label: "Active Cases", value: totalActiveCases, icon: Briefcase, status: "Active", color: "text-emerald-500 bg-emerald-50" },
+                { label: "Today's Hearings", value: totalTodaysHearingsCount, icon: Gavel, status: totalTodaysHearingsCount > 0 ? "TODAY" : "0 Today", color: totalTodaysHearingsCount > 0 ? "text-rose-500 bg-rose-50" : "text-slate-400 bg-slate-50" },
+                { label: "Pending Drafts", value: totalPendingDrafts, icon: FileText, status: "Pending", color: "text-amber-500 bg-amber-50" },
+                { label: "Pending Research", value: totalPendingResearch, icon: Search, status: "Up to Date", color: "text-indigo-500 bg-indigo-50" }
               ].map((stat, i) => (
-                <div key={i} className="p-6 border border-[#E5E7EB] rounded-xl bg-white shadow-sm hover:border-[#6D5DFC] transition-all flex flex-col justify-between">
+                <div key={i} className="p-6 border border-[#E5E7EB] rounded-2xl bg-white shadow-sm hover:border-[#6D5DFC] hover:shadow-md transition-all flex flex-col justify-between">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">{stat.label}</span>
-                    <stat.icon className={`w-5 h-5 ${stat.alert ? 'text-[#6D5DFC]' : 'text-slate-400'}`} />
+                    <div className={`p-2 rounded-xl ${stat.color}`}>
+                      <stat.icon className="w-5 h-5" />
+                    </div>
                   </div>
-                  <span className="text-3xl font-extrabold text-[#111827]">{stat.value}</span>
+                  <div className="flex items-baseline justify-between mt-2">
+                    <span className="text-3xl font-black text-[#111827]">{stat.value}</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                      {stat.status}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -476,6 +498,121 @@ export default function HomeDashboard() {
                       <span>Contracts: <strong className="text-slate-800">{continueWorkingCase.contracts?.length || 0}</strong></span>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* 3. Quick Actions Row */}
+              <div className="space-y-4">
+                <h2 className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wider">Quick Actions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button 
+                    onClick={() => {
+                      setNewCaseForm({ name: '', clientName: '', opponentName: '', caseType: '', courtName: '', summary: '', priority: 'Medium' });
+                      setIsNewCaseModalOpen(true);
+                    }}
+                    className="p-5 border border-slate-200 rounded-2xl bg-white hover:border-[#6D5DFC] hover:shadow-md transition-all flex items-center gap-4 group cursor-pointer text-left"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-indigo-50 text-[#6D5DFC] flex items-center justify-center font-black text-xl group-hover:scale-105 transition-transform shrink-0">
+                      +
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-[#6D5DFC] transition-colors">New Case</h4>
+                      <p className="text-xs text-slate-500 font-medium mt-0.5">Initialize litigation folder & AI docket</p>
+                    </div>
+                  </button>
+
+                  <button 
+                    onClick={() => setIsProductGuideOpen(true)}
+                    className="p-5 border border-slate-200 rounded-2xl bg-white hover:border-[#6D5DFC] hover:shadow-md transition-all flex items-center gap-4 group cursor-pointer text-left"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-amber-50 text-[#C8A34D] flex items-center justify-center font-black text-xl group-hover:scale-105 transition-transform shrink-0">
+                      ✨
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-sm text-slate-900 group-hover:text-[#6D5DFC] transition-colors">Product Guide</h4>
+                      <p className="text-xs text-slate-500 font-medium mt-0.5">Interactive AI feature walkthrough</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* 4. AI Legal Knowledge Hub Card */}
+              <div className="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-amber-50 text-[#C8A34D] border border-amber-200/60 shrink-0">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-extrabold text-slate-900">AI Legal Knowledge Hub</h3>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">Search Indian laws, sections, judgments, legal procedures and get AI-powered legal answers.</p>
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <Search className="w-4 h-4 text-[#C8A34D] absolute left-3.5 top-3.5" />
+                  <input 
+                    type="text"
+                    placeholder="Ask any legal question..."
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && e.target.value.trim()) {
+                        navigate(`/dashboard/chat/new?q=${encodeURIComponent(e.target.value)}`);
+                      }
+                    }}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold focus:outline-none focus:border-[#6D5DFC] transition-all"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Trending Searches:</span>
+                  <div className="flex flex-wrap gap-2">
+                    {['IPC 420', 'BNS', 'Divorce', 'GST', 'Consumer Rights', 'Labour Law', 'Property', 'RTI', 'Motor Accident'].map((chip, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => navigate(`/dashboard/chat/new?q=${encodeURIComponent(chip)}`)}
+                        className="px-3 py-1 bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-[#6D5DFC] text-[#C8A34D] hover:text-[#6D5DFC] rounded-lg text-xs font-bold transition-all cursor-pointer"
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 flex justify-end">
+                  <button 
+                    onClick={() => navigate('/dashboard/chat/new')}
+                    className="text-xs font-bold text-[#C8A34D] hover:text-[#6D5DFC] flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span>Open Knowledge Hub</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* 5. New User Product Guide Banner (Dismissable) */}
+              {isBannerVisible && (
+                <div className="p-6 border border-purple-200 rounded-2xl bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 relative shadow-sm">
+                  <button 
+                    onClick={() => setIsBannerVisible(false)}
+                    className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-white/60 transition-colors cursor-pointer"
+                  >
+                    <X size={16} />
+                  </button>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Sparkles className="w-4 h-4 text-purple-600" />
+                    <h3 className="text-sm font-extrabold text-slate-900">New to AI LEGAL?</h3>
+                  </div>
+                  <p className="text-xs text-slate-600 font-semibold mb-3">Meet your AI Product Guide.</p>
+                  <ul className="text-xs text-slate-600 space-y-1.5 mb-4 font-medium">
+                    <li className="flex items-center gap-2">• Learn every feature step-by-step.</li>
+                    <li className="flex items-center gap-2">• Ask questions in Hindi or English.</li>
+                    <li className="flex items-center gap-2">• Get instant help while using the app.</li>
+                  </ul>
+                  <button 
+                    onClick={() => setIsProductGuideOpen(true)}
+                    className="px-4 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-white text-xs font-bold rounded-xl shadow-sm transition-all cursor-pointer"
+                  >
+                    Open Product Guide &rarr;
+                  </button>
                 </div>
               )}
 
@@ -601,225 +738,10 @@ export default function HomeDashboard() {
                 </div>
               )}
 
-              {/* Archived & Closed Cases */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Archived Case Folder list */}
-                <div className="space-y-4 bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-xxs">
-                  <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-1.5">
-                    <Archive size={13} className="text-slate-400" /> Archived Folders ({archivedCasesList.length})
-                  </h3>
-                  <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
-                    {archivedCasesList.map(c => (
-                      <div key={c._id} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
-                        <span className="text-xs font-bold text-slate-700 truncate max-w-[150px]">{c.name}</span>
-                        <button 
-                          onClick={(e) => handleToggleArchive(e, c)}
-                          className="text-[9px] font-bold text-slate-500 hover:text-[#6D5DFC] uppercase tracking-wider"
-                        >
-                          Restore
-                        </button>
-                      </div>
-                    ))}
-                    {archivedCasesList.length === 0 && (
-                      <span className="text-[10px] text-slate-400 font-bold block py-2">No archived case files.</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Completed / Closed Cases */}
-                <div className="space-y-4 bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-xxs">
-                  <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-1.5">
-                    <CheckCircle2 size={13} className="text-emerald-500" /> Completed Litigations ({completedCasesList.length})
-                  </h3>
-                  <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
-                    {completedCasesList.map(c => (
-                      <div key={c._id} className="flex justify-between items-center py-2 border-b border-slate-50 last:border-0">
-                        <span className="text-xs font-bold text-slate-700 truncate max-w-[150px]">{c.name}</span>
-                        <span className="text-[9px] font-black text-emerald-600 uppercase tracking-wide">Closed</span>
-                      </div>
-                    ))}
-                    {completedCasesList.length === 0 && (
-                      <span className="text-[10px] text-slate-400 font-bold block py-2">No completed cases matching.</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Right Column (2 spans) */}
-            <div className="lg:col-span-2 space-y-12">
-              
-              {/* Today's Hearings Widget */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wider">Today&apos;s Hearings</h2>
-                  <span className="px-2 py-0.5 bg-indigo-50 text-[#6D5DFC] rounded text-[9px] font-bold uppercase tracking-wider">Today Only</span>
-                </div>
-
-                <div className="space-y-4">
-                  {todaysHearingsList.map((h, idx) => (
-                    <div 
-                      key={idx} 
-                      className="p-5 border border-[#E5E7EB] rounded-xl bg-white shadow-sm hover:border-[#6D5DFC] transition-all flex flex-col justify-between gap-4"
-                    >
-                      <div>
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <h3 className="font-bold text-sm text-[#111827]">{h.caseName}</h3>
-                          <span className="text-[10px] font-black text-[#6D5DFC] bg-[#6D5DFC]/5 px-2 py-0.5 rounded border border-[#6D5DFC]/10 shrink-0">
-                            {h.time}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-[#6B7280] font-semibold">
-                          {h.court} • {h.judge}
-                        </p>
-                        <p className="text-[10px] text-[#6B7280] font-medium mt-1 leading-normal italic">
-                          Agenda: {h.title}
-                        </p>
-                      </div>
-                      
-                      <button 
-                        onClick={() => handleOpenWorkspace(h.caseId)}
-                        className="w-full py-2 bg-[#F9FAFB] hover:bg-[#F3F4F6] text-[#374151] border border-[#E5E7EB] rounded-lg text-xs font-bold transition-all text-center cursor-pointer"
-                      >
-                        Open Hearing Assistant
-                      </button>
-                    </div>
-                  ))}
-                  {todaysHearingsList.length === 0 && (
-                    <div className="py-8 text-center text-xs text-[#9CA3AF] font-bold border border-dashed border-[#E5E7EB] rounded-xl bg-white">
-                      No hearings scheduled for today.
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Upcoming Deadlines Milestones */}
-              <div className="space-y-4 bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-xxs">
-                <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-1.5">
-                  <Clock size={13} className="text-indigo-500" /> Upcoming Milestones & Deadlines
-                </h3>
-                <div className="space-y-3">
-                  {sortedDeadlines.map((dl, idx) => (
-                    <div key={idx} className="flex justify-between items-start py-2 border-b border-slate-50 last:border-0 last:pb-0">
-                      <div>
-                        <span className="text-xs font-bold text-slate-800 block leading-tight">{dl.title}</span>
-                        <span className="text-[9px] text-[#6B7280] font-semibold mt-0.5 block">{dl.caseName}</span>
-                      </div>
-                      <span className="px-2 py-1 bg-slate-50 border border-slate-100 rounded text-[9px] font-extrabold text-slate-700 whitespace-nowrap shrink-0">
-                        {dl.date.toLocaleDateString()}
-                      </span>
-                    </div>
-                  ))}
-                  {sortedDeadlines.length === 0 && (
-                    <span className="text-[10px] text-slate-400 font-bold block py-2">No future deadlines scheduled.</span>
-                  )}
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* G. Horizontal Analytics, Insights, Activity, and Actions Panel */}
-          <div className="mt-12 pt-10 border-t border-slate-100 flex flex-row overflow-x-auto md:grid md:grid-cols-4 gap-6 pb-6 scrollbar-thin">
-            {/* Case Analytics Bar visual */}
-            <div className="space-y-4 bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-xxs shrink-0 w-[290px] md:w-auto">
-              <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-1.5">
-                <TrendingUp size={13} className="text-[#6D5DFC]" /> Case Portfolio Analytics
-              </h3>
-              
-              <div className="space-y-4 pt-2">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-slate-700">Average Case Strength</span>
-                  <span className="font-black text-[#6D5DFC]">{averageStrength}% Strength</span>
-                </div>
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div 
-                    className="bg-[#6D5DFC] h-full rounded-full transition-all duration-300"
-                    style={{ width: `${averageStrength}%` }}
-                  />
-                </div>
-
-                {categoryAnalytics.length > 0 && (
-                  <div className="space-y-2 pt-3 border-t border-slate-150">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Category Distribution</span>
-                    {categoryAnalytics.map((cat, idx) => (
-                      <div key={idx} className="flex items-center justify-between text-[11px] font-semibold text-slate-750">
-                        <span className="truncate max-w-[100px]">{cat.name}</span>
-                        <span>{cat.count} ({cat.percentage}%)</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* AI Insights Alerts */}
-            <div className="space-y-4 bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-xxs shrink-0 w-[290px] md:w-auto">
-              <h3 className="text-xs font-black text-[#6D5DFC] uppercase tracking-widest flex items-center gap-1.5">
-                <Sparkles size={13} className="text-[#6D5DFC]" /> Real-Time AI Insights
-              </h3>
-              <div className="space-y-3 max-h-48 overflow-y-auto custom-scrollbar">
-                {aiInsightsList.map((ins) => (
-                  <div 
-                    key={ins.id} 
-                    className={`p-3 border rounded-xl text-xs space-y-1 ${
-                      ins.type === 'warning' 
-                        ? 'bg-amber-50/50 border-amber-200/50 text-amber-950' 
-                        : 'bg-indigo-50/30 border-indigo-100/40 text-indigo-950'
-                    }`}
-                  >
-                    <span className="block font-black uppercase text-[8px] tracking-wider text-slate-400">{ins.caseName}</span>
-                    <p className="font-bold leading-relaxed">{ins.tip}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Recent AI Activity */}
-            <div className="space-y-4 bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-xxs shrink-0 w-[290px] md:w-auto">
-              <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-1.5">
-                <Activity size={13} className="text-slate-400" /> Recent AI Activity
-              </h3>
-              <div className="space-y-3 max-h-48 overflow-y-auto custom-scrollbar font-sans">
-                {recentAiActivities.map((act, idx) => (
-                  <div key={idx} className="flex justify-between items-start py-2 border-b border-slate-50 last:border-0 last:pb-0 text-[11px] font-semibold text-slate-650">
-                    <div>
-                      <span className="text-slate-800 font-bold block">{act.activity}</span>
-                      <span className="text-[9px] text-[#6D5DFC] block mt-0.5">{act.caseName}</span>
-                    </div>
-                    <span className="text-[9px] text-slate-400 whitespace-nowrap shrink-0">{act.time}</span>
-                  </div>
-                ))}
-                {recentAiActivities.length === 0 && (
-                  <span className="text-[10px] text-slate-400 font-bold block py-2">No recent AI activities.</span>
-                )}
-              </div>
-            </div>
-
-            {/* Quick Actions ribbon */}
-            <div className="space-y-4 bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-xxs shrink-0 w-[290px] md:w-auto">
-              <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-3">Quick Actions</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <button 
-                  onClick={() => {
-                    setNewCaseForm({ name: '', clientName: '', opponentName: '', caseType: '', courtName: '', summary: '', priority: 'Medium' });
-                    setIsNewCaseModalOpen(true);
-                  }}
-                  className="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-[10px] font-extrabold uppercase tracking-wider text-slate-700 text-center transition-colors cursor-pointer"
-                >
-                  Add Case File
-                </button>
-                <button 
-                  onClick={() => navigate('/dashboard/cases')}
-                  className="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-[10px] font-extrabold uppercase tracking-wider text-slate-700 text-center transition-colors cursor-pointer"
-                >
-                  Browse Folders
-                </button>
-              </div>
             </div>
           </div>
+          </>
+          )}
 
           {/* E. MODAL Dialog: New Case Folder */}
           <AnimatePresence>
@@ -1036,6 +958,59 @@ export default function HomeDashboard() {
                       Save Changes
                     </button>
                   </form>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+
+          {/* G. MODAL Dialog: AI Product Guide Walkthrough */}
+          <AnimatePresence>
+            {isProductGuideOpen && (
+              <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="bg-white border border-purple-200 rounded-2xl w-full max-w-lg shadow-2xl p-6 overflow-hidden flex flex-col max-h-[90vh]"
+                >
+                  <div className="flex justify-between items-center pb-4 border-b border-slate-100 shrink-0">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-purple-600" />
+                      <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">AI LEGAL Product Guide</h3>
+                    </div>
+                    <button onClick={() => setIsProductGuideOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors p-1">
+                      <X size={18} />
+                    </button>
+                  </div>
+
+                  <div className="py-6 space-y-4 text-slate-700 text-xs font-medium overflow-y-auto custom-scrollbar flex-1">
+                    <p className="font-semibold text-slate-900 text-sm">Welcome to your AI LEGAL Litigation Practice Workspace!</p>
+                    
+                    <div className="p-4 rounded-xl bg-purple-50/60 border border-purple-100 space-y-2">
+                      <h4 className="font-extrabold text-purple-950 text-xs">1. 📁 Litigation Case Folders</h4>
+                      <p className="text-purple-900/80">Manage all client briefs, court hearings, evidence files, and case notes in dedicated case dockets.</p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-indigo-50/60 border border-indigo-100 space-y-2">
+                      <h4 className="font-extrabold text-indigo-950 text-xs">2. 🤖 AI Legal Assistant & Tools</h4>
+                      <p className="text-indigo-900/80">Automate petition drafting, case law precedent searches, document OCR scanning, and trial argument building.</p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-100 space-y-2">
+                      <h4 className="font-extrabold text-amber-950 text-xs">3. 🏛️ Workspace Roles</h4>
+                      <p className="text-amber-900/80">Switch instantly between Advocate litigation mode, Student exam tutor, and Law Firm team collaboration views.</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 flex justify-end">
+                    <button 
+                      onClick={() => setIsProductGuideOpen(false)}
+                      className="px-5 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-white rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
+                    >
+                      Got it! Close Guide
+                    </button>
+                  </div>
                 </motion.div>
               </div>
             )}

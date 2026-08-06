@@ -168,3 +168,9 @@ export const legalViewData = atom({
   key: 'legalViewData',
   default: localStorage.getItem('aisa_legal_view') || 'CHAT'
 })
+
+export const selectedRoleState = atom({
+  key: 'selectedRoleState',
+  default: localStorage.getItem('user_selected_role') || 'advocate',
+})
+

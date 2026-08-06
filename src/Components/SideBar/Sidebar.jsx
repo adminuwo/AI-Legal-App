@@ -6,13 +6,14 @@ import {
   SearchCode, FileCheck, Gavel, Lightbulb, Scale, Calendar, 
   Users, Bell, User, Settings2, LogOut, ChevronRight, Binary,
   Sun, Moon, Globe, ChevronDown, Bookmark, HelpCircle, Download,
-  CreditCard, Shield
+  CreditCard, Shield, Zap, GraduationCap, Building2
 } from 'lucide-react';
-import { useRecoilState } from 'recoil';
-import { userData } from '../../userStore/userData';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { userData, selectedRoleState } from '../../userStore/userData';
 import { AppRoute } from '../../types';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
+import ExperienceRoleSelector from '../ExperienceRoleSelector';
 
 const CORE_VIEWS = [
   { name: 'Dashboard', icon: LayoutGrid, path: '/dashboard' },
@@ -36,7 +37,41 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentUserData, setUserRecoil] = useRecoilState(userData);
+  const selectedRole = useRecoilValue(selectedRoleState) || 'advocate';
   const user = currentUserData.user || { name: "Advocate", email: "..." };
+
+  // 5 Main Navigation Tabs (matching Mobile App)
+  const coreNavigation = [
+    { name: 'Home', icon: LayoutGrid, path: '/dashboard' },
+    { name: selectedRole === 'law_firm' ? 'Firm Workspace' : 'My Matters', icon: Briefcase, path: '/dashboard/cases' },
+    { name: 'AI Legal Assistant', icon: Scale, path: '/dashboard/chat/new' },
+    { name: 'AI Tools', icon: Zap, path: '/dashboard/tools' },
+    { name: 'Profile & Settings', icon: User, path: '/dashboard/settings' },
+  ];
+
+  // Dynamic Role-Specific AI Tools
+  const roleAiTools = selectedRole === 'student' ? [
+    { name: 'Case Summarizer', icon: Search, path: '/dashboard/chat/new?tool=legal_research' },
+    { name: 'Bare Act Tutor', icon: Library, path: '/dashboard/chat/new?tool=legal_precedents' },
+    { name: 'Moot Court Trainer', icon: Gavel, path: '/dashboard/chat/new?tool=legal_argument_builder' },
+    { name: 'Essay & Draft Maker', icon: FileText, path: '/dashboard/chat/new?tool=legal_draft_maker' },
+    { name: 'MCQ & Quiz Prep', icon: GraduationCap, path: '/dashboard/tools' },
+  ] : selectedRole === 'law_firm' ? [
+    { name: 'Firm Workspace', icon: Building2, path: '/dashboard/cases' },
+    { name: 'AI Client Connect', icon: Users, path: '/dashboard/chat/new?prompt=AI%20Client%20Connect' },
+    { name: 'Contract Analyzer', icon: FileCheck, path: '/dashboard/chat/new?tool=legal_contract_analyzer' },
+    { name: 'Strategy Engine', icon: Brain, path: '/dashboard/chat/new?tool=legal_strategy_engine' },
+    { name: 'Enterprise Toolkit', icon: Zap, path: '/dashboard/tools' },
+  ] : [
+    { name: 'Legal Research', icon: Search, path: '/dashboard/chat/new?tool=legal_research' },
+    { name: 'Legal Precedents', icon: Library, path: '/dashboard/chat/new?tool=legal_precedents' },
+    { name: 'Draft Maker', icon: FileText, path: '/dashboard/chat/new?tool=legal_draft_maker' },
+    { name: 'Contract Analyzer', icon: FileCheck, path: '/dashboard/chat/new?tool=legal_contract_analyzer' },
+    { name: 'Evidence Analyst', icon: Binary, path: '/dashboard/chat/new?tool=legal_evidence_checker' },
+    { name: 'Argument Builder', icon: Gavel, path: '/dashboard/chat/new?tool=legal_argument_builder' },
+    { name: 'Case Predictor', icon: Scale, path: '/dashboard/chat/new?tool=legal_case_predictor' },
+    { name: 'Strategy Engine', icon: Brain, path: '/dashboard/chat/new?tool=legal_strategy_engine' },
+  ];
   const [showDropdown, setShowDropdown] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [deviceType, setDeviceType] = useState('desktop');
@@ -240,19 +275,18 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
         <div className="flex-1 overflow-y-auto custom-scrollbar py-4 px-4">
           
           <div className="mb-6">
-            <h3 className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider mb-2 px-4">Core</h3>
-            {CORE_VIEWS.map(renderLink)}
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider mb-2 px-4">AI Tools</h3>
-            {AI_TOOLS.map(renderLink)}
+            <h3 className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wider mb-2 px-4">Navigation</h3>
+            {coreNavigation.map(renderLink)}
           </div>
 
         </div>
 
         {/* Footer profile info (Clickable Card) */}
-        <div ref={profileCardRef} className="relative p-4 border-t border-[#E5E7EB] shrink-0 bg-[#F9FAFB]">
+        <div ref={profileCardRef} className="relative p-4 border-t border-[#E5E7EB] shrink-0 bg-[#F9FAFB] space-y-2">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Role</span>
+            <ExperienceRoleSelector compact={true} />
+          </div>
           
           {/* Dropdown for Desktop */}
           <AnimatePresence>
