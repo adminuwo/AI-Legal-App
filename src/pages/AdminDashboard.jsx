@@ -213,9 +213,18 @@ const AdminDashboard = () => {
         setPlansList(plansFetched);
       } else {
         setPlansList([
-          { _id: 'plan1', planId: 'advocate_starter', name: 'Starter Advocate', priceMonthly: 499, priceYearly: 4990, credits: 50, isPopular: false, isActive: true },
-          { _id: 'plan2', planId: 'advocate_pro', name: 'Professional Advocate', priceMonthly: 999, priceYearly: 9990, credits: 150, isPopular: true, isActive: true },
-          { _id: 'plan3', planId: 'enterprise_firm', name: 'Enterprise Firm', priceMonthly: 2399, priceYearly: 23990, credits: 500, isPopular: false, isActive: true }
+          { _id: 'advocate_basic', planId: 'advocate_basic', planName: 'AI Legal™ Advocate Basic', priceMonthly: 499, priceYearly: 4990, badge: 'ADVOCATE BASIC', isActive: true },
+          { _id: 'advocate_pro', planId: 'advocate_pro', planName: 'AI Legal™ Advocate Pro', priceMonthly: 999, priceYearly: 9990, badge: 'ADVOCATE PRO', isPopular: true, isActive: true },
+          { _id: 'advocate_premium', planId: 'advocate_premium', planName: 'AI Legal™ Advocate Premium', priceMonthly: 2399, priceYearly: 23990, badge: 'ADVOCATE PREMIUM', isActive: true },
+          { _id: 'student_basic', planId: 'student_basic', planName: 'AI Legal™ Student Basic', priceMonthly: 499, priceYearly: 4990, badge: 'STUDENT BASIC', isActive: true },
+          { _id: 'student_pro', planId: 'student_pro', planName: 'AI Legal™ Student Pro', priceMonthly: 999, priceYearly: 9990, badge: 'STUDENT PRO', isPopular: true, isActive: true },
+          { _id: 'student_premium', planId: 'student_premium', planName: 'AI Legal™ Student Premium', priceMonthly: 2399, priceYearly: 23990, badge: 'STUDENT PREMIUM', isActive: true },
+          { _id: 'firm_basic', planId: 'firm_basic', planName: 'AI Legal™ Firm Basic', priceMonthly: 1499, priceYearly: 14990, badge: 'FIRM BASIC', isActive: true },
+          { _id: 'firm_pro', planId: 'firm_pro', planName: 'AI Legal™ Firm Pro', priceMonthly: 2999, priceYearly: 29990, badge: 'FIRM PRO', isPopular: true, isActive: true },
+          { _id: 'firm_premium', planId: 'firm_premium', planName: 'AI Legal™ Firm Premium', priceMonthly: 4999, priceYearly: 49990, badge: 'FIRM PREMIUM', isActive: true },
+          { _id: 'combo_student_advocate', planId: 'combo_student_advocate', planName: 'Student + Advocate Combo', priceMonthly: 1199, priceYearly: 11990, badge: 'STUDENT + ADVOCATE', isActive: true },
+          { _id: 'combo_advocate_firm', planId: 'combo_advocate_firm', planName: 'Advocate + Law Firm Combo', priceMonthly: 1499, priceYearly: 14990, badge: 'ADVOCATE + FIRM', isPopular: true, isActive: true },
+          { _id: 'combo_all_access', planId: 'combo_all_access', planName: 'All Access Ecosystem Pass', priceMonthly: 2399, priceYearly: 23990, badge: 'ALL ACCESS', isActive: true }
         ]);
       }
 
@@ -800,26 +809,54 @@ const AdminDashboard = () => {
               {activeTab === 'plans' && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-base font-extrabold text-slate-900">Live Workspace Plans & Pricing Matrix</h3>
+                    <div>
+                      <h3 className="text-base font-extrabold text-slate-900">Live Master Plans & Pricing Matrix</h3>
+                      <p className="text-xs font-semibold text-slate-500 mt-0.5">All 12 Subscription Plans across Advocate, Student, Law Firm & Combo Workspaces</p>
+                    </div>
+                    <span className="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
+                      12 Active Plans
+                    </span>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {[
-                      { id: 'advocate_basic', name: 'AI Legal™ Basic', monthly: 499, yearly: 4990, credits: 100, badge: 'Advocate' },
-                      { id: 'advocate_pro', name: 'AI Legal™ Professional', monthly: 999, yearly: 9990, credits: 300, badge: 'Popular', popular: true },
-                      { id: 'lawfirm_basic', name: 'AI Legal™ Firm Basic', monthly: 499, yearly: 4990, credits: 500, badge: 'Law Firm' },
-                    ].map(p => (
-                      <div key={p.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs relative">
-                        {p.popular && <span className="absolute top-4 right-4 bg-amber-100 text-amber-800 text-[10px] font-black px-2 py-0.5 rounded-md">POPULAR</span>}
-                        <h4 className="font-extrabold text-slate-900 text-base">{p.name}</h4>
-                        <p className="text-2xl font-black text-slate-900 mt-2">₹{p.monthly}<span className="text-xs font-semibold text-slate-400">/mo</span></p>
-                        <p className="text-xs font-semibold text-slate-500 mt-1">₹{p.yearly}/year (Save 17%)</p>
-                        <div className="mt-4 pt-4 border-t border-slate-100 text-xs font-semibold text-slate-600 space-y-1">
-                          <p>⚡ Included Credits: <strong className="text-slate-900">{p.credits}/mo</strong></p>
-                          <p>📁 Active Cases: <strong className="text-slate-900">Unlimited Access</strong></p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {plansList.map(p => {
+                      const mPrice = p.priceMonthly !== undefined ? p.priceMonthly : (p.monthly || 499);
+                      const yPrice = p.priceYearly !== undefined ? p.priceYearly : (p.yearly || 4990);
+                      const pName = p.planName || p.name || p.planId;
+                      const pBadge = p.badge || p.planId?.toUpperCase() || 'PLAN';
+                      return (
+                        <div key={p._id || p.planId} className={`bg-white p-5 rounded-2xl border ${p.isPopular ? 'border-amber-500 ring-2 ring-amber-500/20' : 'border-slate-200'} shadow-xs relative flex flex-col justify-between`}>
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-2">
+                              <span className="bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider">
+                                {pBadge}
+                              </span>
+                              {p.isPopular && <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-md">⭐ POPULAR</span>}
+                            </div>
+                            <h4 className="font-extrabold text-slate-900 text-base">{pName}</h4>
+                            <p className="text-2xl font-black text-slate-900 mt-2">
+                              ₹{mPrice.toLocaleString('en-IN')}<span className="text-xs font-semibold text-slate-400"> /mo</span>
+                            </p>
+                            <p className="text-xs font-semibold text-amber-600 mt-0.5">
+                              ₹{yPrice.toLocaleString('en-IN')} /year
+                            </p>
+                            
+                            {Array.isArray(p.features) && p.features.length > 0 && (
+                              <div className="mt-3 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-600 space-y-1">
+                                {p.features.slice(0, 5).map((f, i) => (
+                                  <p key={i} className="truncate">✓ {f}</p>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                            <span>ID: {p.planId}</span>
+                            <span className="text-emerald-600 font-bold">🟢 Active</span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
