@@ -19,8 +19,17 @@ import toast from 'react-hot-toast';
 const ADMIN_EMAIL = 'admin@uwo24.com';
 const PROD_API_BASE = 'https://ai-legal-app-backend-743928421487.asia-south1.run.app/api';
 
-// Live Dynamic API Fetcher pointing directly to Live Database
-let CURRENT_API_BASE = PROD_API_BASE;
+const getLocalApiBase = () => {
+  if (typeof window === 'undefined') return 'http://localhost:8080/api';
+  const host = window.location.hostname;
+  if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.')) {
+    return `http://${host}:8080/api`;
+  }
+  return PROD_API_BASE;
+};
+
+// Live Dynamic API Fetcher with automatic Localhost / Local IP & Production Fallback
+let CURRENT_API_BASE = getLocalApiBase();
 
 async function apiAdminFetch(endpoint, options = {}) {
   const user = getUserData();
@@ -47,12 +56,11 @@ async function apiAdminFetch(endpoint, options = {}) {
     const data = await res.json();
     return data;
   } catch (err) {
-    if (CURRENT_API_BASE !== 'http://localhost:8080/api') {
-      try {
-        const res = await fetch('http://localhost:8080/api' + endpoint, { ...options, headers });
-        return await res.json();
-      } catch(lErr) {}
-    }
+    const fallbackBase = CURRENT_API_BASE.includes('8080') ? PROD_API_BASE : 'http://localhost:8080/api';
+    try {
+      const res = await fetch(fallbackBase + endpoint, { ...options, headers });
+      return await res.json();
+    } catch(lErr) {}
     throw err;
   }
 }
@@ -99,15 +107,7 @@ const AdminDashboard = () => {
     storageUsed: 0,
     pendingFeatures: 0,
     openBugs: 0,
-    dailyActivity: [
-      { label: 'Day 1', val: 45 },
-      { label: 'Day 2', val: 78 },
-      { label: 'Day 3', val: 120 },
-      { label: 'Day 4', val: 95 },
-      { label: 'Day 5', val: 160 },
-      { label: 'Day 6', val: 110 },
-      { label: 'Day 7', val: 185 },
-    ]
+    dailyActivity: []
   });
 
   const [usersList, setUsersList] = useState([]);
@@ -179,7 +179,7 @@ const AdminDashboard = () => {
       }
 
       // Users List parsing & seed fallback
-      const userListFetched = usersRes?.users || usersRes?.data?.users || usersRes?.data || (Array.isArray(usersRes) ? usersRes : null);
+      const userListFetched = usersRes?.list || usersRes?.users || usersRes?.data?.users || usersRes?.data || (Array.isArray(usersRes) ? usersRes : null);
       if (Array.isArray(userListFetched) && userListFetched.length > 0) {
         setUsersList(userListFetched);
       } else {
@@ -195,7 +195,7 @@ const AdminDashboard = () => {
       }
 
       // Billing Payments List
-      const billingFetched = billingRes?.payments || billingRes?.data?.payments || billingRes?.data || (Array.isArray(billingRes) ? billingRes : null);
+      const billingFetched = billingRes?.list || billingRes?.payments || billingRes?.data?.payments || billingRes?.data || (Array.isArray(billingRes) ? billingRes : null);
       if (Array.isArray(billingFetched) && billingFetched.length > 0) {
         setPaymentsList(billingFetched);
       } else {
@@ -252,7 +252,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (!isAdmin) return;
     loadData();
-    const interval = setInterval(() => loadData(true), 10000);
+    const interval = setInterval(() => loadData(true), 3000);
     return () => clearInterval(interval);
   }, [isAdmin]);
 
@@ -498,7 +498,7 @@ const AdminDashboard = () => {
                         <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">AI RESOURCE SPENT</span>
                         <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center"><Zap className="w-4 h-4" /></div>
                       </div>
-                      <p className="text-3xl font-black text-slate-900">{(stats.totalCreditsUsed || 1375).toLocaleString()}</p>
+                      <p className="text-3xl font-black text-slate-900">{(stats.totalCreditsUsed ?? 0).toLocaleString()}</p>
                       <div className="flex items-center gap-3 mt-2 text-xs font-semibold text-slate-500">
                         <span>AI transaction units consumed</span>
                       </div>
@@ -517,19 +517,22 @@ const AdminDashboard = () => {
                         <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg">Realtime</span>
                       </div>
                       <div className="h-44 flex items-end justify-between gap-3 pt-6 px-2">
-                        {(stats.dailyActivity || []).map((day, idx) => (
-                          <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
-                            <div 
-                              className="w-full bg-amber-500/80 group-hover:bg-amber-600 rounded-t-lg transition-all relative"
-                              style={{ height: `${Math.max(15, (day.val / 200) * 100)}%` }}
-                            >
-                              <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                {day.val}
-                              </span>
+                        {(() => {
+                          const maxVal = Math.max(1, ...(stats.dailyActivity || []).map(d => d.val || 0));
+                          return (stats.dailyActivity || []).map((day, idx) => (
+                            <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
+                              <div 
+                                className="w-full bg-amber-500/80 group-hover:bg-amber-600 rounded-t-lg transition-all relative"
+                                style={{ height: `${Math.max(10, ((day.val || 0) / maxVal) * 100)}%` }}
+                              >
+                                <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                  {day.val}
+                                </span>
+                              </div>
+                              <span className="text-[11px] font-bold text-slate-500">{day.label}</span>
                             </div>
-                            <span className="text-[11px] font-bold text-slate-500">{day.label}</span>
-                          </div>
-                        ))}
+                          ));
+                        })()}
                       </div>
                     </div>
 
@@ -541,19 +544,19 @@ const AdminDashboard = () => {
                       <div className="grid grid-cols-2 gap-3">
                         <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                           <span className="text-[11px] font-bold text-slate-500 block">Cases Managed</span>
-                          <span className="text-xl font-black text-slate-900 mt-1 block">{stats.totalCases || 4} cases</span>
+                          <span className="text-xl font-black text-slate-900 mt-1 block">{stats.totalCases ?? 0} cases</span>
                         </div>
                         <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                           <span className="text-[11px] font-bold text-slate-500 block">Contracts Analyzed</span>
-                          <span className="text-xl font-black text-slate-900 mt-1 block">{stats.contractsAnalyzed || 2} analysis</span>
+                          <span className="text-xl font-black text-slate-900 mt-1 block">{stats.contractsAnalyzed ?? 0} analysis</span>
                         </div>
                         <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                           <span className="text-[11px] font-bold text-slate-500 block">Strategy Engine Reports</span>
-                          <span className="text-xl font-black text-slate-900 mt-1 block">{stats.strategyReports || 9} reports</span>
+                          <span className="text-xl font-black text-slate-900 mt-1 block">{stats.strategyReports ?? 0} reports</span>
                         </div>
                         <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
                           <span className="text-[11px] font-bold text-slate-500 block">Case Predictor Models</span>
-                          <span className="text-xl font-black text-slate-900 mt-1 block">{stats.casePredictorReports || 7} predictions</span>
+                          <span className="text-xl font-black text-slate-900 mt-1 block">{stats.casePredictorReports ?? 0} predictions</span>
                         </div>
                       </div>
                     </div>
