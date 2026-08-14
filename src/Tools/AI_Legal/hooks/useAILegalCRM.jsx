@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { apiService } from '../../../services/apiService';
 import { chatStorageService } from '../../../services/chatStorageService';
 import LegalDashboard from '../components/LegalDashboard';
+import CreateCaseWizardModal from '../components/CreateCaseWizardModal';
 
 export const useAILegalCRM = ({
   allProjects,
@@ -316,144 +317,22 @@ export const useAILegalCRM = ({
 
   const renderNewCaseModal = () => {
     return (
-      <Transition appear show={isNewCaseModalOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-[200000]" onClose={() => setIsNewCaseModalOpen(false)}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-md" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95 translate-y-8"
-                enterTo="opacity-100 scale-100 translate-y-0"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100 translate-y-0"
-                leaveTo="opacity-0 scale-95 translate-y-8"
-              >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-[32px] bg-white dark:bg-zinc-900 p-8 text-left align-middle shadow-2xl transition-all border border-slate-200 dark:border-zinc-800">
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-indigo-600 rounded-xl text-white">
-                         {editingCaseId ? <Edit2 size={20} /> : <Plus size={20} />}
-                      </div>
-                      <Dialog.Title as="h3" className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                         {editingCaseId ? 'Edit Legal Case' : 'New Legal Case'}
-                      </Dialog.Title>
-                    </div>
-                    <button onClick={() => { setIsNewCaseModalOpen(false); setEditingCaseId(null); }} className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
-                      <X size={20} className="text-subtext" />
-                    </button>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-subtext ml-1 whitespace-nowrap">Client Name/ Complainant <span className="text-red-500">*</span></label>
-                      <input
-                        type="text"
-                        value={newCaseForm.clientName}
-                        onChange={e => setNewCaseForm({ ...newCaseForm, clientName: e.target.value })}
-                        placeholder="Mr. A. Kumar"
-                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-zinc-800 rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none font-bold"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-subtext ml-1 whitespace-nowrap">Case Type</label>
-                      <div className="relative">
-                        <select
-                          value={newCaseForm.caseType}
-                          onChange={e => {
-                            const val = e.target.value;
-                            setNewCaseForm({
-                              ...newCaseForm,
-                              caseType: val,
-                              otherCaseType: val === 'Other' ? newCaseForm.otherCaseType : ''
-                            });
-                          }}
-                          className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-zinc-800 rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none font-bold appearance-none cursor-pointer pr-10"
-                        >
-                          <option value="">Select Case Type</option>
-                          <option value="Civil Case">Civil Case</option>
-                          <option value="Criminal Case">Criminal Case</option>
-                          <option value="Divorce Case">Divorce Case</option>
-                          <option value="Property Dispute">Property Dispute</option>
-                          <option value="Corporate Legal">Corporate Legal</option>
-                          <option value="Consumer Court">Consumer Court</option>
-                          <option value="Labor Dispute">Labor Dispute</option>
-                          <option value="Other">Other</option>
-                        </select>
-                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
-                      </div>
-
-                      <AnimatePresence>
-                        {newCaseForm.caseType === 'Other' && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                            animate={{ opacity: 1, height: 'auto', marginTop: 12 }}
-                            exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                            transition={{ duration: 0.3, ease: 'easeInOut' }}
-                            className="space-y-2 overflow-hidden"
-                          >
-                            <label className="text-[10px] font-black uppercase tracking-widest text-subtext ml-1 whitespace-nowrap">Enter Case Type <span className="text-red-500">*</span></label>
-                            <input
-                              type="text"
-                              autoFocus
-                              value={newCaseForm.otherCaseType}
-                              onChange={e => setNewCaseForm({ ...newCaseForm, otherCaseType: e.target.value })}
-                              placeholder="e.g. Intellectual Property"
-                              className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-zinc-800 rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none font-bold"
-                            />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-subtext ml-1 whitespace-nowrap">Accused</label>
-                      <input
-                        type="text"
-                        value={newCaseForm.accused}
-                        onChange={e => setNewCaseForm({ ...newCaseForm, accused: e.target.value })}
-                        placeholder="Mr. Ravi"
-                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-zinc-800 rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none font-bold"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-subtext ml-1 whitespace-nowrap">Case Summary</label>
-                      <textarea
-                        rows={3}
-                        value={newCaseForm.summary}
-                        onChange={e => setNewCaseForm({ ...newCaseForm, summary: e.target.value })}
-                        placeholder="Mr. A Kumar has give a lo Rs. 5 Lakh to Mr. Ravi on..."
-                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-zinc-800 rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none resize-none font-medium"
-                      />
-                    </div>
-
-                    <button
-                      onClick={handleCreateNewCase}
-                      className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-sm shadow-xl shadow-indigo-500/20 transition-all active:scale-95 mt-4"
-                    >
-                      {editingCaseId ? 'Update Case' : 'Submit'}
-                    </button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+      <CreateCaseWizardModal
+        isOpen={isNewCaseModalOpen}
+        onClose={() => {
+          setIsNewCaseModalOpen(false);
+          setEditingCaseId(null);
+        }}
+        onSuccess={(created) => {
+          if (fetchLegalCases) {
+            fetchLegalCases(true);
+          }
+          if (created && (created._id || created.id)) {
+            const caseId = created._id || created.id;
+            handleOpenCase({ ...created, _id: caseId }, true);
+          }
+        }}
+      />
     );
   };
 

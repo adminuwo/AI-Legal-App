@@ -290,7 +290,7 @@ const ProfileSettingsDropdown = ({ onClose }) => {
                     {/* Modal Sticky Header */}
                     <div className="sticky top-0 z-20 px-6 sm:px-8 py-4 sm:py-5 flex justify-between items-center bg-white border-b border-slate-100 shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-[#6D5DFC]/10 flex items-center justify-center text-[#6D5DFC]">
+                            <div className="w-10 h-10 rounded-2xl bg-[#111111] flex items-center justify-center text-[#C8A34D] border border-[#C8A34D]/30">
                                 <Scale className="w-5 h-5" />
                             </div>
                             <div>
@@ -302,7 +302,6 @@ const ProfileSettingsDropdown = ({ onClose }) => {
                             <button 
                                 onClick={() => {
                                     if (isEditing) {
-                                        // Reset to saved state
                                         if (personalizations?.advocateProfile) {
                                             setProfileForm(personalizations.advocateProfile);
                                         }
@@ -311,15 +310,15 @@ const ProfileSettingsDropdown = ({ onClose }) => {
                                         setIsEditing(true);
                                     }
                                 }} 
-                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
                                     isEditing 
                                         ? 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200' 
-                                        : 'hover:bg-slate-50 text-[#6D5DFC] border-[#6D5DFC]/20 hover:border-[#6D5DFC]/40'
+                                        : 'bg-[#111111] text-[#C8A34D] border-[#C8A34D]/40 hover:bg-[#222222]'
                                 }`}
                             >
                                 {isEditing ? 'Cancel' : 'Edit Profile'}
                             </button>
-                            <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-xl transition-all">
+                            <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-xl transition-all cursor-pointer">
                                 <X size={20} className="text-slate-400" />
                             </button>
                         </div>
@@ -337,7 +336,7 @@ const ProfileSettingsDropdown = ({ onClose }) => {
                                     <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
                                         {/* Avatar Box */}
                                         <div className="relative group shrink-0">
-                                            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#6D5DFC]/10 flex items-center justify-center text-[#6D5DFC] border border-[#6D5DFC]/15 shadow-sm overflow-hidden relative z-10">
+                                            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#111111] flex items-center justify-center text-[#C8A34D] border border-[#C8A34D]/30 shadow-sm overflow-hidden relative z-10">
                                                 {user.avatar ? (
                                                     <img 
                                                         src={user.avatar} 
@@ -364,11 +363,11 @@ const ProfileSettingsDropdown = ({ onClose }) => {
                                             {/* Photo Management Plus Icon (Edit mode only) */}
                                             {isEditing && (
                                                 <button
-                                                    className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#6D5DFC] hover:bg-[#5b4edb] text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white z-20 hover:scale-105 transition-transform"
+                                                    className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-full flex items-center justify-center shadow-lg border-2 border-white z-20 hover:scale-105 transition-transform cursor-pointer"
                                                     onClick={() => fileInputRef.current?.click()}
                                                     title="Upload Photo"
                                                 >
-                                                    <Plus className="w-5 h-5" />
+                                                    <Plus className="w-5 h-5 font-black" />
                                                 </button>
                                             )}
                                         </div>
@@ -381,8 +380,8 @@ const ProfileSettingsDropdown = ({ onClose }) => {
                                                         {profileForm.fullName || user.name || 'Anonymous Advocate'}
                                                     </h3>
                                                     {profileForm.barNumber && (
-                                                        <div className="flex items-center gap-1 px-2.5 py-0.5 bg-[#4F8CFF]/10 border border-[#4F8CFF]/20 rounded-md text-[9px] font-black text-[#4F8CFF] uppercase tracking-widest">
-                                                            <ShieldCheck size={11} /> Verified
+                                                        <div className="flex items-center gap-1 px-2.5 py-0.5 bg-[#C8A34D]/15 border border-[#C8A34D]/30 rounded-md text-[9px] font-black text-[#C8A34D] uppercase tracking-widest">
+                                                            <ShieldCheck size={11} /> Verified Advocate
                                                         </div>
                                                     )}
                                                 </div>
@@ -397,7 +396,7 @@ const ProfileSettingsDropdown = ({ onClose }) => {
                                                 <div className="flex items-center justify-center sm:justify-start gap-2 mt-2">
                                                     <button
                                                         onClick={() => fileInputRef.current?.click()}
-                                                        className="inline-flex items-center gap-1 px-3 py-1 bg-[#6D5DFC]/10 hover:bg-[#6D5DFC]/15 text-[#6D5DFC] rounded-lg border border-[#6D5DFC]/20 text-[10px] font-black uppercase tracking-widest transition-colors"
+                                                        className="inline-flex items-center gap-1 px-3 py-1 bg-[#111111] hover:bg-[#222222] text-[#C8A34D] rounded-lg border border-[#C8A34D]/30 text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer"
                                                     >
                                                         Change Photo
                                                     </button>
@@ -856,7 +855,7 @@ const ProfileSettingsDropdown = ({ onClose }) => {
                             </button>
                             <button
                                 onClick={handleSaveProfile}
-                                className="px-7 py-3 bg-[#6D5DFC] hover:bg-[#5b4edb] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-colors shadow-lg shadow-[#6D5DFC]/10 active:scale-[0.98] animate-fade-in"
+                                className="px-7 py-3 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-xs uppercase tracking-wider transition-colors shadow-md active:scale-[0.98] animate-fade-in cursor-pointer"
                             >
                                 Save Changes
                             </button>

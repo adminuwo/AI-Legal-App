@@ -201,13 +201,13 @@ export const CaseWorkspace = ({
             <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm">
               <h3 className="text-sm font-extrabold text-[#111827] uppercase tracking-wider mb-4 flex items-center justify-between">
                 <span>Recent Facts & Events</span>
-                <button onClick={() => setActiveTab('timeline')} className="text-xs font-bold text-[#6D5DFC] hover:underline">View Timeline</button>
+                <button onClick={() => setActiveTab('timeline')} className="text-xs font-bold text-[#C8A34D] hover:underline">View Timeline</button>
               </h3>
               {caseData.timeline && caseData.timeline.length > 0 ? (
                 <div className="space-y-4 relative border-l border-slate-100 pl-4 ml-2">
                   {caseData.timeline.slice(0, 3).map((item, i) => (
                     <div key={i} className="relative">
-                      <div className="absolute -left-[21px] top-1.5 w-2.5 h-2.5 bg-[#6D5DFC] rounded-full border border-white" />
+                      <div className="absolute -left-[21px] top-1.5 w-2.5 h-2.5 bg-[#C8A34D] rounded-full border border-white" />
                       <div className="text-[10px] font-bold text-[#6B7280]">{item.date}</div>
                       <div className="text-xs font-bold text-[#111827]">{item.title}</div>
                       <div className="text-xs text-[#4B5563] mt-0.5">{item.description}</div>
@@ -240,14 +240,14 @@ export const CaseWorkspace = ({
                 <span>{taskProgress}% ({completedTasks}/{totalTasks})</span>
               </div>
               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden mb-2">
-                <div className="bg-[#6D5DFC] h-full rounded-full transition-all duration-300" style={{ width: `${taskProgress}%` }} />
+                <div className="bg-[#C8A34D] h-full rounded-full transition-all duration-300" style={{ width: `${taskProgress}%` }} />
               </div>
-              <button onClick={() => setActiveTab('tasks')} className="text-xs font-bold text-[#6D5DFC] hover:underline">Manage Tasks</button>
+              <button onClick={() => setActiveTab('tasks')} className="text-xs font-bold text-[#C8A34D] hover:underline">Manage Tasks</button>
             </div>
 
             {nextHearing && (
-              <div className="bg-[#F3F6FF] border border-[#6D5DFC]/20 rounded-2xl p-6 shadow-sm">
-                <span className="text-sm font-extrabold text-[#6D5DFC] uppercase tracking-wider mb-2 block">Next Hearing Scheduled</span>
+              <div className="bg-[#111111] border border-[#C8A34D]/30 rounded-2xl p-6 shadow-sm text-white">
+                <span className="text-sm font-extrabold text-[#C8A34D] uppercase tracking-wider mb-2 block">Next Hearing Scheduled</span>
                 <div className="text-base font-extrabold text-[#111827]">{nextHearing.date}</div>
                 <p className="text-xs text-[#4B5563] mt-1 font-semibold">
                   Courtroom {nextHearing.courtroom} • Judge {nextHearing.judge || 'TBA'}
@@ -6201,32 +6201,33 @@ Through Counsel
             
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-xl font-extrabold text-slate-900 tracking-tight leading-none">
-                  {caseData.name}
+                <h2 className="text-xl font-black text-[#111111] dark:text-white tracking-tight leading-none flex items-center gap-2">
+                  <span>📁</span>
+                  <span>{caseData.name}</span>
                 </h2>
                 <div className="flex gap-1.5">
-                  <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border ${
-                    caseData.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
-                    caseData.status === 'Closed' ? 'bg-slate-100 text-[#6B7280] border-slate-200' :
-                    'bg-amber-50 text-amber-600 border-amber-100'
+                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase tracking-widest border ${
+                    caseData.status === 'Active' ? 'bg-[#111111] text-[#C8A34D] border-[#C8A34D]/40' :
+                    caseData.status === 'Closed' ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200' :
+                    'bg-amber-50 text-amber-600 border-amber-200'
                   }`}>
                     {caseData.status || 'Active'}
                   </span>
-                  <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border ${
-                    caseData.priority === 'Urgent' || caseData.priority === 'High' ? 'bg-rose-50 text-rose-600 border-rose-100' :
-                    caseData.priority === 'Medium' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                    'bg-slate-50 text-slate-500 border-slate-100'
+                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase tracking-widest border ${
+                    caseData.priority === 'Urgent' || caseData.priority === 'High' ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 border-rose-200' :
+                    caseData.priority === 'Medium' ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 border-blue-200' :
+                    'bg-slate-50 text-slate-500 border-slate-200'
                   }`}>
                     {caseData.priority || 'Medium'}
                   </span>
                 </div>
               </div>
-              <p className="text-xs text-slate-500 font-bold mt-1.5 flex items-center gap-2">
-                <span>Client: <strong>{caseData.clientName || 'Private'}</strong></span>
-                <span className="w-1 h-1 rounded-full bg-slate-300" />
-                <span>Opponent: <strong>{caseData.accused || caseData.opponentName || 'Unknown'}</strong></span>
-                <span className="w-1 h-1 rounded-full bg-slate-300" />
-                <span>Court: <strong>{caseData.courtName || 'District Court'}</strong></span>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1.5 flex items-center gap-2">
+                <span>Client: <strong className="text-[#111111] dark:text-white">{caseData.clientName || 'Private'}</strong></span>
+                <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                <span>Opponent: <strong className="text-[#111111] dark:text-white">{caseData.accused || caseData.opponentName || 'Unknown'}</strong></span>
+                <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                <span>Court: <strong className="text-[#111111] dark:text-white">{caseData.courtName || 'District Court'}</strong></span>
               </p>
             </div>
           </div>
@@ -6235,19 +6236,19 @@ Through Counsel
             {aiPanel && (
               <button 
                 onClick={() => setIsAiPanelExpanded(!isAiPanelExpanded)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors border shadow-sm flex items-center gap-1.5 ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border shadow-sm flex items-center gap-1.5 cursor-pointer ${
                   isAiPanelExpanded 
-                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100/80' 
-                    : 'hover:bg-[#F9FAFB] text-slate-700 hover:text-slate-900 border-[#E5E7EB]'
+                    ? 'bg-[#111111] border-[#C8A34D]/50 text-[#C8A34D] shadow-md' 
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800'
                 }`}
               >
-                <Sparkles size={13} className={isAiPanelExpanded ? 'text-indigo-600' : 'text-slate-500'} />
+                <Sparkles size={13} className={isAiPanelExpanded ? 'text-[#C8A34D]' : 'text-slate-500'} />
                 {isAiPanelExpanded ? 'Hide AI' : 'Show AI'}
               </button>
             )}
             <button 
               onClick={handleExportSummary}
-              className="px-3.5 py-2 hover:bg-[#F9FAFB] rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 transition-colors border border-[#E5E7EB] shadow-sm flex items-center gap-1.5"
+              className="px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-1.5 cursor-pointer"
             >
               <Download size={13} /> Export
             </button>
@@ -6256,7 +6257,7 @@ Through Counsel
                 navigator.clipboard.writeText(window.location.href);
                 toast.success("Secure sharing link copied to clipboard!");
               }}
-              className="px-3.5 py-2 hover:bg-[#F9FAFB] rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 transition-colors border border-[#E5E7EB] shadow-sm flex items-center gap-1.5"
+              className="px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-1.5 cursor-pointer"
             >
               <Share2 size={13} /> Share
             </button>
@@ -6265,20 +6266,20 @@ Through Counsel
       </header>
 
       {/* ─── Case-Bound Navigation Tabs ─── */}
-      <nav className="shrink-0 border-b border-[#E5E7EB] bg-[#F9FAFB] px-6 py-2 overflow-x-auto hide-scrollbar flex gap-1.5">
+      <nav className="shrink-0 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#181818] px-6 py-2 overflow-x-auto hide-scrollbar flex gap-1.5">
         {tabs.map((t) => {
           const isActive = activeTab === t.id;
           return (
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id)}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition-all duration-200 shrink-0 select-none ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition-all duration-200 shrink-0 select-none cursor-pointer ${
                 isActive 
-                  ? 'bg-white border border-[#E5E7EB] text-[#6D5DFC] shadow-sm' 
-                  : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#E5E7EB]/30'
+                  ? 'bg-[#111111] text-[#C8A34D] border border-[#C8A34D]/40 shadow-sm' 
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-800/50'
               }`}
             >
-              <t.icon size={13} className={isActive ? 'text-[#6D5DFC]' : 'text-[#9CA3AF]'} />
+              <t.icon size={13} className={isActive ? 'text-[#C8A34D]' : 'text-slate-400'} />
               <span>{t.name}</span>
             </button>
           );

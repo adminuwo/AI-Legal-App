@@ -7525,7 +7525,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                 <button
                   type="button"
                   onClick={() => setIsToolSelectorOpen(prev => !prev)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100/80 border border-indigo-100/30 rounded-full text-[10px] font-black text-[#6D5DFC] uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#111111] hover:bg-[#222222] border border-[#C8A34D]/40 rounded-full text-[10px] font-black text-[#C8A34D] uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
                 >
                   <span>{TOOL_CHIP_DETAILS[caseAiActiveTool]?.icon}</span>
                   <span>{TOOL_CHIP_DETAILS[caseAiActiveTool]?.name}</span>
@@ -7584,13 +7584,13 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
         ) : (
           <div className="px-5 py-4 border-b border-[#E5E7EB] bg-white flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
-              <Sparkles size={14} className="text-[#6D5DFC]" />
+              <Sparkles size={14} className="text-[#C8A34D]" />
               <span className="text-xs font-black text-slate-900 tracking-wider uppercase">Case Assistant</span>
             </div>
             <button
               type="button"
               onClick={() => setIsAiPanelFullscreen(true)}
-              className="p-1.5 text-slate-400 hover:text-[#6D5DFC] rounded-lg hover:bg-slate-50 transition-all flex items-center justify-center cursor-pointer"
+              className="p-1.5 text-slate-400 hover:text-[#C8A34D] rounded-lg hover:bg-slate-50 transition-all flex items-center justify-center cursor-pointer"
               title="Expand to Fullscreen"
             >
               <Maximize2 size={15} />
@@ -7882,7 +7882,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
               <button
                 type="button"
                 onClick={() => setIsToolSelectorOpen(prev => !prev)}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100/80 border border-indigo-100/30 rounded-full text-[10px] font-black text-[#6D5DFC] uppercase tracking-wider transition-all shadow-sm active:scale-95"
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-[#111111] hover:bg-[#222222] border border-[#C8A34D]/40 rounded-full text-[10px] font-black text-[#C8A34D] uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
               >
                 <span>{TOOL_CHIP_DETAILS[caseAiActiveTool]?.icon}</span>
                 <span>{TOOL_CHIP_DETAILS[caseAiActiveTool]?.name}</span>
@@ -7911,7 +7911,6 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                           onClick={() => {
                             setIsToolSelectorOpen(false);
                             if (caseAiActiveTool !== tool.id) {
-                              // Divider message
                               const dividerMsg = {
                                 id: `divider-${Date.now()}`,
                                 role: 'system',
@@ -7930,8 +7929,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               }
                             }
                           }}
-                          className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-left text-xs font-bold transition-all ${isActive
-                              ? 'bg-[#6D5DFC] text-white'
+                          className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-left text-xs font-bold transition-all cursor-pointer ${isActive
+                              ? 'bg-[#111111] text-[#C8A34D] border border-[#C8A34D]/40'
                               : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 dark:text-zinc-300 dark:hover:bg-zinc-800/50'
                             }`}
                         >
@@ -7939,7 +7938,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                             <span>{tool.icon}</span>
                             <span className="truncate">{tool.name}</span>
                           </div>
-                          {isActive && <span className="text-[10px]">✓</span>}
+                          {isActive && <span className="text-[10px] text-[#C8A34D]">✓</span>}
                         </button>
                       );
                     })}
@@ -7957,8 +7956,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                       <img src={preview.url} alt="Preview" className="w-full h-full object-cover rounded-xl" />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center p-1 bg-slate-50/50">
-                        <FileText className="w-5 h-5 text-indigo-500" />
-                        <span className="text-[6px] font-black uppercase text-indigo-600 truncate px-0.5 w-full text-center">
+                        <FileText className="w-5 h-5 text-[#C8A34D]" />
+                        <span className="text-[6px] font-black uppercase text-[#C8A34D] truncate px-0.5 w-full text-center">
                           {preview.name || 'FILE'}
                         </span>
                       </div>
@@ -7966,7 +7965,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                     <button
                       type="button"
                       onClick={() => handleRemoveFile(preview.id)}
-                      className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-white text-rose-500 rounded-full flex items-center justify-center shadow border border-slate-100 hover:scale-110 transition-transform"
+                      className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-white text-rose-500 rounded-full flex items-center justify-center shadow border border-slate-100 hover:scale-110 transition-transform cursor-pointer"
                     >
                       <X size={10} />
                     </button>
@@ -7981,15 +7980,15 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                 e.preventDefault();
                 handleSendMessage(e);
               }}
-              className={`flex items-center gap-2 border border-slate-200 rounded-2xl transition-all duration-200 ${isAiPanelFullscreen
-                  ? 'bg-slate-50 hover:bg-slate-100/40 px-4 py-3 focus-within:border-[#6D5DFC]/50 focus-within:ring-2 focus-within:ring-[#6D5DFC]/10 focus-within:bg-white shadow-sm'
-                  : 'bg-slate-50 hover:bg-slate-100/60 px-3.5 py-2 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 focus-within:bg-white'
+              className={`flex items-center gap-2 border border-slate-200 dark:border-slate-800 rounded-2xl transition-all duration-200 ${isAiPanelFullscreen
+                  ? 'bg-slate-50 dark:bg-[#111111] hover:bg-slate-100/40 px-4 py-3 focus-within:border-[#C8A34D] focus-within:ring-1 focus-within:ring-[#C8A34D] shadow-sm'
+                  : 'bg-slate-50 dark:bg-[#111111] hover:bg-slate-100/60 px-3.5 py-2 focus-within:border-[#C8A34D] focus-within:ring-1 focus-within:ring-[#C8A34D]'
                 }`}
             >
               <button
                 type="button"
                 onClick={() => uploadInputRef.current?.click()}
-                className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-slate-200/50 transition-colors"
+                className="p-1.5 text-slate-400 hover:text-[#C8A34D] rounded-lg hover:bg-slate-200/50 transition-colors cursor-pointer"
                 title="Attach File"
               >
                 <Paperclip size={14} />
@@ -7999,9 +7998,9 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
               <button
                 type="button"
                 onClick={() => setIsToolSelectorOpen(prev => !prev)}
-                className={`p-1.5 rounded-lg transition-colors flex items-center justify-center ${isToolSelectorOpen
-                    ? 'text-[#6D5DFC] bg-indigo-50'
-                    : 'text-slate-400 hover:text-[#6D5DFC] hover:bg-slate-200/50'
+                className={`p-1.5 rounded-lg transition-colors flex items-center justify-center cursor-pointer ${isToolSelectorOpen
+                    ? 'text-[#C8A34D] bg-[#111111]'
+                    : 'text-slate-400 hover:text-[#C8A34D] hover:bg-slate-200/50'
                   }`}
                 title="AI Tools"
               >
@@ -8013,15 +8012,15 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Ask AI about this case..."
-                className={`flex-1 bg-transparent border-0 outline-none placeholder-slate-400 focus:ring-0 py-1 ${isAiPanelFullscreen ? 'text-sm text-slate-800' : 'text-xs text-slate-800'
+                className={`flex-1 bg-transparent border-0 outline-none placeholder-slate-400 focus:ring-0 py-1 text-[#111111] dark:text-white ${isAiPanelFullscreen ? 'text-sm' : 'text-xs'
                   }`}
               />
               <button
                 type="button"
                 onClick={handleVoiceInput}
-                className={`p-1.5 rounded-lg transition-colors flex items-center justify-center shrink-0 ${isListening
+                className={`p-1.5 rounded-lg transition-colors flex items-center justify-center shrink-0 cursor-pointer ${isListening
                     ? 'text-red-500 bg-red-50 animate-pulse'
-                    : 'text-slate-400 hover:text-[#6D5DFC] hover:bg-slate-200/50'
+                    : 'text-slate-400 hover:text-[#C8A34D] hover:bg-slate-200/50'
                   }`}
                 title={isListening ? "Listening... Click to Stop" : "Voice Input"}
               >
@@ -8030,7 +8029,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
               <button
                 type="submit"
                 disabled={(!inputValue.trim() && filePreviews.length === 0) || isLoading}
-                className={`bg-[#6D5DFC] hover:bg-[#5b4edb] disabled:bg-slate-200 text-white rounded-xl transition-colors shrink-0 flex items-center justify-center disabled:cursor-not-allowed ${isAiPanelFullscreen ? 'p-2.5' : 'p-1.5'
+                className={`bg-[#C8A34D] hover:bg-[#b08d3b] disabled:bg-slate-200 text-[#111111] font-black rounded-xl transition-colors shrink-0 flex items-center justify-center disabled:cursor-not-allowed shadow-md cursor-pointer ${isAiPanelFullscreen ? 'p-2.5' : 'p-1.5'
                   }`}
               >
                 <Send size={isAiPanelFullscreen ? 14 : 12} />

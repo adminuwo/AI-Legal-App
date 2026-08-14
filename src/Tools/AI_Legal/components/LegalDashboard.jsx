@@ -159,25 +159,25 @@ const LegalDashboard = ({
               setNewCaseForm({ clientName: '', caseType: '', otherCaseType: '', accused: '', summary: '' });
               setIsNewCaseModalOpen(true);
             }}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-[#6D5DFC] hover:bg-[#5b4edb] text-white rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm active:scale-95 whitespace-nowrap"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-3 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 whitespace-nowrap cursor-pointer"
           >
-            <Plus className="w-4 h-4 sm:w-5 h-5" />
-            <span>New Case Folder</span>
+            <Plus className="w-4 h-4" />
+            <span>New Case</span>
           </button>
         </div>
       </div>
 
       {/* Control Bar - Filters & Search */}
       <div className="w-full px-6 sm:px-10 py-5 border-b border-[#ECECEC] bg-white flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center shrink-0">
-        {/* Search Input */}
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+        {/* ─── BAR 2: Search Input (100% Width) ─── */}
+        <div className="relative w-full">
+          <Search className="w-4 h-4 text-[#C8A34D] absolute left-3.5 top-3.5" />
           <input
             type="text"
-            placeholder="Search cases by name, client, opponent, court..."
+            placeholder="Search by case name, client, opponent, court, or case type..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-[#ECECEC] rounded-xl text-sm placeholder-[#9CA3AF] focus:outline-none focus:border-[#6D5DFC] focus:ring-1 focus:ring-[#6D5DFC] bg-white transition-all shadow-[0_1px_2px_rgba(0,0,0,0.02)]"
+            className="w-full pl-10 pr-4 py-2.5 border border-[#ECECEC] dark:border-slate-800 rounded-xl text-sm placeholder-[#9CA3AF] focus:outline-none focus:border-[#C8A34D] focus:ring-1 focus:ring-[#C8A34D] bg-white dark:bg-[#111111] text-[#111111] dark:text-white transition-all shadow-sm"
           />
         </div>
 
@@ -228,17 +228,17 @@ const LegalDashboard = ({
           </div>
 
           {/* Grid/List Toggle */}
-          <div className="flex items-center border border-[#ECECEC] bg-white rounded-xl p-1 shadow-[0_1px_2px_rgba(0,0,0,0.02)] gap-0.5">
+          <div className="flex items-center border border-[#ECECEC] dark:border-slate-800 bg-white dark:bg-[#111111] rounded-xl p-1 shadow-sm gap-0.5">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-slate-100 text-[#6D5DFC]' : 'text-[#9CA3AF] hover:text-[#111827]'}`}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#111111] dark:bg-[#222222] text-[#C8A34D]' : 'text-slate-400 hover:text-slate-600'}`}
               title="Grid View"
             >
               <LayoutGrid size={16} />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-slate-100 text-[#6D5DFC]' : 'text-[#9CA3AF] hover:text-[#111827]'}`}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-[#111111] dark:bg-[#222222] text-[#C8A34D]' : 'text-slate-400 hover:text-slate-600'}`}
               title="List View"
             >
               <List size={16} />
@@ -249,7 +249,7 @@ const LegalDashboard = ({
 
       {/* Case Listing Area */}
       <div
-        className="flex-1 overflow-y-auto custom-scrollbar px-6 sm:px-10 py-8 bg-slate-50/20"
+        className="flex-1 overflow-y-auto custom-scrollbar px-6 sm:px-10 py-8 bg-slate-50/20 dark:bg-[#111111]"
         style={{ scrollBehavior: 'smooth' }}
       >
         {sortedCases.length > 0 ? (
@@ -261,15 +261,15 @@ const LegalDashboard = ({
                 return (
                   <div
                     key={c._id}
-                    className="relative bg-white border border-[#ECECEC] rounded-2xl p-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] flex flex-col justify-between min-h-[360px] group"
+                    className="relative bg-white dark:bg-[#222222] border border-[#ECECEC] dark:border-slate-800 rounded-2xl p-8 shadow-sm transition-all hover:border-[#C8A34D] hover:shadow-md flex flex-col justify-between min-h-[360px] group"
                   >
                     {/* Top Section */}
                     <div className="flex-1 flex flex-col space-y-6">
                       {/* Header with Title and Three-dot Menu */}
                       <div className="flex justify-between items-start gap-4">
-                        <h3 className="text-[22px] font-bold text-[#111827] leading-tight flex items-start gap-2.5">
+                        <h3 className="text-[22px] font-bold text-[#111111] dark:text-white leading-tight flex items-start gap-2.5">
                           <span className="shrink-0">📁</span>
-                          <span className="hover:text-[#6D5DFC] transition-colors cursor-pointer" onClick={() => handleOpenCase(c)}>
+                          <span className="hover:text-[#C8A34D] transition-colors cursor-pointer" onClick={() => handleOpenCase(c)}>
                             {c.name}
                           </span>
                         </h3>
@@ -281,7 +281,7 @@ const LegalDashboard = ({
                               e.stopPropagation();
                               setActiveMenuCaseId(activeMenuCaseId === c._id ? null : c._id);
                             }}
-                            className="p-1.5 hover:bg-slate-50 border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all"
+                            className="p-1.5 hover:bg-slate-50 border border-transparent hover:border-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all cursor-pointer"
                             title="Actions"
                           >
                             <span className="text-xl font-bold leading-none">⋮</span>
@@ -289,13 +289,13 @@ const LegalDashboard = ({
                           {activeMenuCaseId === c._id && (
                             <>
                               <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setActiveMenuCaseId(null); }} />
-                              <div className="absolute right-0 top-8 w-40 bg-white border border-[#ECECEC] rounded-xl shadow-lg py-1.5 z-50 text-left" onClick={(e) => e.stopPropagation()}>
+                              <div className="absolute right-0 top-8 w-40 bg-white dark:bg-[#111111] border border-[#ECECEC] dark:border-slate-800 rounded-xl shadow-lg py-1.5 z-50 text-left" onClick={(e) => e.stopPropagation()}>
                                 <button
                                   onClick={() => {
                                     handleOpenEditModal(c);
                                     setActiveMenuCaseId(null);
                                   }}
-                                  className="w-full px-4 py-2 hover:bg-slate-50 text-xs font-semibold text-[#111827] flex items-center gap-2 transition-colors"
+                                  className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#222222] text-xs font-semibold text-[#111827] dark:text-white flex items-center gap-2 transition-colors"
                                 >
                                   <Edit2 size={13} />
                                   Edit Case
@@ -305,7 +305,7 @@ const LegalDashboard = ({
                                     handleToggleArchive(e, c);
                                     setActiveMenuCaseId(null);
                                   }}
-                                  className="w-full px-4 py-2 hover:bg-slate-50 text-xs font-semibold text-[#111827] flex items-center gap-2 transition-colors"
+                                  className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#222222] text-xs font-semibold text-[#111827] dark:text-white flex items-center gap-2 transition-colors"
                                 >
                                   <Archive size={13} />
                                   {c.status === 'Archived' ? 'Restore' : 'Archive'}
@@ -327,17 +327,17 @@ const LegalDashboard = ({
                       </div>
 
                       {/* Case Type */}
-                      <div className="text-base text-[#6B7280] font-medium leading-normal">
+                      <div className="text-base text-slate-500 dark:text-slate-400 font-medium leading-normal">
                         {c.caseType || 'General Dispute'}
                       </div>
 
                       {/* Court Name */}
-                      <div className="text-sm text-[#6B7280] font-normal leading-normal">
+                      <div className="text-sm text-slate-500 dark:text-slate-400 font-normal leading-normal">
                         {c.courtName || 'District Court'}
                       </div>
 
                       {/* Next Hearing */}
-                      <div className="text-sm text-[#6B7280] font-normal leading-normal flex items-center gap-1.5">
+                      <div className="text-sm text-slate-500 dark:text-slate-400 font-normal leading-normal flex items-center gap-1.5">
                         <span>🗓</span>
                         <span>{hearingDate !== 'None' ? hearingDate : 'No upcoming hearings'}</span>
                       </div>
@@ -350,10 +350,10 @@ const LegalDashboard = ({
 
                     {/* Divider and Open Case Action */}
                     <div className="mt-6">
-                      <div className="border-t border-[#ECECEC] w-full my-4" />
+                      <div className="border-t border-[#ECECEC] dark:border-slate-800 w-full my-4" />
                       <button
                         onClick={() => handleOpenCase(c)}
-                        className="text-[#6D5DFC] hover:text-[#5b4edb] text-sm font-bold inline-flex items-center gap-1 transition-colors"
+                        className="text-[#C8A34D] hover:text-[#b08d3b] text-sm font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
                       >
                         Open Workspace →
                       </button>
@@ -364,10 +364,10 @@ const LegalDashboard = ({
             </div>
           ) : (
             /* List View */
-            <div className="w-full bg-white border border-[#ECECEC] rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+            <div className="w-full bg-white dark:bg-[#222222] border border-[#ECECEC] dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
               <div className="overflow-x-auto min-h-[280px]">
                 <table className="w-full border-collapse text-left text-sm text-slate-500">
-                  <thead className="bg-[#FAFBFB] text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-[#ECECEC]">
+                  <thead className="bg-slate-50 dark:bg-[#111111] text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-[#ECECEC] dark:border-slate-800">
                     <tr>
                       <th scope="col" className="w-[30%] px-4 py-3 whitespace-nowrap">Case Name</th>
                       <th scope="col" className="w-[15%] px-4 py-3 whitespace-nowrap">Case Type</th>
@@ -378,22 +378,22 @@ const LegalDashboard = ({
                       <th scope="col" className="w-[10%] px-4 py-3 text-right whitespace-nowrap">Open Workspace</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#ECECEC] bg-white">
+                  <tbody className="divide-y divide-[#ECECEC] dark:divide-slate-800 bg-white dark:bg-[#222222]">
                     {sortedCases.map((c) => {
                       const hearingDate = getNextHearingDate(c);
                       return (
-                        <tr key={c._id} className="hover:bg-slate-50/50 transition-colors group">
-                          <td className="px-4 py-3 font-semibold text-[#111827] text-base whitespace-nowrap">
+                        <tr key={c._id} className="hover:bg-slate-50/50 dark:hover:bg-[#111111] transition-colors group">
+                          <td className="px-4 py-3 font-semibold text-[#111111] dark:text-white text-base whitespace-nowrap">
                             <span className="flex items-center gap-2 whitespace-nowrap">
                               <span className="shrink-0">📁</span>
-                              <span className="hover:text-[#6D5DFC] transition-colors cursor-pointer" onClick={() => handleOpenCase(c)}>
+                              <span className="hover:text-[#C8A34D] transition-colors cursor-pointer" onClick={() => handleOpenCase(c)}>
                                 {c.name}
                               </span>
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-slate-500 text-sm whitespace-nowrap">{c.caseType || 'General Dispute'}</td>
-                          <td className="px-4 py-3 text-slate-500 text-sm whitespace-nowrap">{c.courtName || 'District Court'}</td>
-                          <td className="px-4 py-3 text-slate-500 text-sm font-medium whitespace-nowrap">
+                          <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-sm whitespace-nowrap">{c.caseType || 'General Dispute'}</td>
+                          <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-sm whitespace-nowrap">{c.courtName || 'District Court'}</td>
+                          <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-sm font-medium whitespace-nowrap">
                             {hearingDate !== 'None' ? `🗓 ${hearingDate}` : 'None'}
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap">{renderStatusPill(c.status)}</td>
@@ -403,20 +403,20 @@ const LegalDashboard = ({
                                 e.stopPropagation();
                                 setActiveMenuCaseId(activeMenuCaseId === c._id ? null : c._id);
                               }}
-                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-colors inline-block"
+                              className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-colors inline-block cursor-pointer"
                             >
                               <span className="text-xl font-bold leading-none">⋮</span>
                             </button>
                             {activeMenuCaseId === c._id && (
                               <>
                                 <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setActiveMenuCaseId(null); }} />
-                                <div className="absolute right-6 top-8 w-40 bg-white border border-[#ECECEC] rounded-xl shadow-lg py-1.5 z-50 text-left" onClick={(e) => e.stopPropagation()}>
+                                <div className="absolute right-6 top-8 w-40 bg-white dark:bg-[#111111] border border-[#ECECEC] dark:border-slate-800 rounded-xl shadow-lg py-1.5 z-50 text-left" onClick={(e) => e.stopPropagation()}>
                                   <button
                                     onClick={() => {
                                       handleOpenEditModal(c);
                                       setActiveMenuCaseId(null);
                                     }}
-                                    className="w-full px-4 py-2 hover:bg-slate-50 text-xs font-semibold text-[#111827] flex items-center gap-2 transition-colors"
+                                    className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#222222] text-xs font-semibold text-[#111827] dark:text-white flex items-center gap-2 transition-colors"
                                   >
                                     <Edit2 size={13} />
                                     Edit Case
@@ -426,7 +426,7 @@ const LegalDashboard = ({
                                       handleToggleArchive(e, c);
                                       setActiveMenuCaseId(null);
                                     }}
-                                    className="w-full px-4 py-2 hover:bg-slate-50 text-xs font-semibold text-[#111827] flex items-center gap-2 transition-colors"
+                                    className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#222222] text-xs font-semibold text-[#111827] dark:text-white flex items-center gap-2 transition-colors"
                                   >
                                     <Archive size={13} />
                                     {c.status === 'Archived' ? 'Restore' : 'Archive'}
@@ -448,7 +448,7 @@ const LegalDashboard = ({
                           <td className="px-4 py-3 text-right font-bold whitespace-nowrap">
                             <button
                               onClick={() => handleOpenCase(c)}
-                              className="text-[#6D5DFC] hover:text-[#5b4edb] hover:translate-x-0.5 transition-all text-xs font-bold inline-flex items-center gap-1"
+                              className="text-[#C8A34D] hover:text-[#b08d3b] hover:translate-x-0.5 transition-all text-xs font-bold inline-flex items-center gap-1 cursor-pointer"
                             >
                               Open Workspace <ChevronRight size={14} />
                             </button>
@@ -463,11 +463,11 @@ const LegalDashboard = ({
           )
         ) : (
           /* Empty Case List */
-          <div className="flex flex-col items-center justify-center h-full min-h-[450px] text-center space-y-6 max-w-lg mx-auto bg-white border border-[#ECECEC] rounded-2xl p-10 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-            <span className="text-6xl text-[#6D5DFC]">📁</span>
+          <div className="flex flex-col items-center justify-center h-full min-h-[450px] text-center space-y-6 max-w-lg mx-auto bg-white dark:bg-[#222222] border border-[#ECECEC] dark:border-slate-800 rounded-2xl p-10 shadow-sm">
+            <span className="text-6xl text-[#C8A34D]">📁</span>
             <div className="space-y-2">
-              <h3 className="text-2xl font-bold text-[#111827]">No Cases Yet</h3>
-              <p className="text-sm text-[#6B7280] leading-relaxed">
+              <h3 className="text-2xl font-bold text-[#111111] dark:text-white">No Cases Yet</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
                 Create your first case to start managing litigation, research, evidence and AI-powered legal drafting.
               </p>
             </div>
@@ -477,7 +477,7 @@ const LegalDashboard = ({
                 setNewCaseForm({ clientName: '', caseType: '', otherCaseType: '', accused: '', summary: '' });
                 setIsNewCaseModalOpen(true);
               }}
-              className="px-6 py-3 bg-[#6D5DFC] hover:bg-[#5b4edb] text-white rounded-xl font-bold text-sm transition-all shadow-sm flex items-center gap-2 active:scale-95"
+              className="px-6 py-3 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-sm transition-all shadow-md flex items-center gap-2 active:scale-95 cursor-pointer"
             >
               <Plus size={16} />
               <span>Create New Case</span>

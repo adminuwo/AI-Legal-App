@@ -205,7 +205,7 @@ const SettingsPage = () => {
             placeholder="Search settings category..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl text-xs font-bold bg-[#F9FAFB] focus:bg-white focus:outline-none focus:border-[#6D5DFC] focus:ring-1 focus:ring-[#6D5DFC] transition-all placeholder-slate-400"
+            className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold bg-[#F9FAFB] dark:bg-[#111111] focus:bg-white dark:focus:bg-[#111111] focus:outline-none focus:border-[#C8A34D] focus:ring-1 focus:ring-[#C8A34D] transition-all placeholder-slate-400 text-[#111111] dark:text-white"
           />
         </div>
       </div>
@@ -218,7 +218,7 @@ const SettingsPage = () => {
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Settings Console</span>
             <button 
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="hidden lg:block text-[9px] font-extrabold text-[#6D5DFC] hover:underline"
+              className="hidden lg:block text-[9px] font-extrabold text-[#C8A34D] hover:underline cursor-pointer"
             >
               {isSidebarCollapsed ? 'Expand' : 'Collapse'}
             </button>
@@ -230,13 +230,13 @@ const SettingsPage = () => {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`w-full h-12 flex items-center gap-3.5 px-4 rounded-xl text-left transition-all ${
+                className={`w-full h-12 flex items-center gap-3.5 px-4 rounded-xl text-left transition-all cursor-pointer ${
                   isActive 
-                    ? 'bg-[#6D5DFC]/10 text-[#6D5DFC] font-bold border border-[#6D5DFC]/20 shadow-sm'
-                    : 'text-slate-600 hover:bg-slate-50 border border-transparent font-semibold'
+                    ? 'bg-[#111111] text-[#C8A34D] font-black border border-[#C8A34D]/40 shadow-sm'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent font-semibold'
                 }`}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#6D5DFC]' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#C8A34D]' : 'text-slate-400'}`} />
                 {!isSidebarCollapsed && (
                   <div className="min-w-0">
                     <p className="text-xs truncate leading-none mb-0.5">{cat.label}</p>
@@ -252,7 +252,7 @@ const SettingsPage = () => {
           {activeCategory === 'general' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-[#6D5DFC] border-b border-slate-100 pb-3">General Settings</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-[#C8A34D] border-b border-slate-100 dark:border-slate-800 pb-3">General Settings</h3>
                 <p className="text-[11px] font-semibold text-slate-400 mt-2">Adjust core application and scheduling behaviors.</p>
               </div>
 
@@ -347,7 +347,7 @@ const SettingsPage = () => {
           {activeCategory === 'appearance' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-[#6D5DFC] border-b border-slate-100 pb-3">Appearance Settings</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-[#C8A34D] border-b border-slate-100 dark:border-slate-800 pb-3">Appearance Settings</h3>
                 <p className="text-[11px] font-semibold text-slate-400 mt-2">Adjust styling parameters and animation speed.</p>
               </div>
 
@@ -394,7 +394,7 @@ const SettingsPage = () => {
                   </div>
                   <button 
                     onClick={() => handleToggle('general', 'compactMode', generalSettings.compactMode === true)}
-                    className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 ${generalSettings.compactMode === true ? 'bg-[#6D5DFC]' : 'bg-slate-200'}`}
+                    className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 ${generalSettings.compactMode === true ? 'bg-[#C8A34D]' : 'bg-slate-200'}`}
                   >
                     <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${generalSettings.compactMode === true ? 'translate-x-5' : 'translate-x-0'}`} />
                   </button>
@@ -404,10 +404,10 @@ const SettingsPage = () => {
               </div>
 
               {/* Accent Color Preview */}
-              <div className="border-t border-slate-100 pt-6">
+              <div className="border-t border-slate-100 dark:border-slate-800 pt-6">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-3">Accent Color Preference</label>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#6D5DFC] border border-[#6D5DFC]/20 shadow-sm" title="Primary Purple" />
+                  <div className="w-8 h-8 rounded-lg bg-[#C8A34D] border border-[#C8A34D]/20 shadow-sm" title="Soft Gold" />
                   <div className="w-8 h-8 rounded-lg bg-[#4F8CFF] border border-[#4F8CFF]/20 shadow-sm" title="Accent Blue" />
                   <p className="text-[11px] font-semibold text-slate-400">AI LEGAL default color theme is optimized for court-ready litigation.</p>
                 </div>
@@ -420,7 +420,7 @@ const SettingsPage = () => {
           {activeCategory === 'notifications' && (
             <div className="space-y-6">
               <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-[#6D5DFC] border-b border-slate-100 pb-3">Notification Preferences</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-[#C8A34D] border-b border-slate-100 dark:border-slate-800 pb-3">Notification Preferences</h3>
                 <p className="text-[11px] font-semibold text-slate-400 mt-2">Choose how you wish to receive upcoming hearings and strategic briefings reminders.</p>
               </div>
 
@@ -543,13 +543,13 @@ const SettingsPage = () => {
           {activeCategory === 'security' && (
             <div className="space-y-8">
               <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-[#6D5DFC] border-b border-slate-100 pb-3">Security & Account Access</h3>
+                <h3 className="text-xs font-black uppercase tracking-widest text-[#C8A34D] border-b border-slate-100 pb-3">Security & Account Access</h3>
                 <p className="text-[11px] font-semibold text-slate-400 mt-2">Manage your verification credentials, passwords, and trusted devices.</p>
               </div>
 
               {/* Password change form */}
               <form onSubmit={handleUpdatePassword} className="space-y-4 bg-slate-55/40 border border-slate-100 rounded-2xl p-6">
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#6D5DFC] block mb-2">Change Password</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#C8A34D] block mb-2">Change Password</span>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Current Password</label>

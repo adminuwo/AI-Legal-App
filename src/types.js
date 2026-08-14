@@ -117,4 +117,20 @@ const apis = {
   baseUrl: API,
 };
 
+export const appendLanguagePromptModifier = (message, language) => {
+  if (!language || language === 'English') return message;
+  
+  if (language === 'Bilingual') {
+    return `${message}\n\n[INSTRUCTION: Please generate the response in Bilingual style (English + Hindi). Use English for headings, titles, and structural labels. Use Hindi for descriptions, explanations, and subtitles. Where appropriate, write in English with key sentences explained in Hindi. Do NOT translate client names, case numbers, evidence names, file names, phone numbers, emails, and legal section numbers. Keep them in their original form.]`;
+  }
+  
+  if (language.startsWith('Bilingual (English + ') || language.startsWith('English + ')) {
+    const targetLang = language.replace('Bilingual (English + ', '').replace('English + ', '').replace(')', '');
+    return `${message}\n\n[INSTRUCTION: Please generate the response in Bilingual style (English + ${targetLang}). Use English for headings, titles, and structural labels. Use ${targetLang} for descriptions, explanations, and subtitles. Where appropriate, write in English with key sentences explained in ${targetLang}. Do NOT translate client names, case numbers, evidence names, file names, phone numbers, emails, and legal section numbers. Keep them in their original form.]`;
+  }
+  
+  return `${message}\n\n[INSTRUCTION: Please generate the response in ${language}. All analysis, descriptions, and headings must be in ${language}. Do NOT translate client names, case numbers, evidence names, file names, phone numbers, emails, and legal section numbers. Keep them in their original form.]`;
+};
+
 export { API, apis };
+
