@@ -1113,21 +1113,21 @@ html.lenis body {
 }
 
 .user-row .chat-bubble-text {
-  background-color: hsl(var(--primary-bg)) !important;
-  border: 1px solid rgba(var(--primary-rgb), 0.12) !important;
+  background-color: #FBF8F1 !important; /* Soft warm Rolex gold cream background */
+  border: 1px solid rgba(200, 163, 77, 0.3) !important; /* Warm Rolex gold border */
   padding: 14px 18px !important;
   border-radius: 16px !important; /* Clean, modern uniform border radius */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
-  color: #1f2937 !important; /* Clean dark text for contrast in light mode */
+  box-shadow: 0 2px 8px rgba(200, 163, 77, 0.06) !important;
+  color: #111827 !important; /* Clean dark text for contrast in light mode */
   text-align: left !important; /* Keep text left-aligned inside the bubble */
   margin-left: auto !important;
 }
 
 .dark .user-row .chat-bubble-text {
-  background-color: hsl(var(--primary-bg)) !important;
-  border: 1px solid rgba(var(--primary-rgb), 0.25) !important;
+  background-color: rgba(200, 163, 77, 0.12) !important;
+  border: 1px solid rgba(200, 163, 77, 0.35) !important;
   color: #f3f4f6 !important; /* Soft light text in dark mode */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
 }
 
 .ai-row .chat-bubble-text {

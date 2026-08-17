@@ -102,16 +102,7 @@ const DEFAULT_TOOL_CONFIG = {
 };
 
 const FILTER_OPTIONS = [
-  { id: 'all', label: 'All' },
-  { id: 'legal_my_case', label: 'Assistant' },
-  { id: 'legal_draft_maker', label: 'Draft Maker' },
-  { id: 'legal_research', label: 'Research' },
-  { id: 'legal_contract_analyzer', label: 'Contracts' },
-  { id: 'legal_evidence_checker', label: 'Evidence' },
-  { id: 'legal_argument_builder', label: 'Arguments' },
-  { id: 'legal_case_predictor', label: 'Predictor' },
-  { id: 'legal_strategy_engine', label: 'Strategy' },
-  { id: 'legal_research_assistant', label: 'Research Assistant' }
+  { id: 'all', label: 'All Chat History' }
 ];
 
 const AIHistoryPanel = ({
@@ -120,7 +111,8 @@ const AIHistoryPanel = ({
   width,
   onStartResize,
   currentSessionId,
-  onSelectSession
+  onSelectSession,
+  activeCaseId
 }) => {
   const navigate = useNavigate();
   const panelRef = useRef(null);
@@ -156,11 +148,12 @@ const AIHistoryPanel = ({
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  // Load all sessions
+  // Load case-isolated sessions
   const loadSessions = useCallback(async (search = '') => {
     setIsLoading(true);
     try {
-      const data = await chatStorageService.getSessions('all', search);
+      const scope = activeCaseId || 'all';
+      const data = await chatStorageService.getSessions(scope, search);
       setSessions(data || []);
     } catch (err) {
       console.error("[HISTORY] Load failed:", err);
@@ -168,14 +161,14 @@ const AIHistoryPanel = ({
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [activeCaseId]);
 
-  // Reload history when open or when search/filters change
+  // Reload history when open or when search/filters/activeCaseId change
   useEffect(() => {
     if (isOpen) {
       loadSessions(debouncedSearch);
     }
-  }, [isOpen, debouncedSearch, loadSessions]);
+  }, [isOpen, debouncedSearch, activeCaseId, loadSessions]);
 
   // Outside click close detection
   useEffect(() => {
@@ -419,7 +412,7 @@ const AIHistoryPanel = ({
     setMenuOpenId(null);
   };
 
-  // Grouping sessions
+  // Grouping sessions — Only show pure AI Assistant chat history (exclude background tool sessions)
   const filteredSessions = useMemo(() => {
     return sessions.filter((s) => {
       // 1. Archive filter
@@ -430,22 +423,40 @@ const AIHistoryPanel = ({
         if (isArchived) return false;
       }
 
-      // 2. Tab Filter
-      if (activeFilter !== 'all') {
-        const toolId = s.activeTool || 'legal_my_case';
-        if (activeFilter === 'legal_my_case') {
-          // Copilot handles legal_my_case and unassigned tools
-          return toolId === 'legal_my_case' || !s.activeTool;
-        }
-        // Special case for general research
-        if (activeFilter === 'legal_research') {
-          return toolId === 'legal_research' || toolId === 'legal_precedents';
-        }
-        return toolId === activeFilter;
+      // 2. Strict Chat Filter: Must be legal_my_case or unassigned tool
+      const toolId = s.activeTool || 'legal_my_case';
+      if (toolId !== 'legal_my_case' && toolId !== 'chat' && toolId !== 'NORMAL_CHAT') {
+        return false;
       }
+
+      // 3. Exclude automated tool titles, advocate submissions, mock courtroom turns, performance reports, etc.
+      const titleLower = (s.title || '').toLowerCase();
+      const excludedKeywords = [
+        'advocate submission',
+        'judicial performance',
+        'performance report',
+        'research the relevant law',
+        'write email draft',
+        'write whatsapp draft',
+        'mock courtroom',
+        'courtroom practice',
+        'client connect',
+        'start ai mock courtroom',
+        'evidence analyst',
+        'contract analyzer',
+        'argument builder',
+        'case predictor',
+        'strategy engine',
+        'turn '
+      ];
+
+      if (excludedKeywords.some(kw => titleLower.includes(kw))) {
+        return false;
+      }
+
       return true;
     });
-  }, [sessions, activeFilter, archivedChats, showArchivedOnly]);
+  }, [sessions, archivedChats, showArchivedOnly]);
 
   const groupedSessions = useMemo(() => {
     const groups = {
@@ -539,25 +550,6 @@ const AIHistoryPanel = ({
             )}
           </div>
           <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => setShowArchivedOnly(!showArchivedOnly)}
-              className={`p-1.5 rounded-lg transition-colors text-xs font-bold uppercase tracking-wider border cursor-pointer ${
-                showArchivedOnly 
-                  ? 'bg-amber-500/10 border-amber-500/20 text-amber-600' 
-                  : 'hover:bg-slate-50 dark:hover:bg-zinc-800/50 border-slate-200 dark:border-zinc-800 text-slate-500'
-              }`}
-              title={showArchivedOnly ? "Show Main History" : "Show Archived Conversations"}
-            >
-              <Archive className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => loadSessions(debouncedSearch)}
-              disabled={isLoading}
-              className="p-1.5 hover:bg-slate-50 dark:hover:bg-zinc-800/50 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer transition-colors"
-              title="Refresh History"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            </button>
             <button
               onClick={onClose}
               className="p-1.5 hover:bg-slate-50 dark:hover:bg-zinc-800/50 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer transition-colors"
@@ -653,176 +645,77 @@ const AIHistoryPanel = ({
 
                   {list.map((session) => {
                     const active = currentSessionId === session.sessionId;
-                    const toolId = session.activeTool || 'legal_my_case';
-                    const config = TOOL_CONFIG[toolId] || DEFAULT_TOOL_CONFIG;
-                    const isPinned = pinnedChats.includes(session.sessionId);
-                    const isFav = favoriteChats.includes(session.sessionId);
 
                     return (
                       <div
                         key={session.sessionId}
                         onClick={() => onSelectSession(session)}
-                        className={`group relative flex flex-col p-3 rounded-2xl border transition-all cursor-pointer shadow-2xs hover:shadow-xs ${
+                        className={`group relative flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${
                           active
-                            ? `bg-white dark:bg-[#121321] border-[#6D5DFC]/40 dark:border-[#8b5cf6]/40 shadow-sm`
-                            : `bg-slate-50/50 hover:bg-white dark:bg-zinc-900/10 dark:hover:bg-zinc-800/20 border-slate-100/80 hover:border-slate-200 dark:border-zinc-800/40 dark:hover:border-zinc-700/40`
+                            ? `bg-white dark:bg-[#121321] border-[#C8A34D] text-slate-900 dark:text-white shadow-xs`
+                            : `bg-slate-50/70 hover:bg-white dark:bg-zinc-900/20 dark:hover:bg-zinc-800/40 border-slate-200/60 dark:border-zinc-800/60`
                         }`}
                       >
-                        {/* Top Line: Tool Tag & Metadata Actions */}
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider ${config.bgClass} ${config.textClass} border ${config.borderClass}`}>
-                            <span>{config.emoji}</span>
-                            <span>{config.name}</span>
-                          </span>
-
-                          <div className="flex items-center gap-1 shrink-0">
-                            {isFav && <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />}
-                            {isPinned && <Pin className="w-3.5 h-3.5 text-[#6D5DFC] dark:text-[#8b5cf6] rotate-45" />}
-                            
-                            {/* Action dropdown menu */}
-                            <div className="relative select-none z-30">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setMenuOpenId(menuOpenId === session.sessionId ? null : session.sessionId);
+                        <div className="flex-1 min-w-0 pr-2">
+                          {renameSessionId === session.sessionId ? (
+                            <div 
+                              className="flex items-center gap-1.5 w-full"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <input
+                                type="text"
+                                value={renameValue}
+                                onChange={(e) => setRenameValue(e.target.value)}
+                                onBlur={() => handleRename(session.sessionId)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleRename(session.sessionId);
+                                  if (e.key === 'Escape') setRenameSessionId(null);
                                 }}
-                                className="p-1 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md text-slate-400 hover:text-slate-600 transition-colors cursor-pointer opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+                                className="w-full px-2 py-1 border border-[#C8A34D] rounded-lg text-xs bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100 outline-none font-semibold"
+                                autoFocus
+                              />
+                              <button
+                                onClick={() => handleRename(session.sessionId)}
+                                className="px-2.5 py-1 bg-[#C8A34D] text-[#111] rounded-lg text-xs font-black cursor-pointer"
                               >
-                                <MoreVertical className="w-3.5 h-3.5" />
+                                Save
                               </button>
-                              
-                              {menuOpenId === session.sessionId && (
-                                <>
-                                  <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setMenuOpenId(null); }} />
-                                  <div className="absolute right-0 mt-1 w-44 bg-white dark:bg-[#161726] border border-slate-100 dark:border-zinc-800 rounded-xl shadow-xl py-1.5 z-50 text-left font-sans text-xs font-semibold select-none text-slate-600 dark:text-zinc-300">
-                                    <button
-                                      onClick={(e) => handlePin(e, session.sessionId)}
-                                      className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-800/60 flex items-center gap-2 transition-colors"
-                                    >
-                                      <Pin className="w-3.5 h-3.5 text-slate-400" />
-                                      {isPinned ? 'Unpin Chat' : 'Pin Chat'}
-                                    </button>
-                                    <button
-                                      onClick={(e) => handleFavorite(e, session.sessionId)}
-                                      className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-800/60 flex items-center gap-2 transition-colors"
-                                    >
-                                      <Star className="w-3.5 h-3.5 text-slate-400" />
-                                      {isFav ? 'Unfavorite' : 'Mark Favorite'}
-                                    </button>
-                                    <button
-                                      onClick={(e) => handleArchive(e, session.sessionId)}
-                                      className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-800/60 flex items-center gap-2 transition-colors"
-                                    >
-                                      <Archive className="w-3.5 h-3.5 text-slate-400" />
-                                      {showArchivedOnly ? 'Unarchive' : 'Archive Chat'}
-                                    </button>
-                                    <button
-                                      onClick={(e) => startRename(e, session)}
-                                      className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-800/60 flex items-center gap-2 transition-colors"
-                                    >
-                                      <Edit2 className="w-3.5 h-3.5 text-slate-400" />
-                                      Rename
-                                    </button>
-                                    <button
-                                      onClick={(e) => handleDuplicate(e, session)}
-                                      className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-800/60 flex items-center gap-2 transition-colors"
-                                    >
-                                      <Copy className="w-3.5 h-3.5 text-slate-400" />
-                                      Duplicate
-                                    </button>
-                                    <div className="h-[1px] bg-slate-100 dark:bg-zinc-800/60 my-1 mx-2" />
-                                    <button
-                                      onClick={(e) => handleExport(e, session, 'txt')}
-                                      className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-800/60 flex items-center gap-2 transition-colors"
-                                    >
-                                      <Download className="w-3.5 h-3.5 text-slate-400" />
-                                      Export as TXT
-                                    </button>
-                                    <button
-                                      onClick={(e) => handleExport(e, session, 'json')}
-                                      className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-800/60 flex items-center gap-2 transition-colors"
-                                    >
-                                      <Download className="w-3.5 h-3.5 text-slate-400" />
-                                      Export as JSON
-                                    </button>
-                                    <div className="h-[1px] bg-slate-100 dark:bg-zinc-800/60 my-1 mx-2" />
-                                    <button
-                                      onClick={(e) => handleDelete(e, session.sessionId)}
-                                      className="w-full px-3 py-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-500 hover:text-rose-600 flex items-center gap-2 font-bold transition-colors"
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                      Delete Chat
-                                    </button>
-                                  </div>
-                                </>
-                              )}
                             </div>
-                          </div>
+                          ) : (
+                            <div className="space-y-1">
+                              <h5 className="text-xs font-black text-slate-800 dark:text-zinc-100 truncate leading-snug">
+                                {session.title || 'Untitled Conversation'}
+                              </h5>
+                              <div className="flex items-center gap-2 text-[10px] text-slate-400 dark:text-zinc-500 font-bold uppercase tracking-wider">
+                                <span>
+                                  {new Date(session.lastModified).toLocaleDateString([], { month: 'short', day: 'numeric' })} • {new Date(session.lastModified).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                                {session.projectId?.name && (
+                                  <span className="text-[#C8A34D] truncate max-w-[100px]">
+                                    • {session.projectId.name}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
 
-                        {/* Middle Line: Conversation Title or Rename input */}
-                        {renameSessionId === session.sessionId ? (
-                          <div 
-                            className="flex items-center gap-1.5 w-full mt-0.5"
-                            onClick={(e) => e.stopPropagation()}
+                        {/* Direct Action Icons: Edit & Delete */}
+                        <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={(e) => startRename(e, session)}
+                            className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer"
+                            title="Rename Chat"
                           >
-                            <input
-                              type="text"
-                              value={renameValue}
-                              onChange={(e) => setRenameValue(e.target.value)}
-                              onBlur={() => handleRename(session.sessionId)}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleRename(session.sessionId);
-                                if (e.key === 'Escape') setRenameSessionId(null);
-                              }}
-                              className="w-full px-2 py-0.5 border border-[#6D5DFC] rounded-lg text-sm bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100 outline-none"
-                              autoFocus
-                            />
-                            <button
-                              onClick={() => handleRename(session.sessionId)}
-                              className="px-2 py-0.5 bg-[#6D5DFC] hover:bg-[#5a4ec2] text-white rounded-lg text-xs font-bold"
-                            >
-                              Save
-                            </button>
-                          </div>
-                        ) : (
-                          <h5 className="text-xs font-bold text-slate-800 dark:text-zinc-100 truncate leading-snug tracking-tight pr-4">
-                            {session.title || 'Untitled Conversation'}
-                          </h5>
-                        )}
-
-                        {/* Case display badge */}
-                        {session.projectId?.name && (
-                          <div 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onClose();
-                              navigate(`/dashboard/cases/${session.projectId._id || session.projectId}`);
-                            }}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-100 hover:bg-slate-200/80 dark:bg-zinc-800/40 dark:hover:bg-zinc-800 text-slate-500 dark:text-zinc-400 rounded-md border border-slate-200/50 dark:border-zinc-800/50 mt-1.5 w-fit max-w-full text-[9px] font-bold tracking-wide transition-colors group/case"
-                            title="Click to view Case Workspace directly"
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => handleDelete(e, session.sessionId)}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-lg transition-colors cursor-pointer"
+                            title="Delete Chat"
                           >
-                            <Briefcase className="w-3 h-3 text-indigo-500/70" />
-                            <span className="truncate uppercase max-w-[180px] group-hover/case:text-[#6D5DFC]">
-                              {session.projectId.name}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Bottom line: Timestamp / Info */}
-                        <div className="flex items-center justify-between text-[9px] text-slate-400 dark:text-zinc-500 font-bold uppercase tracking-wider mt-2 pt-1.5 border-t border-slate-100/50 dark:border-zinc-800/30">
-                          <span>
-                            {new Date(session.lastModified).toLocaleDateString([], {
-                              month: 'short',
-                              day: 'numeric'
-                            })}
-                          </span>
-                          <span>
-                            {new Date(session.lastModified).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </span>
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </div>
                     );

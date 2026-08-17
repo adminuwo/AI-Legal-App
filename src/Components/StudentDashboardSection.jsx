@@ -33,7 +33,7 @@ const STUDENT_TOOLS = [
     icon: Brain,
     badge: 'Interactive',
     color: 'from-emerald-500/20 to-teal-500/10 border-emerald-500/30 text-emerald-400',
-    query: '?tool=legal_argument_builder',
+    path: '/dashboard/tools/argument-builder',
   },
   {
     id: 'legal_draft_maker',
@@ -42,7 +42,7 @@ const STUDENT_TOOLS = [
     icon: GraduationCap,
     badge: 'Academic',
     color: 'from-sky-500/20 to-blue-500/10 border-sky-500/30 text-sky-400',
-    query: '?tool=legal_draft_maker',
+    path: '/dashboard/tools/draft-maker',
   },
 ];
 
@@ -58,29 +58,34 @@ export default function StudentDashboardSection({ user }) {
 
   return (
     <div className="space-y-6">
-      {/* 1. Header & Motivational Banner */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-indigo-950/40 via-slate-900/90 to-purple-950/40 border border-indigo-500/30 shadow-2xl backdrop-blur-xl">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
-            <GraduationCap className="w-4 h-4 text-indigo-400" />
-            <span>Student AI Workspace & Learning Hub</span>
+      {/* 1. Header Hero Banner */}
+      <div className="relative p-6 rounded-3xl bg-gradient-to-br from-indigo-900/60 via-slate-900 to-slate-950 border border-indigo-500/20 overflow-hidden shadow-2xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center gap-1">
+                <GraduationCap className="w-3 h-3" /> Law Student Portal
+              </span>
+              <span className="text-xs text-slate-400 font-mono">Streak: 🔥 {daysActive} Days</span>
+            </div>
+            <h2 className="text-xl md:text-2xl font-black text-white tracking-tight">
+              Welcome back, {userName}! 📚⚖️
+            </h2>
+            <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+              AI Legal Academic Hub — Prepare moot court memorials, analyze landmark judgments, build statutory arguments & study for judicial service exams.
+            </p>
           </div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">
-            Welcome back, {userName}! 🎓
-          </h2>
-          <p className="text-sm text-slate-300">
-            Boost your legal studies with AI precedent analysis, moot court training, and case summarization.
-          </p>
-        </div>
 
-        <button
-          onClick={() => navigate('/dashboard/chat/new?tool=legal_research')}
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 transition-all duration-200"
-        >
-          <Sparkles className="w-4 h-4" />
-          <span>Ask AI Tutor</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => navigate('/dashboard/tools/knowledge-hub')}
+              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition-all cursor-pointer flex items-center gap-2"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>Explore Knowledge Hub</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* 2. Study Metrics Row */}

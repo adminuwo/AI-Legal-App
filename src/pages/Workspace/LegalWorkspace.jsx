@@ -3,7 +3,6 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Send, SendHorizontal, Bot, User, Sparkles, Plus, Monitor, ChevronDown, History, Paperclip, X, AlertCircle, FileText, FileCheck, Binary, Library, Image as ImageIcon, Cloud, HardDrive, Edit2, Download, Mic, Wand2, Eye, FileSpreadsheet, Presentation, File as FileIcon, MoreVertical, Trash2, Check, Camera, Video, Copy, ThumbsUp, ThumbsDown, Share, Search, Undo2, Menu as MenuIcon, Volume2, Pause, Headphones, MessageCircle, ExternalLink, ZoomIn, ZoomOut, RotateCcw, Minus, Code, Globe, Sliders, PlayCircle, Brain, ImagePlus, PlaySquare, RefreshCcw, TrendingUp, Zap, Gavel, Navigation, Rocket, Megaphone, Scale, ArrowLeft, ChevronRight, Briefcase, Calendar, Users, FolderOpen, Save, Sun, Moon, LayoutDashboard, Maximize2, Minimize2, ArrowDown } from 'lucide-react';
 import LegalLogo from '../../Tools/AI_Legal/components/LegalLogo';
-import CaseIntelligencePanel from '../../Tools/AI_Legal/components/CaseIntelligencePanel';
 import { logo } from '../../constants';
 import { renderAsync } from 'docx-preview';
 import * as XLSX from 'xlsx';
@@ -1061,11 +1060,10 @@ const LegalWorkspace = () => {
   const location = useLocation();
   const querySessionId = new URLSearchParams(location.search).get('sessionId');
   const sessionId = routeSessionId || querySessionId || currentCaseSessionId;
-  const activeCaseId = (caseId && /^[a-f\d]{24}$/i.test(caseId))
-    ? caseId
-    : (new URLSearchParams(location.search).get('caseId') && /^[a-f\d]{24}$/i.test(new URLSearchParams(location.search).get('caseId')))
-      ? new URLSearchParams(location.search).get('caseId')
-      : null;
+  const rawCaseId = caseId || new URLSearchParams(location.search).get('caseId');
+  const activeCaseId = (rawCaseId && typeof rawCaseId === 'string' && rawCaseId.trim().length > 0 && rawCaseId !== 'null' && rawCaseId !== 'undefined' && rawCaseId !== 'new' && rawCaseId !== 'all' && rawCaseId !== 'default')
+    ? rawCaseId
+    : null;
   const { personalizations, getSystemPromptExtensions, updatePersonalization } = usePersonalization();
   const { language: currentLang, toolkitLanguage, t } = useLanguage();
   const isDarkMode = personalizations?.general?.theme === 'Dark' ||
@@ -1367,6 +1365,13 @@ const LegalWorkspace = () => {
   }, [currentCase]);
 
   const [allProjects, setAllProjects] = useRecoilState(activeProjectsData);
+  const [selectedLanguage, setSelectedLanguage] = useState(() => localStorage.getItem('aisa_selected_language') || 'English');
+  const [isQuickActionsModalOpen, setIsQuickActionsModalOpen] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('aisa_selected_language', selectedLanguage);
+  }, [selectedLanguage]);
+
   const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [listeningTime, setListeningTime] = useState(0);
@@ -1401,7 +1406,7 @@ const LegalWorkspace = () => {
   const [caseAiActiveTool, setCaseAiActiveTool] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const caseIdInUrl = params.get('caseId');
-    if (caseIdInUrl && /^[a-f\d]{24}$/i.test(caseIdInUrl)) {
+    if (caseIdInUrl && caseIdInUrl !== 'null' && caseIdInUrl !== 'undefined' && caseIdInUrl !== 'new' && caseIdInUrl !== 'all' && caseIdInUrl !== 'default') {
       // safe fallback because store may not be ready
       try {
         const saved = localStorage.getItem('aisa_active_project_id');
@@ -1493,15 +1498,30 @@ const LegalWorkspace = () => {
       window.history.replaceState({}, '', location.pathname);
     }
 
-    // Auto-activate legal tools from URL if they exist
-    if (toolParam?.startsWith('legal_') && selectedLegalTool?.id !== toolParam) {
+    // Redirect non-case AI tool URL parameters to dedicated non-chat tool routes
+    const TOOL_ROUTE_MAP = {
+      legal_draft_maker: '/dashboard/tools/draft-maker',
+      legal_contract_analyzer: '/dashboard/tools/contract-analyzer',
+      legal_evidence_checker: '/dashboard/tools/evidence-analyst',
+      legal_case_predictor: '/dashboard/tools/case-predictor',
+      legal_strategy_engine: '/dashboard/tools/strategy-engine',
+      legal_argument_builder: '/dashboard/tools/argument-builder',
+      legal_precedents: '/dashboard/tools/legal-precedents',
+      legal_research: '/dashboard/tools/knowledge-hub',
+    };
+
+    if (!activeCaseId && toolParam && TOOL_ROUTE_MAP[toolParam]) {
+      navigate(TOOL_ROUTE_MAP[toolParam], { replace: true });
+      return;
+    }
+
+    // Auto-activate legal tools from URL if they exist (only inside case assistant)
+    if (activeCaseId && toolParam?.startsWith('legal_') && selectedLegalTool?.id !== toolParam) {
       if (manualToolSelectionRef.current === toolParam) {
-        // Just cleared - reset ref and skip to avoid double toast
         manualToolSelectionRef.current = null;
         return;
       }
       lastHandledSearchRef.current = location.search;
-      console.log(`[RouteActivation] Activating legal tool from URL: ${toolParam}`);
       const legalTool = PREMIUM_TOOLS.find(t => t.id === toolParam);
       activateToolWithTypingEffect(toolParam, legalTool?.name, true);
     }
@@ -1549,7 +1569,7 @@ const LegalWorkspace = () => {
     const params = new URLSearchParams(location.search);
     const caseIdInUrl = params.get('caseId') || caseId;
 
-    if (caseIdInUrl && /^[a-f\d]{24}$/i.test(caseIdInUrl)) {
+    if (caseIdInUrl && caseIdInUrl !== 'null' && caseIdInUrl !== 'undefined' && caseIdInUrl !== 'new' && caseIdInUrl !== 'all' && caseIdInUrl !== 'default') {
       if (lastProcessedCaseIdRef.current !== caseIdInUrl) {
         lastProcessedCaseIdRef.current = caseIdInUrl;
 
@@ -4167,7 +4187,7 @@ const LegalWorkspace = () => {
 
           // If this session belongs to a case, sync with workspace store
           const projId = sessionMeta.projectId?._id || sessionMeta.projectId?.id || (typeof sessionMeta.projectId === 'string' ? sessionMeta.projectId : null);
-          if (projId && /^[a-f\d]{24}$/i.test(projId)) {
+          if (projId && projId !== 'null' && projId !== 'undefined' && projId !== 'new' && projId !== 'all' && projId !== 'default') {
             updateWorkspace(projId, { messages: historyMessages });
           }
 
@@ -4352,7 +4372,7 @@ const LegalWorkspace = () => {
       } finally {
         setIsHydrating(false);
         setIsSessionLoading(false);
-        setShowHistory(false);
+        setIsHistoryOpen(false);
       }
     };
     initChat();
@@ -4493,7 +4513,7 @@ const LegalWorkspace = () => {
     setSelectedLegalTool(null);
     setMessages([]); // Clear messages immediately for instant transition
     navigate('/dashboard/chat/new', { state: { forceGlobal: true } });
-    setShowHistory(false);
+    setIsHistoryOpen(false);
   };
 
   const handleDriveClick = () => {
@@ -4687,73 +4707,9 @@ const LegalWorkspace = () => {
     // --- CASE WORKSPACE INTELLIGENT ROUTING ---
     const isCaseWorkspaceActive = !!activeCaseId && !!currentCase;
     if (isCaseWorkspaceActive && caseAiActiveTool === 'legal_my_case' && !toolOverride) {
-      const matchedTool = matchRoutingKeywords(contentToSend);
-      if (matchedTool && matchedTool.id !== 'legal_my_case') {
-        const autoSwitch = localStorage.getItem('aisa_auto_switch_tool') === 'true';
-        if (autoSwitch) {
-          // Switch silently
-          const dividerMsg = {
-            id: `divider-${Date.now()}`,
-            role: 'system',
-            isDivider: true,
-            content: `Switched to ${matchedTool.name}`,
-            timestamp: new Date(),
-            mode: 'LEGAL_TOOLKIT',
-            activeTool: matchedTool.id
-          };
-          setMessages(prev => [...prev, dividerMsg], activeSessionId);
-          chatStorageService.saveMessage(activeSessionId, dividerMsg, null, currentProjectId);
-          setCaseAiActiveTool(matchedTool.id);
-          if (currentProjectId) {
-            updateWorkspace(currentProjectId, { activeTool: { id: matchedTool.id, name: matchedTool.name } });
-          }
-          toolOverride = matchedTool.id;
-        } else {
-          // Offer choices in conversation
-          const offerMsg = {
-            id: `routing-offer-${Date.now()}`,
-            role: 'system',
-            isRoutingOffer: true,
-            suggestedToolId: matchedTool.id,
-            suggestedToolName: matchedTool.name,
-            originalContent: contentToSend,
-            timestamp: new Date(),
-            mode: 'LEGAL_TOOLKIT',
-            activeTool: 'legal_my_case'
-          };
-          // Append user's original message to conversation first (so it's visible in thread)
-          const userMsgId = Date.now().toString();
-          const newUserMsg = {
-            id: userMsgId,
-            role: 'user',
-            content: contentToSend,
-            timestamp: new Date(),
-            mode: 'LEGAL_TOOLKIT',
-            activeTool: 'legal_my_case',
-            attachments: filePreviews.map(fp => ({
-              url: fp.url,
-              name: fp.name,
-              type: fp.type.startsWith('image/') ? 'image' :
-                fp.type.includes('pdf') ? 'pdf' :
-                  fp.type.includes('word') || fp.type.includes('document') ? 'docx' : 'file'
-            }))
-          };
-
-          setMessages(prev => prev.filter(m => !m.isSystemLog).concat(newUserMsg, offerMsg), activeSessionId);
-          chatStorageService.saveMessage(activeSessionId, newUserMsg, null, currentProjectId);
-          chatStorageService.saveMessage(activeSessionId, offerMsg, null, currentProjectId);
-
-          // Clear inputs
-          setInputValue('');
-          handleRemoveFile();
-          if (longTextPreview) setLongTextPreview(null);
-
-          // Release lock and loading states
-          chatLock.locked = false;
-          setIsLoading(false);
-          return;
-        }
-      }
+      // In Case Assistant mode, process all suggested tasks/prompts directly within the Case Assistant
+      // without creating 'Switched to Tool' banners or changing routes.
+      toolOverride = 'legal_my_case';
     }
 
     if (longTextPreview) setLongTextPreview(null);
@@ -5008,7 +4964,9 @@ const LegalWorkspace = () => {
             setSessions(prev => [optimisticSession, ...prev]);
           }
 
-          chatStorageService.saveMessage(activeSessionId, newUserMsg, null, currentProjectId).then(() => {
+          const effectiveProjectId = activeCaseId || (currentProjectId !== 'default' && currentProjectId !== 'all' ? currentProjectId : null);
+
+          chatStorageService.saveMessage(activeSessionId, newUserMsg, null, effectiveProjectId).then(() => {
             // 2. Trigger title generation in background if it's the first message
             if (isFirstMessage) {
               chatStorageService.generateSessionTitle(activeSessionId, contentToSend).then(savedTitle => {
@@ -5030,10 +4988,14 @@ const LegalWorkspace = () => {
 
           // ── Navigate AFTER state is stabilized ──
           if (isFirstMessage) {
-            const searchParams = new URLSearchParams(location.search);
-            const toolParam = searchParams.get('tool');
-            const navigateUrl = `/dashboard/chat/${activeSessionId}${toolParam ? `?tool=${toolParam}` : ''}`;
-            navigate(navigateUrl, { replace: true });
+            if (activeCaseId) {
+              setCurrentCaseSessionId(activeSessionId);
+            } else {
+              const searchParams = new URLSearchParams(location.search);
+              const toolParam = searchParams.get('tool');
+              const navigateUrl = `/dashboard/chat/${activeSessionId}${toolParam ? `?tool=${toolParam}` : ''}`;
+              navigate(navigateUrl, { replace: true });
+            }
           }
 
           setTimeout(() => scrollToBottom(true, 'smooth'), 50);
@@ -5058,14 +5020,20 @@ const LegalWorkspace = () => {
             }
           }
 
+          let latestCaseContext = currentCase;
+          if (activeCaseId && allProjects && allProjects.length > 0) {
+            const freshCase = allProjects.find(p => (p._id && p._id === activeCaseId) || (p.id && p.id === activeCaseId));
+            if (freshCase) latestCaseContext = freshCase;
+          }
+
           const res = await axios.post(`${API}/legal-toolkit/execute`, {
             message: contentToSend,
             toolName: activeToolId === 'legal_research' ? 'legal_research_assistant' : activeToolId,
             sessionId: activeSessionId,
             attachments: newUserMsg.attachments,
             conversationHistory: messages,
-            caseContext: currentCase,
-            projectId: currentProjectId,
+            caseContext: latestCaseContext,
+            projectId: effectiveProjectId,
             language: toolkitLanguage || currentLang
           }, {
             headers: { Authorization: `Bearer ${getUserData()?.token}` }
@@ -5130,7 +5098,7 @@ const LegalWorkspace = () => {
             }, activeSessionId);
 
             // Final AI response sync
-            await chatStorageService.saveMessage(activeSessionId, finalAiMsg, null, currentProjectId);
+            await chatStorageService.saveMessage(activeSessionId, finalAiMsg, null, effectiveProjectId);
             refreshSubscription();
           } else {
             throw new Error(res.data.error || 'Execution failed');
@@ -5392,7 +5360,11 @@ const LegalWorkspace = () => {
           if (exists) return currentSessions;
           return [{ sessionId: activeSessionId, title: 'New Chat', lastModified: Date.now(), detectedMode: detectedMode }, ...currentSessions];
         });
-        navigate(`/dashboard/chat/${activeSessionId}`, { replace: true });
+        if (activeCaseId) {
+          setCurrentCaseSessionId(activeSessionId);
+        } else {
+          navigate(`/dashboard/chat/${activeSessionId}`, { replace: true });
+        }
         // Generate title in background - does NOT block the AI response
         chatStorageService.generateSessionTitle(activeSessionId, userMsg.content).then(newTitle => {
           if (newTitle) setSessions(prev => {
@@ -5879,48 +5851,58 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
 
           // Set Smart Suggestions for the last response part
           if (i === responseParts.length - 1) {
-            const hasSmartSuggestions = aiResponseData?.suggestions && Array.isArray(aiResponseData.suggestions) && aiResponseData.suggestions.length > 0;
-            let finalSuggestions = hasSmartSuggestions ? aiResponseData.suggestions : [];
+            const cleanSuggestionItem = (str) => {
+              if (!str) return '';
+              let cleaned = String(str || '')
+                .replace(/^[.\-*•\d\s]+/, '')
+                .replace(/\*\*/g, '')
+                .replace(/\*/g, '')
+                .replace(/^Hello\s+[^,]+,?\s*/i, '')
+                .replace(/^Hi\s+[^,]+,?\s*/i, '')
+                .replace(/^Yes\s*,\s*[^,]+,?\s*/i, '')
+                .replace(/^Sure\s*,\s*[^,]+,?\s*/i, '')
+                .replace(/^Certainly\s*,\s*[^,]+,?\s*/i, '')
+                .replace(/^Dear\s+[^,]+,?\s*/i, '')
+                .replace(/^(Yes|Sure|Certainly|Okay|Ok|Hello|Hi)\s*,\s*/i, '')
+                .replace(/:\s*$/, '')
+                .trim();
 
-            // If we have a background promise for suggestions, wait for it now
-            if (!hasSmartSuggestions && dynamicSuggestionsPromise) {
-              try {
-                const dynamicPrompts = await dynamicSuggestionsPromise;
-                if (dynamicPrompts && dynamicPrompts.length > 0) {
-                  finalSuggestions = dynamicPrompts;
-                }
-              } catch (err) {
-                console.error("Background suggestions failed:", err);
+              if (/^(Yes|No|Sure|Certainly|Hello|Hi|Thanks|Thank you|To ensure|Name of)/i.test(cleaned) || cleaned.length < 4) {
+                return '';
               }
-            }
+              return cleaned;
+            };
 
-            // Fallback to minimal generic suggestions only if absolutely necessary
-            if (finalSuggestions.length === 0 && !currentCase?.isLegalCase) {
-              finalSuggestions = [
-                "Tell me more about this",
-                "Give me a practical example",
-                "What are the next steps?"
+            const hasSmartSuggestions = aiResponseData?.suggestions && Array.isArray(aiResponseData.suggestions) && aiResponseData.suggestions.length > 0;
+            let rawList = hasSmartSuggestions ? aiResponseData.suggestions : [];
+            let cleanedList = rawList.map(cleanSuggestionItem).filter(Boolean);
+
+            if (cleanedList.length === 0) {
+              cleanedList = [
+                "Research relevant Case Laws",
+                "Explain applicable IPC/BNS Sections",
+                "Suggest Legal Strategy",
+                "Predict Case Outcome"
               ];
             }
 
-            // --- LEGAL CASE CRM OVERRIDE (Specific to Legal Folder context) ---
-            if (currentCase && currentCase.isLegalCase) {
-              const legalOptions = [
-                "Draft a Legal Notice",
-                "Analyze this document",
-                "Search relevant Case Laws",
-                "Draft a Contract Response",
-                "Identify Legal Risks",
-                "Explain legal terminology"
-              ];
-              // Shuffle and pick 4
-              const shuffled = [...legalOptions].sort(() => 0.5 - Math.random());
-              finalSuggestions = shuffled.slice(0, 4);
-            }
-
-            const trimmedSuggestions = finalSuggestions.slice(0, 4);
+            const trimmedSuggestions = cleanedList.slice(0, 4);
             finalModelMsg.suggestions = trimmedSuggestions;
             setSuggestions(trimmedSuggestions);
+
+            // NON-BLOCKING: Fetch dynamic suggestions in background without holding up input box typing
+            if (!hasSmartSuggestions && dynamicSuggestionsPromise) {
+              dynamicSuggestionsPromise.then(dynamicPrompts => {
+                if (dynamicPrompts && Array.isArray(dynamicPrompts) && dynamicPrompts.length > 0) {
+                  const cleanedAsync = dynamicPrompts.map(cleanSuggestionItem).filter(Boolean);
+                  if (cleanedAsync.length > 0) {
+                    const finalAsync = cleanedAsync.slice(0, 4);
+                    setSuggestions(finalAsync);
+                    chatStorageService.saveMessage(activeSessionId, { ...finalModelMsg, suggestions: finalAsync }, null, currentProjectId).catch(e => console.error(e));
+                  }
+                }
+              }).catch(err => console.error("Async background suggestions failed:", err));
+            }
           }
 
           // After typing is complete, save the full message to history
@@ -7440,6 +7422,59 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
     );
   }
 
+  const handleSaveToNotes = async (content) => {
+    if (!activeCaseId) {
+      toast.error("No active case selected");
+      return;
+    }
+    try {
+      const newNote = {
+        id: `note_ai_${Date.now()}`,
+        title: `AI Assistant Note — ${new Date().toLocaleDateString()}`,
+        content: content,
+        category: 'AI Notes',
+        priority: 'High',
+        tags: ['ai-generated', 'case-assistant'],
+        createdAt: new Date().toISOString()
+      };
+      const updatedNotes = [newNote, ...(currentCase?.notes || [])];
+      await apiService.updateCase(activeCaseId, { notes: updatedNotes });
+      if (typeof handleUpdateCase === 'function') {
+        handleUpdateCase({ ...currentCase, notes: updatedNotes });
+      }
+      toast.success("✨ Saved to Case Notes!");
+    } catch (err) {
+      toast.error("Failed to save to Case Notes");
+    }
+  };
+
+  const handleSaveToTimeline = async (content) => {
+    if (!activeCaseId) {
+      toast.error("No active case selected");
+      return;
+    }
+    try {
+      const newEvent = {
+        id: `tl_ai_${Date.now()}`,
+        date: new Date().toISOString().split('T')[0],
+        category: 'AI Analysis',
+        importance: 'Medium',
+        title: 'AI Assistant Case Insight',
+        description: content.slice(0, 180) + '...',
+        sourceDoc: 'Case-Aware AI Assistant',
+        isAiGenerated: true
+      };
+      const updatedTimeline = [...(currentCase?.timeline || []), newEvent];
+      await apiService.updateCase(activeCaseId, { timeline: updatedTimeline });
+      if (typeof handleUpdateCase === 'function') {
+        handleUpdateCase({ ...currentCase, timeline: updatedTimeline });
+      }
+      toast.success("✨ Saved to Timeline!");
+    } catch (err) {
+      toast.error("Failed to save to Timeline");
+    }
+  };
+
   const handleExportFullscreenChat = (format) => {
     if (messages.length === 0) {
       toast.error("No messages to export");
@@ -7519,46 +7554,22 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
               </button>
               <div className="h-4 w-px bg-slate-200 hidden xs:block" />
               <span className="text-xs font-black text-slate-900 tracking-wider uppercase truncate max-w-[200px] sm:max-w-none">{currentCase?.name}</span>
-              <div className="h-4 w-px bg-slate-200 hidden xs:block" />
-              {/* Active AI Tool Switcher */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setIsToolSelectorOpen(prev => !prev)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-[#111111] hover:bg-[#222222] border border-[#C8A34D]/40 rounded-full text-[10px] font-black text-[#C8A34D] uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
-                >
-                  <span>{TOOL_CHIP_DETAILS[caseAiActiveTool]?.icon}</span>
-                  <span>{TOOL_CHIP_DETAILS[caseAiActiveTool]?.name}</span>
-                </button>
-              </div>
             </div>
 
-            {/* Right section: Export, History, Collapse */}
+            {/* Right section: New Chat, History, Collapse */}
             <div className="flex items-center gap-2">
-              <div className="relative group">
-                <button
-                  type="button"
-                  className="px-3 py-1.5 hover:bg-[#F9FAFB] rounded-xl text-[10px] font-bold text-slate-700 hover:text-slate-900 transition-colors border border-[#E5E7EB] shadow-xs flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Download size={12} /> Export Chat
-                </button>
-                <div className="absolute right-0 mt-1 hidden group-hover:block w-36 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-45 text-[10px] font-bold text-slate-650">
-                  <button
-                    type="button"
-                    onClick={() => handleExportFullscreenChat('txt')}
-                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer"
-                  >
-                    Export as TXT
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleExportFullscreenChat('json')}
-                    className="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer"
-                  >
-                    Export as JSON
-                  </button>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setMessages([]);
+                  setCurrentCaseSessionId('new');
+                  toast.success("Started a new conversation for this case!");
+                }}
+                className="px-3 py-1.5 bg-[#111111] hover:bg-[#222222] text-[#C8A34D] border border-[#C8A34D]/40 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-xs flex items-center gap-1.5 cursor-pointer active:scale-95"
+                title="Start New Chat"
+              >
+                <Plus size={12} /> New Chat
+              </button>
 
               <button
                 type="button"
@@ -7611,8 +7622,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
             <div className={`flex flex-col h-full justify-center py-4 ${isAiPanelFullscreen ? 'w-full max-w-full lg:max-w-[1000px] xl:max-w-[1100px] 2xl:max-w-[1200px] mx-auto px-4 sm:px-6 md:px-8' : ''
               }`}>
               <div className="flex flex-col items-center text-center max-w-sm mx-auto px-4">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-[#6D5DFC] border border-indigo-100/30 mb-4 shadow-sm">
-                  <Brain size={22} />
+                <div className="w-12 h-12 rounded-2xl bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 mb-4 shadow-xs flex items-center justify-center">
+                  <Brain size={24} />
                 </div>
                 <h4 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Case-Aware AI Assistant</h4>
                 <p className="text-xs text-slate-500 font-medium leading-relaxed mt-2">
@@ -7771,14 +7782,14 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                 h2: ({ node, ...props }) => <h2 className="text-lg font-extrabold text-slate-900 tracking-tight mt-5 mb-2.5" {...props} />,
                                 h3: ({ node, ...props }) => <h3 className="text-md font-bold text-slate-800 mt-4 mb-2" {...props} />,
                                 p: ({ node, ...props }) => <p className="text-slate-700 leading-relaxed mb-4" {...props} />,
-                                ul: ({ node, ...props }) => <ul className="list-disc pl-6 mb-4 space-y-2 text-slate-700 marker:text-indigo-500" {...props} />,
-                                ol: ({ node, ...props }) => <ol className="list-decimal pl-6 mb-4 space-y-2 text-slate-700 marker:text-indigo-500 font-semibold" {...props} />,
-                                li: ({ node, ...props }) => <li className="pl-1 text-slate-700 font-normal" {...props} />,
-                                strong: ({ node, ...props }) => <strong className="font-extrabold text-slate-900" {...props} />,
-                                blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-indigo-500 bg-indigo-50/30 pl-4 py-2 pr-2 rounded-r-xl my-4 text-slate-700 italic" {...props} />,
+                                ul: ({ node, ...props }) => <ul className="list-disc pl-6 mb-4 space-y-2 text-slate-700 dark:text-zinc-300 marker:text-[#C8A34D]" {...props} />,
+                                ol: ({ node, ...props }) => <ol className="list-decimal pl-6 mb-4 space-y-2 text-slate-700 dark:text-zinc-300 marker:text-[#C8A34D] font-semibold" {...props} />,
+                                li: ({ node, ...props }) => <li className="pl-1 text-slate-700 dark:text-zinc-300 font-normal" {...props} />,
+                                strong: ({ node, ...props }) => <strong className="font-extrabold text-slate-900 dark:text-zinc-100" {...props} />,
+                                blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-[#C8A34D] bg-[#C8A34D]/10 dark:bg-[#C8A34D]/15 pl-4 py-2 pr-2 rounded-r-xl my-4 text-slate-800 dark:text-zinc-200 italic" {...props} />,
                                 code: ({ node, inline, className, children, ...props }) => {
                                   return (
-                                    <code className="bg-slate-100/80 text-indigo-600 px-1.5 py-0.5 rounded-md font-mono text-xs border border-slate-200/50" {...props}>
+                                    <code className="bg-[#C8A34D]/10 text-[#C8A34D] dark:text-[#E2C275] px-1.5 py-0.5 rounded-md font-mono text-xs border border-[#C8A34D]/20" {...props}>
                                       {children}
                                     </code>
                                   );
@@ -7795,23 +7806,43 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                           )}
 
                           {/* Message actions underneath */}
-                          <div className="flex items-center gap-4.5 pt-1.5 text-[10px] text-slate-400 font-bold select-none opacity-60 hover:opacity-100 transition-opacity">
+                          <div className="flex items-center flex-wrap gap-3.5 pt-1.5 text-[10px] text-slate-400 font-bold select-none opacity-80 hover:opacity-100 transition-opacity">
                             <button
                               type="button"
                               onClick={() => {
                                 copyText(msg.content);
                                 toast.success("Copied to clipboard!");
                               }}
-                              className="flex items-center gap-1 hover:text-indigo-600 transition-colors cursor-pointer"
+                              className="flex items-center gap-1 hover:text-[#C8A34D] transition-colors cursor-pointer"
                               title="Copy response"
                             >
                               <Copy size={11} />
-                              <span>Copy Response</span>
+                              <span>Copy</span>
                             </button>
                             <span className="h-3 w-px bg-slate-200" />
                             <button
                               type="button"
-                              className="hover:text-[#6D5DFC] transition-colors cursor-pointer"
+                              onClick={() => handleSaveToNotes(msg.content)}
+                              className="flex items-center gap-1 hover:text-[#C8A34D] transition-colors cursor-pointer"
+                              title="Save to Case Notes"
+                            >
+                              <FileText size={11} />
+                              <span>Save to Case Notes</span>
+                            </button>
+                            <span className="h-3 w-px bg-slate-200" />
+                            <button
+                              type="button"
+                              onClick={() => handleSaveToTimeline(msg.content)}
+                              className="flex items-center gap-1 hover:text-[#C8A34D] transition-colors cursor-pointer"
+                              title="Save to Timeline"
+                            >
+                              <History size={11} />
+                              <span>Save to Timeline</span>
+                            </button>
+                            <span className="h-3 w-px bg-slate-200" />
+                            <button
+                              type="button"
+                              className="hover:text-[#C8A34D] transition-colors cursor-pointer"
                               title="Thumbs up"
                             >
                               <ThumbsUp size={11} />
@@ -7839,8 +7870,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                         {isUser ? 'Advocate' : 'AI Assistant'}
                       </span>
                       <div className={`p-4 rounded-2xl text-xs leading-relaxed ${isUser
-                          ? 'bg-[#6D5DFC] text-white rounded-tr-none shadow-sm'
-                          : 'bg-white border border-[#E5E7EB] text-slate-800 rounded-tl-none shadow-sm select-text'
+                          ? 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-tr-none shadow-xs font-semibold'
+                          : 'bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none shadow-sm select-text'
                         }`}>
                         {isUser ? (
                           <p className="whitespace-pre-wrap font-medium">{msg.content}</p>
@@ -7877,17 +7908,6 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
         {/* Input area */}
         <div className={`border-t border-[#E5E7EB] bg-white shrink-0 relative overflow-visible ${isAiPanelFullscreen ? 'p-6 pb-8' : 'p-4'}`}>
           <div className={isAiPanelFullscreen ? 'w-full max-w-full lg:max-w-[1000px] xl:max-w-[1100px] 2xl:max-w-[1200px] mx-auto px-4 sm:px-6 md:px-8' : ''}>
-            {/* Active Tool Chip */}
-            <div className="flex items-center mb-2.5">
-              <button
-                type="button"
-                onClick={() => setIsToolSelectorOpen(prev => !prev)}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-[#111111] hover:bg-[#222222] border border-[#C8A34D]/40 rounded-full text-[10px] font-black text-[#C8A34D] uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
-              >
-                <span>{TOOL_CHIP_DETAILS[caseAiActiveTool]?.icon}</span>
-                <span>{TOOL_CHIP_DETAILS[caseAiActiveTool]?.name}</span>
-              </button>
-            </div>
 
             {/* Floating Tool Selector Popup Menu */}
             {isToolSelectorOpen && (
@@ -8858,10 +8878,10 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                     const chatLock = getSessionLock(activeSessionId);
                     chatLock.locked = false;
                   }}
-                  className="w-[36px] h-[36px] rounded-full text-white flex items-center justify-center shadow-sm hover:scale-105 transition-all"
-                  style={{ backgroundColor: 'var(--color-primary)' }}
+                  className="w-[32px] h-[32px] sm:w-[34px] sm:h-[34px] rounded-full text-[#111111] bg-[#C8A34D] hover:bg-[#b08d3b] flex items-center justify-center shadow-md hover:scale-105 transition-all cursor-pointer shrink-0"
+                  title="Stop generating"
                 >
-                  <div className="w-[12px] h-[12px] bg-white rounded-sm" />
+                  <div className="w-[10px] h-[10px] sm:w-[12px] sm:h-[12px] bg-[#111111] rounded-xs" />
                 </button>
               ) : (
                 <div className="flex items-center gap-[6px] relative">
@@ -8875,11 +8895,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     title={t('send')}
-                    className={`w-[30px] h-[30px] sm:w-[34px] sm:h-[34px] rounded-full flex items-center justify-center transition-all shadow-lg relative overflow-visible z-20 text-white`}
-                    style={{
-                      background: `linear-gradient(135deg, var(--color-primary), var(--color-primary-dark))`,
-                      boxShadow: isSendHovered ? `0 10px 20px -5px var(--color-primary-border)` : `none`
-                    }}
+                    className={`w-[30px] h-[30px] sm:w-[34px] sm:h-[34px] rounded-full flex items-center justify-center transition-all shadow-md relative overflow-visible z-20 text-[#111111] bg-[#C8A34D] hover:bg-[#b08d3b] disabled:bg-slate-200 disabled:text-slate-400`}
                   >
                     <AnimatePresence>
                       {ripples.map(id => (
@@ -10176,16 +10192,30 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                   {/* Integrated Smart Suggestions (Only for the latest AI response) */}
                                   {idx === messages.length - 1 && (msg.role === 'model' || msg.role === 'assistant') &&
                                     suggestions.length > 0 && !isLoading && !typingMessageId && (
-                                      <div className="suggestions-container animate-in fade-in slide-in- duration-500">
-                                        {suggestions.map((item, index) => (
-                                          <button
-                                            key={index}
-                                            onClick={() => handleSuggestionClick(item)}
-                                            className="suggestion-btn"
-                                          >
-                                            {item}
-                                          </button>
-                                        ))}
+                                      <div className="flex flex-wrap gap-2 mt-4 animate-in fade-in duration-300 select-none">
+                                        {suggestions.map((item, index) => {
+                                          const cleanItem = String(item || '')
+                                            .replace(/^[.\-*•\d\s]+/, '')
+                                            .replace(/\*\*/g, '')
+                                            .replace(/\*/g, '')
+                                            .replace(/^Hello\s+[^,]+,?\s*/i, '')
+                                            .replace(/^Hi\s+[^,]+,?\s*/i, '')
+                                            .trim();
+
+                                          if (!cleanItem || cleanItem.length < 3) return null;
+
+                                          return (
+                                            <button
+                                              key={index}
+                                              type="button"
+                                              onClick={() => handleSuggestionClick(cleanItem)}
+                                              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-zinc-800/90 text-slate-700 dark:text-zinc-200 hover:text-[#C8A34D] dark:hover:text-[#C8A34D] hover:bg-[#C8A34D]/10 dark:hover:bg-[#C8A34D]/20 border border-slate-200/80 dark:border-zinc-700/60 hover:border-[#C8A34D]/40 transition-all shadow-2xs cursor-pointer text-left flex items-center gap-1.5"
+                                            >
+                                              <span className="text-[#C8A34D] font-bold">💡</span>
+                                              <span>{cleanItem}</span>
+                                            </button>
+                                          );
+                                        })}
                                       </div>
                                     )}
 
@@ -10217,19 +10247,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                       const IconComponent = details.icon;
                       const isGeneralCopilot = !activeToolId || !['legal_draft_maker', 'legal_research', 'legal_contract_analyzer', 'legal_evidence_checker', 'legal_argument_builder', 'legal_case_predictor', 'legal_strategy_engine', 'legal_research_assistant'].includes(activeToolId);
 
-                      // Define a mapping of tool colors for glow effects
-                      const colorMap = {
-                        legal_draft_maker: 'from-blue-500/20 to-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-500/30',
-                        legal_research: 'from-sky-500/20 to-blue-500/20 text-sky-600 dark:text-sky-400 border-sky-500/30',
-                        legal_contract_analyzer: 'from-emerald-500/20 to-teal-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
-                        legal_evidence_checker: 'from-violet-500/20 to-purple-500/20 text-violet-600 dark:text-violet-400 border-violet-500/30',
-                        legal_argument_builder: 'from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30',
-                        legal_case_predictor: 'from-rose-500/20 to-pink-500/20 text-rose-600 dark:text-rose-400 border-rose-500/30',
-                        legal_strategy_engine: 'from-fuchsia-500/20 to-violet-500/20 text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-500/30',
-                        legal_research_assistant: 'from-cyan-500/20 to-blue-500/20 text-cyan-600 dark:text-cyan-400 border-cyan-500/30',
-                      };
-
-                      const activeColor = colorMap[activeToolId] || 'from-violet-500/20 to-indigo-500/20 text-violet-600 dark:text-violet-400 border-violet-500/30';
+                      // Define a mapping of tool colors for glow effects (Warm Gold Rolex Theme)
+                      const activeColor = 'from-[#C8A34D]/20 to-[#C8A34D]/10 text-[#C8A34D] border-[#C8A34D]/30';
 
                       return (
                         <>
@@ -10241,7 +10260,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                 className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 rounded-xl text-xs font-bold transition-all shadow-xs border border-slate-200/60 dark:border-zinc-700/40 hover:bg-slate-50 dark:hover:bg-zinc-800/80 cursor-pointer"
                                 title="Open AI History"
                               >
-                                <History className="w-4 h-4 text-[#6D5DFC]" />
+                                <History className="w-4 h-4 text-[#C8A34D]" />
                                 <span>History</span>
                               </button>
                             </div>
@@ -10257,10 +10276,10 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                             <div className="flex flex-col items-center space-y-4">
                               <motion.div
                                 whileHover={{ scale: 1.05, rotate: 2 }}
-                                className={`w-16 h-16 bg-gradient-to-tr ${activeColor.split(' ')[0]} ${activeColor.split(' ')[1]} rounded-2xl flex items-center justify-center border ${activeColor.split(' ')[4]} shadow-md relative overflow-hidden`}
+                                className="w-16 h-16 bg-[#C8A34D]/10 rounded-2xl flex items-center justify-center border border-[#C8A34D]/30 shadow-sm relative overflow-hidden"
                               >
-                                <div className="absolute inset-0 bg-white/10 dark:bg-white/5 opacity-50 backdrop-blur-xs" />
-                                <IconComponent className={`w-8 h-8 ${activeColor.split(' ')[2]} ${activeColor.split(' ')[3]} relative z-10`} strokeWidth={2.2} />
+                                <div className="absolute inset-0 bg-[#C8A34D]/5 backdrop-blur-xs" />
+                                <IconComponent className="w-8 h-8 text-[#C8A34D] relative z-10" strokeWidth={2.2} />
                               </motion.div>
 
                               <div className="text-center space-y-2 select-text">
@@ -10310,9 +10329,9 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                                   handleSuggestionClick(action.prompt);
                                                 }
                                               }}
-                                              className={`h-[34px] px-3.5 rounded-full text-[12px] sm:text-[13px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs cursor-pointer select-none border border-slate-200/60 dark:border-zinc-700/40 ${isSurprise
-                                                  ? "bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 dark:from-indigo-400/15 dark:via-purple-400/15 dark:to-pink-400/15 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20 dark:border-indigo-400/25 hover:border-indigo-500/35 hover:bg-slate-50"
-                                                  : "bg-white dark:bg-zinc-800/40 text-slate-700 dark:text-zinc-300 hover:border-slate-300 dark:hover:border-zinc-600/60 hover:bg-slate-50 dark:hover:bg-zinc-800/80"
+                                              className={`h-[34px] px-3.5 rounded-full text-[12px] sm:text-[13px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs cursor-pointer select-none border ${isSurprise
+                                                  ? "bg-[#C8A34D]/15 text-[#C8A34D] border-[#C8A34D]/30 hover:bg-[#C8A34D]/25 font-bold"
+                                                  : "bg-white dark:bg-zinc-800/40 text-slate-700 dark:text-zinc-300 border-slate-200/60 hover:border-[#C8A34D]/50 hover:text-[#C8A34D] hover:bg-[#C8A34D]/5"
                                                 }`}
                                             >
                                               {action.label}
@@ -10328,7 +10347,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                             whileHover={{ scale: 1.03, y: -0.5 }}
                                             whileTap={{ scale: 0.97 }}
                                             onClick={() => setIsSuggestionsExpanded(!isSuggestionsExpanded)}
-                                            className="h-[34px] px-3.5 rounded-full text-[12px] sm:text-[13px] font-bold shadow-2xs hover:shadow-xs cursor-pointer select-none border border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 transition-all duration-200 flex items-center justify-center"
+                                            className="h-[34px] px-3.5 rounded-full text-[12px] sm:text-[13px] font-bold shadow-2xs hover:shadow-xs cursor-pointer select-none border border-[#C8A34D]/30 bg-[#C8A34D]/15 text-[#C8A34D] hover:bg-[#C8A34D]/25 transition-all duration-200 flex items-center justify-center"
                                           >
                                             {isSuggestionsExpanded ? "Less -" : "More +"}
                                           </motion.button>
@@ -10385,31 +10404,48 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                   const activeToolId = selectedLegalTool?.id || new URLSearchParams(window.location.search).get('tool');
                   const details = getToolDetails(activeToolId);
                   return (
-                    <div className="w-full border-b border-slate-200/50 dark:border-zinc-800/60 bg-white dark:bg-[#0d0e16] shrink-0 select-none z-30">
-                      <div className="flex items-center justify-between px-6 py-3.5 w-full">
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-2">
+                    <div className="w-full border-b border-slate-200/60 dark:border-zinc-800/60 bg-white dark:bg-[#0d0e16] shrink-0 select-none z-30 shadow-2xs">
+                      <div className="flex items-center justify-between px-4 sm:px-6 py-3 w-full gap-3">
+                        
+                        {/* LEFT: Assistant Title & History */}
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <span className="text-xs sm:text-sm font-black text-slate-800 dark:text-zinc-100 flex items-center gap-1.5">
                             <span className="text-base">{details.emoji}</span>
                             <span>{details.title}</span>
                           </span>
+
                           <button
                             type="button"
                             onClick={() => setIsHistoryOpen(true)}
-                            className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-[#6D5DFC] hover:bg-[#6D5DFC]/10 dark:text-[#8b5cf6] dark:hover:bg-[#8b5cf6]/10 rounded-lg transition-colors border border-[#6D5DFC]/20 dark:border-[#8b5cf6]/20 cursor-pointer"
+                            className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-[#C8A34D] hover:bg-[#C8A34D]/10 rounded-lg transition-colors border border-[#C8A34D]/30 cursor-pointer"
                             title="Open AI History"
                           >
                             <History className="w-3.5 h-3.5" />
-                            <span>History</span>
+                            <span className="hidden sm:inline">History</span>
                           </button>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => navigate('/dashboard/chat/new')}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#6D5DFC] hover:bg-[#5b4ecb] text-white rounded-lg text-xs font-bold transition-all shadow-sm hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>New Chat</span>
-                        </button>
+
+                        {/* RIGHT: New Chat Button */}
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          {/* New Chat Button */}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMessages([]);
+                              setCurrentCaseSessionId('new');
+                              if (!activeCaseId) {
+                                navigate('/dashboard/chat/new');
+                              } else {
+                                toast.success("Started a new conversation for this case!");
+                              }
+                            }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-lg text-xs transition-all shadow-sm cursor-pointer shrink-0"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">New Chat</span>
+                          </button>
+                        </div>
+
                       </div>
                     </div>
                   );
@@ -11328,18 +11364,6 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
         sessionTitle={messages[0]?.content || "Shared Chat"}
         sessionId={activeSessionId}
       />
-      {/* My Case Intelligence Dashboard Panel */}
-      <CaseIntelligencePanel
-        isOpen={isCasePanelOpen}
-        onClose={() => setIsCasePanelOpen(false)}
-        currentCase={currentCase}
-        onUseInArgument={handleUseInArgument}
-        onUpdate={(updated) => {
-          setCurrentCase(updated);
-          // Sync with the legalCases list if needed
-          setAllProjects(prev => prev.map(c => c._id === updated._id ? updated : c));
-        }}
-      />
       <AIHistoryPanel
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}
@@ -11347,6 +11371,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
         onStartResize={startResizing}
         currentSessionId={activeSessionId}
         onSelectSession={handleSelectSession}
+        activeCaseId={activeCaseId}
       />
     </div>
 

@@ -5,7 +5,7 @@ import {
   Clock, AlertTriangle, CheckCircle2, RefreshCw, Edit2, 
   Trash2, Archive, ChevronRight, X, ArrowUpRight, TrendingUp,
   Sparkles, Info, Users, ShieldCheck, BookOpen, User, MoreVertical, Activity,
-  Binary, Scale
+  Binary, Scale, Bell
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -17,6 +17,7 @@ import ExperienceRoleSelector from '../Components/ExperienceRoleSelector';
 import StudentDashboardSection from '../Components/StudentDashboardSection';
 import LawFirmDashboardSection from '../Components/LawFirmDashboardSection';
 import CreateCaseWizardModal from '../Tools/AI_Legal/components/CreateCaseWizardModal';
+import NotificationCenter from '../Components/NotificationBar/NotificationCenter';
 
 export default function HomeDashboard() {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ export default function HomeDashboard() {
   const [activeMenuCaseId, setActiveMenuCaseId] = useState(null);
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [isProductGuideOpen, setIsProductGuideOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
 
   // Form States
   const [newCaseForm, setNewCaseForm] = useState({
@@ -445,7 +447,7 @@ export default function HomeDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] pt-24 pb-16 px-6 md:px-16 max-w-6xl mx-auto text-[#111827] font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] p-4 sm:p-6 lg:p-8 w-full max-w-7xl mx-auto text-[#111827] dark:text-white font-sans transition-colors">
       
       {isLoading ? renderLoadingSkeletons() : (
         <>
@@ -453,8 +455,8 @@ export default function HomeDashboard() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-slate-200 dark:border-slate-800">
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white">
-                  Welcome, {selectedRole === 'student' ? 'Student' : selectedRole === 'law_firm' ? 'Law Firm' : 'Advocate'} {userName}
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white">
+                  Welcome, Advocate {userName}
                 </h1>
                 {isSyncing && (
                   <RefreshCw size={14} className="text-[#C8A34D] animate-spin" />
@@ -466,31 +468,43 @@ export default function HomeDashboard() {
               </p>
             </div>
             
-            <button
-              onClick={() => {
-                setNewCaseForm({ name: '', clientName: '', opponentName: '', caseType: '', courtName: '', summary: '', priority: 'Medium' });
-                setIsNewCaseModalOpen(true);
-              }}
-              className="flex items-center gap-2 px-5 py-3 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-sm shadow-md transition-all active:scale-95 shrink-0 self-start md:self-auto cursor-pointer"
-            >
-              <Plus className="w-4.5 h-4.5" />
-              <span>New Case</span>
-            </button>
+            <div className="flex items-center gap-3 self-start md:self-auto shrink-0">
+              <button
+                onClick={() => setIsNotifOpen(true)}
+                className="relative flex items-center gap-2 px-4 py-2.5 bg-[#C8A34D]/15 hover:bg-[#C8A34D]/25 border border-[#C8A34D]/40 text-[#B48A35] dark:text-[#C8A34D] font-black rounded-xl text-xs sm:text-sm shadow-xs transition-all active:scale-95 cursor-pointer"
+                title="View Updates & System Notifications"
+              >
+                <div className="relative">
+                  <Bell className="w-4.5 h-4.5 text-[#C8A34D]" />
+                  {notifications?.length > 0 && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white dark:ring-[#0F172A] animate-pulse" />
+                  )}
+                </div>
+                <span>Updates & Notifications</span>
+                {notifications?.length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-[#C8A34D] text-[#111111] text-[10px] font-black ml-1">
+                    {notifications.length}
+                  </span>
+                )}
+              </button>
+            </div>
           </div>
+
+          <NotificationCenter isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
 
           {/* Pending Workspace Invitation Banner */}
           {pendingInvite && (
-            <div className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-[#111111] via-[#222222] to-[#111111] border border-[#C8A34D]/40 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="mb-8 p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-[#C8A34D]/40 text-[#0F172A] dark:text-white shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="space-y-1">
                 <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#C8A34D]/20 text-[#C8A34D] text-[10px] font-bold uppercase tracking-wider">
                   <Users className="w-3.5 h-3.5 text-[#C8A34D]" />
                   <span>Pending Firm Invitation</span>
                 </div>
-                <h3 className="text-base font-bold text-white">
+                <h3 className="text-base font-bold text-[#0F172A] dark:text-white">
                   Invited to join <strong className="text-[#C8A34D]">{pendingInvite.firmName || pendingInvite.workspaceName || 'Law Firm Workspace'}</strong>
                 </h3>
-                <p className="text-xs text-slate-300">
-                  Role Designation: <span className="font-semibold text-white">{pendingInvite.role || 'Associate Advocate'}</span>
+                <p className="text-xs text-slate-600 dark:text-slate-300">
+                  Role Designation: <span className="font-semibold text-[#0F172A] dark:text-white">{pendingInvite.role || 'Associate Advocate'}</span>
                 </p>
               </div>
 
@@ -503,7 +517,7 @@ export default function HomeDashboard() {
                 </button>
                 <button
                   onClick={() => handleRejectInvite(pendingInvite._id || pendingInvite.id)}
-                  className="flex-1 sm:flex-none px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl border border-slate-700 transition-all cursor-pointer"
+                  className="flex-1 sm:flex-none px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-xl border border-slate-200 dark:border-slate-700 transition-all cursor-pointer"
                 >
                   Decline
                 </button>
@@ -518,27 +532,22 @@ export default function HomeDashboard() {
             </div>
           )}
 
-          {selectedRole === 'student' ? (
-            <StudentDashboardSection user={currentUser?.user} />
-          ) : selectedRole === 'law_firm' ? (
-            <LawFirmDashboardSection user={currentUser?.user} cases={cases} />
-          ) : (
-            <>
-              {/* 2. Today's Overview Statistics Ribbon */}
-              <div className="mb-12">
+          {/* Advocate Litigation Dashboard */}
+          {/* 2. Today's Overview Statistics Ribbon */}
+          <div className="mb-8">
             <h2 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">Today&apos;s Overview</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {[
-                { label: "Active Cases", value: totalActiveCases, icon: Briefcase, status: "Active", color: "text-[#C8A34D] bg-[#111111] border border-[#C8A34D]/30" },
-                { label: "Today's Hearings", value: totalTodaysHearingsCount, icon: Gavel, status: totalTodaysHearingsCount > 0 ? "TODAY" : "0 Today", color: totalTodaysHearingsCount > 0 ? "text-rose-500 bg-rose-50 border border-rose-200" : "text-slate-400 bg-slate-100" },
-                { label: "Pending Drafts", value: totalPendingDrafts, icon: FileText, status: "Pending", color: "text-amber-500 bg-amber-50 border border-amber-200" },
-                { label: "Pending Research", value: totalPendingResearch, icon: Search, status: "Up to Date", color: "text-emerald-500 bg-emerald-50 border border-emerald-200" }
+                { label: "Active Cases", value: totalActiveCases, icon: Briefcase, status: "Active", color: "text-[#C8A34D] bg-[#C8A34D]/10 border border-[#C8A34D]/25" },
+                { label: "Today's Hearings", value: totalTodaysHearingsCount, icon: Gavel, status: totalTodaysHearingsCount > 0 ? "TODAY" : "0 Today", color: totalTodaysHearingsCount > 0 ? "text-rose-500 bg-rose-50 border border-rose-200" : "text-slate-400 bg-slate-100 dark:bg-slate-800" },
+                { label: "Pending Drafts", value: totalPendingDrafts, icon: FileText, status: "Pending", color: "text-amber-500 bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-900/40" },
+                { label: "Pending Research", value: totalPendingResearch, icon: Search, status: "Up to Date", color: "text-emerald-500 bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-900/40" }
               ].map((stat, i) => (
-                <div key={i} className="p-6 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#222222] shadow-sm hover:border-[#C8A34D] hover:shadow-md transition-all flex flex-col justify-between">
-                  <div className="flex items-center justify-between mb-4">
+                <div key={i} className="p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] shadow-xs hover:border-[#C8A34D] hover:shadow-md transition-all flex flex-col justify-between">
+                  <div className="flex items-center justify-between mb-3">
                     <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{stat.label}</span>
                     <div className={`p-2 rounded-xl ${stat.color}`}>
-                      <stat.icon className="w-5 h-5" />
+                      <stat.icon className="w-4.5 h-4.5" />
                     </div>
                   </div>
                   <div className="flex items-baseline justify-between mt-2">
@@ -552,24 +561,21 @@ export default function HomeDashboard() {
             </div>
           </div>
 
-          {/* 3. Multi-Column Workspace layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-            
-            {/* Left Column (3 spans) */}
-            <div className="lg:col-span-3 space-y-12">
+          {/* 3. Main Workspace Content */}
+          <div className="w-full space-y-6 lg:space-y-8">
 
               {/* Continue Working Card */}
               {continueWorkingCase && (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <h2 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Continue Working</h2>
                   <div 
                     onClick={() => handleOpenWorkspace(continueWorkingCase._id)}
-                    className="p-6 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#222222] hover:border-[#C8A34D] transition-all shadow-sm cursor-pointer relative group overflow-hidden"
+                    className="p-6 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] hover:border-[#C8A34D] transition-all shadow-xs cursor-pointer relative group overflow-hidden"
                   >
                     <div className="absolute right-6 top-6 text-slate-400 group-hover:text-[#C8A34D] transition-colors">
                       <ArrowUpRight size={18} />
                     </div>
-                    <span className="px-2.5 py-1 bg-[#111111] text-[#C8A34D] border border-[#C8A34D]/30 text-[9px] font-mono font-bold uppercase tracking-wider rounded-full">Last Updated Case</span>
+                    <span className="px-2.5 py-1 bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25 text-[9px] font-mono font-bold uppercase tracking-wider rounded-full">Last Updated Case</span>
                     <h3 className="text-xl font-black text-[#111111] dark:text-white mt-3 group-hover:text-[#C8A34D] transition-colors">{continueWorkingCase.name}</h3>
                     <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-1 max-w-md truncate">{continueWorkingCase.summary || 'No summary configured yet.'}</p>
                     
@@ -583,7 +589,7 @@ export default function HomeDashboard() {
               )}
 
               {/* 3. Quick Actions Row */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <h2 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Quick Actions</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <button 
@@ -591,9 +597,9 @@ export default function HomeDashboard() {
                       setNewCaseForm({ name: '', clientName: '', opponentName: '', caseType: '', courtName: '', summary: '', priority: 'Medium' });
                       setIsNewCaseModalOpen(true);
                     }}
-                    className="p-5 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#222222] hover:border-[#C8A34D] hover:shadow-md transition-all flex items-center gap-4 group cursor-pointer text-left"
+                    className="p-5 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] hover:border-[#C8A34D] hover:shadow-md transition-all flex items-center gap-4 group cursor-pointer text-left"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-[#111111] text-[#C8A34D] border border-[#C8A34D]/30 flex items-center justify-center font-black text-xl group-hover:scale-105 transition-transform shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25 flex items-center justify-center font-black text-xl group-hover:scale-105 transition-transform shrink-0">
                       +
                     </div>
                     <div>
@@ -603,10 +609,10 @@ export default function HomeDashboard() {
                   </button>
 
                   <button 
-                    onClick={() => setIsProductGuideOpen(true)}
-                    className="p-5 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#222222] hover:border-[#C8A34D] hover:shadow-md transition-all flex items-center gap-4 group cursor-pointer text-left"
+                    onClick={() => navigate('/dashboard/guide')}
+                    className="p-5 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] hover:border-[#C8A34D] hover:shadow-md transition-all flex items-center gap-4 group cursor-pointer text-left"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-[#111111] text-[#C8A34D] border border-[#C8A34D]/30 flex items-center justify-center font-black text-xl group-hover:scale-105 transition-transform shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25 flex items-center justify-center font-black text-xl group-hover:scale-105 transition-transform shrink-0">
                       ✨
                     </div>
                     <div>
@@ -618,9 +624,9 @@ export default function HomeDashboard() {
               </div>
 
               {/* 4. AI Legal Knowledge Hub Card */}
-              <div className="p-6 border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#222222] shadow-sm space-y-4">
+              <div className="p-6 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] shadow-xs space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-[#111111] text-[#C8A34D] border border-[#C8A34D]/30 shrink-0">
+                  <div className="p-2.5 rounded-xl bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25 shrink-0">
                     <BookOpen className="w-5 h-5" />
                   </div>
                   <div>
@@ -636,10 +642,10 @@ export default function HomeDashboard() {
                     placeholder="Ask any legal question..."
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && e.target.value.trim()) {
-                        navigate(`/dashboard/chat/new?q=${encodeURIComponent(e.target.value)}`);
+                        navigate(`/dashboard/tools/knowledge-hub?q=${encodeURIComponent(e.target.value)}`);
                       }
                     }}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#111111] border border-slate-200 dark:border-slate-800 text-xs font-semibold focus:outline-none focus:border-[#C8A34D] text-[#111111] dark:text-white transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 text-xs font-semibold focus:outline-none focus:border-[#C8A34D] text-[#111111] dark:text-white transition-all"
                   />
                 </div>
 
@@ -649,8 +655,8 @@ export default function HomeDashboard() {
                     {['IPC 420', 'BNS', 'Divorce', 'GST', 'Consumer Rights', 'Labour Law', 'Property', 'RTI', 'Motor Accident'].map((chip, idx) => (
                       <button 
                         key={idx}
-                        onClick={() => navigate(`/dashboard/chat/new?q=${encodeURIComponent(chip)}`)}
-                        className="px-3 py-1 bg-slate-50 dark:bg-[#111111] hover:bg-[#111111] dark:hover:bg-[#333333] border border-slate-200 dark:border-slate-800 hover:border-[#C8A34D] text-[#111111] dark:text-white hover:text-[#C8A34D] rounded-lg text-xs font-bold transition-all cursor-pointer"
+                        onClick={() => navigate(`/dashboard/tools/knowledge-hub?q=${encodeURIComponent(chip)}`)}
+                        className="px-3 py-1 bg-slate-50 dark:bg-[#0F172A] hover:bg-[#111111] dark:hover:bg-[#333333] border border-slate-200/80 dark:border-slate-800 hover:border-[#C8A34D] text-[#111111] dark:text-white hover:text-[#C8A34D] rounded-lg text-xs font-bold transition-all cursor-pointer"
                       >
                         {chip}
                       </button>
@@ -660,7 +666,7 @@ export default function HomeDashboard() {
 
                 <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
                   <button 
-                    onClick={() => navigate('/dashboard/chat/new')}
+                    onClick={() => navigate('/dashboard/tools/knowledge-hub')}
                     className="text-xs font-bold text-[#C8A34D] hover:text-[#b08d3b] flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>Open Knowledge Hub</span>
@@ -671,136 +677,38 @@ export default function HomeDashboard() {
 
               {/* 5. New User Product Guide Banner (Dismissable) */}
               {isBannerVisible && (
-                <div className="p-6 border border-[#C8A34D]/40 rounded-2xl bg-gradient-to-r from-[#111111] via-[#222222] to-[#111111] text-white relative shadow-md">
+                <div className="p-6 border border-[#C8A34D]/30 rounded-2xl bg-white dark:bg-[#1E293B] text-[#0F172A] dark:text-white relative shadow-xs">
                   <button 
                     onClick={() => setIsBannerVisible(false)}
-                    className="absolute right-4 top-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                    className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                   >
                     <X size={16} />
                   </button>
                   <div className="flex items-center gap-2 mb-1">
                     <Sparkles className="w-4 h-4 text-[#C8A34D]" />
-                    <h3 className="text-sm font-extrabold text-white">New to AI LEGAL?</h3>
+                    <h3 className="text-sm font-extrabold text-[#0F172A] dark:text-white">New to AI LEGAL?</h3>
                   </div>
-                  <p className="text-xs text-slate-300 font-semibold mb-3">Meet your AI Product Guide.</p>
-                  <ul className="text-xs text-slate-300 space-y-1.5 mb-4 font-medium">
+                  <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold mb-3">Meet your AI Product Guide.</p>
+                  <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 mb-4 font-medium">
                     <li className="flex items-center gap-2">• Learn every feature step-by-step.</li>
                     <li className="flex items-center gap-2">• Ask questions in Hindi or English.</li>
                     <li className="flex items-center gap-2">• Get instant help while using the app.</li>
                   </ul>
                   <button 
-                    onClick={() => setIsProductGuideOpen(true)}
-                    className="px-4 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] text-xs font-black rounded-xl shadow-sm transition-all cursor-pointer"
+                    onClick={() => navigate('/dashboard/guide')}
+                    className="px-4 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] text-xs font-black rounded-xl shadow-xs transition-all cursor-pointer"
                   >
                     Open Product Guide &rarr;
                   </button>
                 </div>
               )}
 
-              {/* Recent Cases List with dropdown dropdown actions */}
-              <div className="space-y-4">
-                <h2 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Recent Cases</h2>
-                <div className="space-y-4">
-                  {recentCasesList.slice(0, 4).map((c) => (
-                    <div 
-                      key={c._id} 
-                      className="p-5 border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-[#222222] shadow-sm hover:border-[#C8A34D] transition-all flex items-center justify-between gap-4 relative group"
-                    >
-                      <div className="space-y-1.5 min-w-0 flex-1">
-                        <h3 
-                          onClick={() => handleOpenWorkspace(c._id)}
-                          className="font-bold text-base text-[#111111] dark:text-white truncate hover:text-[#C8A34D] transition-colors cursor-pointer"
-                        >
-                          {c.name}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400 font-semibold">
-                          <span>Client: <strong className="text-[#111111] dark:text-white">{c.clientName || 'General'}</strong></span>
-                          <span>•</span>
-                          <span>Court: <strong className="text-[#111111] dark:text-white">{c.courtName || 'District Court'}</strong></span>
-                        </div>
-                        <div className="flex items-center gap-2 pt-1">
-                          <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wide ${
-                            c.status === 'Archived' ? 'bg-amber-50 text-amber-700 border border-amber-100' :
-                            c.status === 'Closed' ? 'bg-slate-100 text-slate-700' : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                          }`}>
-                            {c.status || 'Active'}
-                          </span>
-                          {c.priority === 'High' && (
-                            <span className="px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-100 rounded text-[8px] font-bold uppercase">High Priority</span>
-                          )}
-                        </div>
-                      </div>
 
-                      <div className="flex items-center gap-2 shrink-0">
-                        <button 
-                          onClick={() => handleOpenWorkspace(c._id)}
-                          className="px-4.5 py-2 bg-slate-50 dark:bg-[#111111] hover:bg-[#111111] dark:hover:bg-[#333333] text-[#111111] dark:text-white hover:text-[#C8A34D] rounded-lg text-xs font-bold transition-all border border-slate-200 dark:border-slate-800 cursor-pointer"
-                        >
-                          Open
-                        </button>
-                        
-                        {/* 3-dot dropdown dropdown menu */}
-                        <div className="relative">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveMenuCaseId(activeMenuCaseId === c._id ? null : c._id);
-                            }}
-                            className="p-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-400 hover:text-slate-600 transition-all cursor-pointer"
-                          >
-                            <MoreVertical size={14} />
-                          </button>
-                          {activeMenuCaseId === c._id && (
-                            <>
-                              <div className="fixed inset-0 z-40" onClick={() => setActiveMenuCaseId(null)} />
-                              <div className="absolute right-0 top-8 w-40 bg-white dark:bg-[#111111] border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg py-1.5 z-50 text-left">
-                                <button
-                                  onClick={() => {
-                                    setEditingCase(c);
-                                    setActiveMenuCaseId(null);
-                                  }}
-                                  className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#222222] text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors text-left"
-                                >
-                                  <Edit2 size={13} /> Edit Details
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    handleToggleArchive(e, c);
-                                    setActiveMenuCaseId(null);
-                                  }}
-                                  className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-[#222222] text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors text-left"
-                                >
-                                  <Archive size={13} /> {c.status === 'Archived' ? 'Restore Case' : 'Archive Case'}
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    handleDeleteCase(e, c._id);
-                                    setActiveMenuCaseId(null);
-                                  }}
-                                  className="w-full px-4 py-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold text-rose-600 flex items-center gap-2 transition-colors border-t border-slate-100 dark:border-slate-800 text-left"
-                                >
-                                  <Trash2 size={13} /> Delete Case
-                                </button>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {cases.length === 0 && (
-                    <div className="py-12 text-center text-sm text-slate-400 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-[#222222] font-semibold">
-                      No cases found in database. Click New Case above to create your first litigation workspace.
-                    </div>
-                  )}
-                </div>
-              </div>
 
               {/* High Priority Cases List */}
               {highPriorityCasesList.length > 0 && (
-                <div className="space-y-4">
-                  <h2 className="text-xs font-bold text-rose-600 uppercase tracking-wider flex items-center gap-1.5">
+                <div className="space-y-3">
+                  <h2 className="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
                     <AlertTriangle size={13} /> High Priority Action Required
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -808,21 +716,18 @@ export default function HomeDashboard() {
                       <div 
                         key={c._id}
                         onClick={() => handleOpenWorkspace(c._id)}
-                        className="p-5 border border-rose-100 rounded-xl bg-rose-50/20 hover:border-rose-300 transition-all cursor-pointer space-y-2"
+                        className="p-5 border border-rose-100 dark:border-rose-900/40 rounded-2xl bg-rose-50/20 dark:bg-rose-950/20 hover:border-rose-300 transition-all cursor-pointer space-y-2"
                       >
-                        <h4 className="font-extrabold text-sm text-slate-900 truncate">{c.name}</h4>
-                        <p className="text-[11px] text-slate-500 font-medium truncate">Court: {c.courtName || 'Not Set'}</p>
-                        <span className="px-2 py-0.5 bg-rose-50 text-rose-700 text-[8px] font-bold uppercase rounded block w-fit">Critical Tracker</span>
+                        <h4 className="font-extrabold text-sm text-slate-900 dark:text-white truncate">{c.name}</h4>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">Court: {c.courtName || 'Not Set'}</p>
+                        <span className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 text-[8px] font-bold uppercase rounded block w-fit">Critical Tracker</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-            </div>
           </div>
-          </>
-          )}
 
           {/* E. MODAL Dialog: New Case Folder Wizard */}
           <CreateCaseWizardModal 

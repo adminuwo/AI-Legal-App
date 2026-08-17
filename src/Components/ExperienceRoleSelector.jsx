@@ -56,11 +56,11 @@ export default function ExperienceRoleSelector({ compact = false }) {
       <div className="relative inline-block text-left">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-amber-500/30 text-amber-400 font-medium text-xs shadow-md transition-all duration-200 cursor-pointer"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#C8A34D]/15 hover:bg-[#C8A34D]/25 border border-[#C8A34D]/40 text-[#C8A34D] font-bold text-xs shadow-xs transition-all duration-200 cursor-pointer"
         >
-          <IconComponent className="w-3.5 h-3.5" />
+          <IconComponent className="w-3.5 h-3.5 text-[#C8A34D]" />
           <span>{currentRoleObj.label}</span>
-          <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-3 h-3 text-[#C8A34D] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
         <AnimatePresence>
@@ -70,7 +70,7 @@ export default function ExperienceRoleSelector({ compact = false }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 bottom-full mb-2 w-64 rounded-xl bg-slate-950/95 border border-slate-800 shadow-2xl backdrop-blur-xl z-[100] p-1.5"
+              className="absolute right-0 bottom-full mb-2 w-64 rounded-2xl bg-white dark:bg-[#1E293B] border border-[#C8A34D]/30 shadow-xl backdrop-blur-xl z-[100] p-2"
             >
               <div className="px-2 py-1 text-[10px] font-semibold tracking-wider text-slate-400 uppercase border-b border-slate-800/80 mb-1">
                 Select Active Role
@@ -82,22 +82,22 @@ export default function ExperienceRoleSelector({ compact = false }) {
                   <button
                     key={r.id}
                     onClick={() => handleSelectRole(r.id)}
-                    className={`w-full flex items-center justify-between p-2 rounded-lg text-left transition-all text-xs ${
-                      isSelected ? 'bg-amber-500/15 text-amber-300 font-semibold' : 'text-slate-300 hover:bg-slate-900/80 hover:text-white'
+                    className={`w-full flex items-center justify-between p-2.5 rounded-xl text-left transition-all text-xs ${
+                      isSelected ? 'bg-[#C8A34D]/15 text-[#C8A34D] font-extrabold border border-[#C8A34D]/30' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <ItemIcon className={`w-4 h-4 ${isSelected ? 'text-amber-400' : 'text-slate-400'}`} />
+                      <ItemIcon className={`w-4 h-4 ${isSelected ? 'text-[#C8A34D]' : 'text-slate-400'}`} />
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span>{r.label}</span>
-                          <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-400 font-mono">
+                          <span className={isSelected ? 'text-[#C8A34D]' : 'text-slate-800 dark:text-white'}>{r.label}</span>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/20 font-mono font-bold">
                             {r.badge}
                           </span>
                         </div>
                       </div>
                     </div>
-                    {isSelected && <Check className="w-3.5 h-3.5 text-amber-400" />}
+                    {isSelected && <Check className="w-3.5 h-3.5 text-[#C8A34D]" />}
                   </button>
                 );
               })}

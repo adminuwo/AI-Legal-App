@@ -52,6 +52,17 @@ const HomeDashboard = lazy(() => import('./pages/HomeDashboard'));
 const SettingsPage = lazy(() => import('./pages/Settings'));
 const HelpSupport = lazy(() => import('./pages/HelpSupport'));
 const AiToolsPage = lazy(() => import('./pages/AiToolsPage'));
+const ProductGuideWorkspace = lazy(() => import('./pages/Workspace/ProductGuideWorkspace'));
+const KnowledgeHubWorkspace = lazy(() => import('./pages/Workspace/KnowledgeHubWorkspace'));
+const DraftMakerWorkspace = lazy(() => import('./pages/DraftMakerWorkspace'));
+const ArgumentBuilderWorkspace = lazy(() => import('./pages/ArgumentBuilderWorkspace'));
+const LegalPrecedentsWorkspace = lazy(() => import('./pages/LegalPrecedentsWorkspace'));
+const EvidenceAnalystWorkspace = lazy(() => import('./pages/EvidenceAnalystWorkspace'));
+const ContractAnalyzerWorkspace = lazy(() => import('./pages/ContractAnalyzerWorkspace'));
+const CasePredictorWorkspace = lazy(() => import('./pages/CasePredictorWorkspace'));
+const StrategyEngineWorkspace = lazy(() => import('./pages/StrategyEngineWorkspace'));
+const MockCourtroomWorkspace = lazy(() => import('./pages/MockCourtroomWorkspace'));
+const ClientConnectWorkspace = lazy(() => import('./pages/ClientConnectWorkspace'));
 
 const isAuthenticated = () => {
   const tokenStr = localStorage.getItem('token');
@@ -235,6 +246,16 @@ const DashboardLayout = () => {
 
   const showOnScroll = useScrollNavbar();
 
+  const mainRef = useRef(null);
+
+  // Scroll main container to top on route change
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   // Sync CSS variable for child pages top-padding
   useEffect(() => {
     // Keep padding constant to prevent layout shifts/flickering. The navbar will slide out of view smoothly via CSS translate, but the content shouldn't abruptly jump up.
@@ -308,7 +329,8 @@ const DashboardLayout = () => {
         <NotificationCenter isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
         {/* Outlet for pages */}
         <main
-          className={`flex-1 ${(location.pathname.includes('/chat') || location.pathname.includes('/case')) ? 'overflow-hidden' : 'overflow-y-auto'} relative w-full scroll-smooth p-0 scrollbar-hide transition-all duration-300 ease-in-out`}
+          ref={mainRef}
+          className={`flex-1 ${(location.pathname.includes('/chat') || (location.pathname.includes('/case') && !location.pathname.includes('case-predictor'))) ? 'overflow-hidden' : 'overflow-y-auto'} relative w-full scroll-smooth p-0 scrollbar-hide transition-all duration-300 ease-in-out`}
           style={{ paddingTop: '0px' }}
         >
           <Suspense fallback={
@@ -483,11 +505,76 @@ const NavigateProvider = () => {
           } />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<SettingsPage />} />
+          <Route path="guide" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Product Guide...</div>}>
+              <ProductGuideWorkspace />
+            </Suspense>
+          } />
+          <Route path="tools/knowledge-hub" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Knowledge Hub...</div>}>
+              <KnowledgeHubWorkspace />
+            </Suspense>
+          } />
+          <Route path="knowledge-hub" element={<Navigate to="/dashboard/tools/knowledge-hub" replace />} />
           <Route path="tools" element={
             <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Tools...</div>}>
               <AiToolsPage />
             </Suspense>
           } />
+          <Route path="tools/draft-maker" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Draft Maker...</div>}>
+              <DraftMakerWorkspace />
+            </Suspense>
+          } />
+          <Route path="draft-maker" element={<Navigate to="/dashboard/tools/draft-maker" replace />} />
+          <Route path="tools/argument-builder" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Argument Builder...</div>}>
+              <ArgumentBuilderWorkspace />
+            </Suspense>
+          } />
+          <Route path="argument-builder" element={<Navigate to="/dashboard/tools/argument-builder" replace />} />
+          <Route path="tools/legal-precedents" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Legal Precedents...</div>}>
+              <LegalPrecedentsWorkspace />
+            </Suspense>
+          } />
+          <Route path="legal-precedents" element={<Navigate to="/dashboard/tools/legal-precedents" replace />} />
+          <Route path="tools/evidence-analyst" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Evidence Analyst...</div>}>
+              <EvidenceAnalystWorkspace />
+            </Suspense>
+          } />
+          <Route path="evidence-analyst" element={<Navigate to="/dashboard/tools/evidence-analyst" replace />} />
+          <Route path="tools/contract-analyzer" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Contract Analyzer...</div>}>
+              <ContractAnalyzerWorkspace />
+            </Suspense>
+          } />
+          <Route path="contract-analyzer" element={<Navigate to="/dashboard/tools/contract-analyzer" replace />} />
+          <Route path="tools/case-predictor" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Case Predictor...</div>}>
+              <CasePredictorWorkspace />
+            </Suspense>
+          } />
+          <Route path="case-predictor" element={<Navigate to="/dashboard/tools/case-predictor" replace />} />
+          <Route path="tools/strategy-engine" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Strategy Engine...</div>}>
+              <StrategyEngineWorkspace />
+            </Suspense>
+          } />
+          <Route path="strategy-engine" element={<Navigate to="/dashboard/tools/strategy-engine" replace />} />
+          <Route path="tools/mock-courtroom" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Mock Courtroom...</div>}>
+              <MockCourtroomWorkspace />
+            </Suspense>
+          } />
+          <Route path="mock-courtroom" element={<Navigate to="/dashboard/tools/mock-courtroom" replace />} />
+          <Route path="tools/client-connect" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Client Connect...</div>}>
+              <ClientConnectWorkspace />
+            </Suspense>
+          } />
+          <Route path="client-connect" element={<Navigate to="/dashboard/tools/client-connect" replace />} />
           <Route path="knowledge-vault" element={<PlaceholderPage title="Knowledge Vault" />} />
           <Route path="court-diary" element={<PlaceholderPage title="Court Diary" />} />
           <Route path="templates" element={<PlaceholderPage title="Templates" />} />

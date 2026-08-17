@@ -952,9 +952,9 @@ const AdminDashboard = () => {
               <option value="student_basic">Student Basic (₹499/mo)</option>
               <option value="student_pro">Student Pro (₹999/mo)</option>
               <option value="student_premium">Student Premium (₹2,399/mo)</option>
-              <option value="firm_basic">Firm Basic (₹499/mo)</option>
-              <option value="firm_pro">Firm Pro (₹999/mo)</option>
-              <option value="firm_premium">Firm Premium (₹2,399/mo)</option>
+              <option value="firm_basic">Firm Basic (₹1,499/mo)</option>
+              <option value="firm_pro">Firm Pro (₹2,999/mo)</option>
+              <option value="firm_premium">Firm Premium (₹4,999/mo)</option>
               <option value="combo_student_advocate">Combo: Student + Advocate (₹1,199/mo)</option>
               <option value="combo_advocate_firm">Combo: Advocate + Firm (₹1,499/mo)</option>
               <option value="combo_all_access">Combo: All Access Pass (₹2,399/mo)</option>

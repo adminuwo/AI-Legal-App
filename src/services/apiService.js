@@ -1569,6 +1569,57 @@ export const apiService = {
       console.error('[Frontend] autoAnalyzeCase failed:', error?.response?.data || error.message);
       throw error;
     }
+  },
+
+  async postClientConnectDraft(projectId, payload) {
+    try {
+      const response = await apiClient.post(`/projects/${projectId}/client-connect/draft`, payload);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to generate client connect draft:', error);
+      throw error;
+    }
+  },
+
+  async postClientConnectLog(projectId, payload) {
+    try {
+      const response = await apiClient.post(`/projects/${projectId}/client-connect/log`, payload);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to log client connect communication:', error);
+      throw error;
+    }
+  },
+
+  async deleteClientConnectLog(projectId, logId) {
+    try {
+      const endpoint = logId ? `/projects/${projectId}/client-connect/logs/${logId}` : `/projects/${projectId}/client-connect/logs`;
+      const response = await apiClient.delete(endpoint);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to delete client connect log:', error);
+      throw error;
+    }
+  },
+
+  async triggerPersonalAnalysis(caseId) {
+    try {
+      const response = await apiClient.post(`/projects/${caseId}/personal-analysis-trigger`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to trigger personal case analysis:', error);
+      throw error;
+    }
+  },
+
+  async getPersonalAnalysisLatest(caseId) {
+    try {
+      const response = await apiClient.get(`/projects/${caseId}/personal-analysis-latest`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch latest personal case analysis:', error);
+      throw error;
+    }
   }
 };
 

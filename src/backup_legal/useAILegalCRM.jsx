@@ -470,7 +470,7 @@ export const useAILegalCRM = ({
         return;
       }
 
-      const isValidObjectId = /^[a-f\d]{24}$/i.test(currentProjectId);
+      const isValidObjectId = Boolean(currentProjectId && typeof currentProjectId === 'string' && currentProjectId.trim().length > 0 && currentProjectId !== 'null' && currentProjectId !== 'undefined' && currentProjectId !== 'default' && currentProjectId !== 'new' && currentProjectId !== 'all');
       if (!isValidObjectId) {
         console.warn(`[Case] Invalid project ID format, clearing: ${currentProjectId}`);
         if (currentProjectId !== null) setCurrentProjectId(null);

@@ -121,12 +121,19 @@ const LANGUAGES = [
   'Tamil', 'Bengali', 'Assamese', 'Kannada', 'Malayalam', 'Punjabi', 'Urdu', 'Odia'
 ];
 
+import { useNavigate } from 'react-router-dom';
+
 export default function LegalDraftMakerModal({ isOpen, onClose }) {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATES[0]);
-  const [favorites, setFavorites] = useState([]);
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (isOpen) {
+      navigate('/dashboard/tools/draft-maker');
+      if (onClose) onClose();
+    }
+  }, [isOpen, navigate, onClose]);
+
+  if (!isOpen) return null;
   
   // Step 2: Auto Extraction
   const [uploadedFiles, setUploadedFiles] = useState([]);
