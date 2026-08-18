@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, Fragment, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Send, SendHorizontal, Bot, User, Sparkles, Plus, Monitor, ChevronDown, History, Paperclip, X, AlertCircle, FileText, FileCheck, Binary, Library, Image as ImageIcon, Cloud, HardDrive, Edit2, Download, Mic, Wand2, Eye, FileSpreadsheet, Presentation, File as FileIcon, MoreVertical, Trash2, Check, Camera, Video, Copy, ThumbsUp, ThumbsDown, Share, Search, Undo2, Menu as MenuIcon, Volume2, Pause, Headphones, MessageCircle, ExternalLink, ZoomIn, ZoomOut, RotateCcw, Minus, Code, Globe, Sliders, PlayCircle, Brain, ImagePlus, PlaySquare, RefreshCcw, TrendingUp, Zap, Gavel, Navigation, Rocket, Megaphone, Scale, ArrowLeft, ChevronRight, Briefcase, Calendar, Users, FolderOpen, Save, Sun, Moon, LayoutDashboard, Maximize2, Minimize2, ArrowDown } from 'lucide-react';
+import { Send, SendHorizontal, Bot, User, Sparkles, Plus, Monitor, ChevronDown, History, Paperclip, X, AlertCircle, FileText, FileCheck, Binary, Library, Image as ImageIcon, Cloud, HardDrive, Edit2, Download, Mic, Wand2, Eye, FileSpreadsheet, Presentation, File as FileIcon, MoreVertical, Trash2, Check, Camera, Video, Copy, ThumbsUp, ThumbsDown, Share, Search, Undo2, Menu as MenuIcon, Volume2, Pause, Headphones, MessageCircle, ExternalLink, ZoomIn, ZoomOut, RotateCcw, Minus, Code, Globe, Sliders, PlayCircle, Brain, ImagePlus, PlaySquare, RefreshCcw, TrendingUp, Zap, Gavel, Navigation, Rocket, Megaphone, Scale, ArrowLeft, ChevronRight, Briefcase, Calendar, Users, FolderOpen, Save, Sun, Moon, LayoutDashboard, Maximize2, Minimize2, ArrowDown, GraduationCap } from 'lucide-react';
 import LegalLogo from '../../Tools/AI_Legal/components/LegalLogo';
 import { logo } from '../../constants';
 import { renderAsync } from 'docx-preview';
@@ -10,7 +10,7 @@ import { Menu, Transition, Dialog, Listbox, Portal } from '@headlessui/react';
 import { generateChatResponse, generateFollowUpPrompts } from '../../services/geminiService';
 import { chatStorageService } from '../../services/chatStorageService';
 import { useLanguage } from '../../context/LanguageContext';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -33,7 +33,7 @@ import { toCanvas } from 'html-to-image';
 import html2canvas from 'html2canvas-pro';
 import { detectMode, getModeName, getModeIcon, getModeColor, MODES } from '../../utils/modeDetection';
 import { copyText } from '../../utils/clipboard';
-import { userData, getUserData, clearUser, sessionsData, toggleState, memoryData, activeProjectIdData, activeModeData, activeLegalToolData, activeProjectsData, legalViewData } from '../../userStore/userData';
+import { userData, getUserData, clearUser, sessionsData, toggleState, memoryData, activeProjectIdData, activeModeData, activeLegalToolData, activeProjectsData, legalViewData, selectedRoleState } from '../../userStore/userData';
 import { usePersonalization } from '../../context/PersonalizationContext';
 import OnboardingModal from '../../Components/OnboardingModal';
 import PremiumUpsellModal from '../../Components/PremiumUpsellModal';
@@ -464,7 +464,7 @@ const getSessionLock = (chatId) => {
 let isGlobalSending = false;
 let lastMessageSentTime = 0;
 
-const getToolDetails = (toolId) => {
+const getToolDetails = (toolId, selectedRole = 'advocate') => {
   const tools = {
     legal_draft_maker: {
       title: "Draft Maker",
@@ -523,6 +523,26 @@ const getToolDetails = (toolId) => {
       placeholder: "Ask any legal research question..."
     }
   };
+
+  if (!tools[toolId] && ((localStorage.getItem('user_selected_role') || selectedRole) === 'law_firm')) {
+    return {
+      title: "AI Firm™ Assistant",
+      emoji: "🏛️",
+      icon: Scale,
+      desc: "Your AI-powered enterprise firm assistant for research, drafting, team collaboration, and case intelligence.",
+      placeholder: "Ask anything about your firm legal matter..."
+    };
+  }
+
+  if (!tools[toolId] && selectedRole === 'student') {
+    return {
+      title: "AI Legal™ Tutor",
+      emoji: "🎓",
+      icon: GraduationCap,
+      desc: "Your AI-powered legal learning companion for concepts, judgments, bare acts, exams, and legal research.",
+      placeholder: "Ask your AI Legal Tutor anything about law, exams or case laws..."
+    };
+  }
 
   return tools[toolId] || {
     title: "AI Legal™ Assistant",
@@ -1058,6 +1078,22 @@ const LegalWorkspace = () => {
   const [currentCaseSessionId, setCurrentCaseSessionId] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const selectedRole = useRecoilValue(selectedRoleState) || 'advocate';
+
+  // Role Isolation Effect — Refetch cases and reset chat state when user switches roles
+  useEffect(() => {
+    console.log(`[Role Isolation] Active role changed to: ${selectedRole}. Resetting workspace & chat context...`);
+    setCurrentCase(null);
+    setMessages([]);
+    localStorage.removeItem('aisa_current_case');
+    localStorage.removeItem('aisa_active_project_id');
+    apiService.getProjects().then(projs => {
+      if (Array.isArray(projs)) {
+        setAllProjects(projs);
+        setProjects(projs);
+      }
+    }).catch(err => console.warn("Failed to refetch projects on role change:", err));
+  }, [selectedRole]);
   const querySessionId = new URLSearchParams(location.search).get('sessionId');
   const sessionId = routeSessionId || querySessionId || currentCaseSessionId;
   const rawCaseId = caseId || new URLSearchParams(location.search).get('caseId');
@@ -1573,11 +1609,25 @@ const LegalWorkspace = () => {
       if (lastProcessedCaseIdRef.current !== caseIdInUrl) {
         lastProcessedCaseIdRef.current = caseIdInUrl;
 
-        // 1. Sync Project ID
+        // 1. Sync Project ID & Case Object
         if (currentProjectId !== caseIdInUrl) {
           console.log(`[DeepLink] Case ID detected: ${caseIdInUrl}`);
           setCurrentProjectId(caseIdInUrl);
           localStorage.setItem('aisa_active_project_id', caseIdInUrl);
+        }
+        if (!currentCase || (currentCase._id !== caseIdInUrl && currentCase.id !== caseIdInUrl)) {
+          const found = (allProjects || []).find(p => p._id === caseIdInUrl || p.id === caseIdInUrl);
+          if (found) {
+            setCurrentCase(found);
+          } else {
+            apiService.getProjects().then(projs => {
+              if (Array.isArray(projs)) {
+                setAllProjects(projs);
+                const p = projs.find(x => x._id === caseIdInUrl || x.id === caseIdInUrl);
+                if (p) setCurrentCase(p);
+              }
+            }).catch(err => console.warn("Failed to sync deep link case:", err));
+          }
         }
 
         // 2. Hydrate Workspace Metadata (Tools/Views)
@@ -1670,6 +1720,31 @@ const LegalWorkspace = () => {
     }
   }, [location.state, location.pathname, location.search, navigate, setCurrentProjectId, setCurrentMode, setSelectedLegalTool, setMessages, setLegalView, setActiveTool, setActiveLegalToolkit, setCurrentCase]);
 
+  // Auto-send prompt if `prompt` and `autoSend=true` query parameters are present in URL
+  const processedPromptRef = useRef(null);
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const urlPrompt = searchParams.get('prompt');
+    const autoSend = searchParams.get('autoSend');
+
+    if (urlPrompt && (autoSend === 'true' || autoSend === '1') && processedPromptRef.current !== urlPrompt) {
+      processedPromptRef.current = urlPrompt;
+
+      // Clean up URL query parameters so refreshing doesn't re-trigger
+      searchParams.delete('prompt');
+      searchParams.delete('autoSend');
+      const newQueryStr = searchParams.toString() ? `?${searchParams.toString()}` : '';
+      navigate(`${location.pathname}${newQueryStr}`, { replace: true });
+
+      // Automatically trigger handleSendMessage after mounting
+      setTimeout(() => {
+        if (handleSendMessageRef.current) {
+          handleSendMessageRef.current(null, urlPrompt);
+        }
+      }, 150);
+    }
+  }, [location.search, location.pathname, navigate]);
+
 
   const [intentSuggestion, setIntentSuggestion] = useState(null);
   const [isIntentLoading, setIsIntentLoading] = useState(false);
@@ -1748,21 +1823,32 @@ const LegalWorkspace = () => {
     } catch (e) { }
   };
 
-  // Generate randomized & prioritized suggestions based on the active tool
+  // Generate randomized & prioritized suggestions based on the active tool and workspace role
   const generateSuggestions = () => {
+    const activeRole = localStorage.getItem('user_selected_role') || selectedRole || 'advocate';
     const activeToolId = selectedLegalTool?.id || new URLSearchParams(window.location.search).get('tool');
 
-    // If it's general AI Legal Assistant (no tool or unknown tool), use general quick actions
+    // If it's general AI Legal Assistant or AI Legal Tutor (no tool or unknown tool), use role-scoped quick actions
     const isGeneralCopilot = !activeToolId || !['legal_draft_maker', 'legal_research', 'legal_contract_analyzer', 'legal_evidence_checker', 'legal_argument_builder', 'legal_case_predictor', 'legal_strategy_engine', 'legal_research_assistant'].includes(activeToolId);
 
     if (isGeneralCopilot) {
-      const generalRemaining = [
-        { label: "📝 Draft Notice", prompt: "Draft a legal notice." },
-        { label: "🔍 Research Law", prompt: "Research the relevant law and acts." },
-        { label: "📄 Analyze Contract", prompt: "Analyze this contract for risks." },
-        { label: "⚖️ Explain IPC/BNS", prompt: "Explain the relevant IPC/BNS sections." },
-        { label: "📚 Find Case Law", prompt: "Find relevant Supreme Court case laws and precedents." },
-        { label: "🧠 Summarize Case", prompt: "Summarize the current legal case." }
+      const isStudentRole = activeRole === 'student' || selectedRole === 'student' || location.pathname.includes('/tutor');
+      const generalRemaining = isStudentRole ? [
+        { label: "📖 Article 21 Rights & Cases", prompt: "Explain Article 21 of Indian Constitution simply with key landmark cases." },
+        { label: "⚖️ IPC 300 vs Culpable Homicide", prompt: "Explain Section 300 IPC vs Culpable Homicide with clear examples." },
+        { label: "📚 Kesavananda Bharati Ratio", prompt: "Summarize Kesavananda Bharati case law ratio decidendi in IRAC format." },
+        { label: "🎯 Judiciary Exam MCQs", prompt: "Generate 5 practice MCQs on Constitutional Law & Fundamental Rights." },
+        { label: "🎓 Moot Court Memorial Draft", prompt: "Help me structure a Moot Court Memorial Argument for Appellant." },
+        { label: "✍️ Indian Contract Act Sec 10", prompt: "Explain Section 10 of Indian Contract Act 1872 valid contract elements." }
+      ] : [
+        { label: "📑 Draft Sec 483 BNSS Bail", prompt: "Draft a formal bail application under Section 483 BNSS (CrPC 439) with grounds." },
+        { label: "⚖️ Sec 138 NI Act Precedents", prompt: "Search latest Supreme Court precedents on Section 138 Negotiable Instruments Act." },
+        { label: "📝 Draft Legal Notice", prompt: "Draft a formal legal notice for breach of contract with damages claim." },
+        { label: "🛡️ Cross-Examination Strategy", prompt: "Generate cross-examination questions for witness in court." },
+        { label: "📄 Property Partition Suit Plaint", prompt: "Draft a suit for partition of ancestral property under Hindu Succession Act." },
+        { label: "💼 Draft NDA Agreement", prompt: "Draft a standard Non-Disclosure Agreement (NDA) under Indian law." },
+        { label: "🔍 Contract Risk Analysis", prompt: "Analyze contract clauses for hidden legal risks and liabilities." },
+        { label: "🧾 Consumer Court Complaint", prompt: "Draft a consumer court complaint for deficiency of service." }
       ];
 
       const sortedTemplates = [...generalRemaining].sort((a, b) => {
@@ -1791,14 +1877,12 @@ const LegalWorkspace = () => {
     return sortedToolPrompts;
   };
 
-  // Regeneration trigger on session or project/cases/tool change
+  // Regeneration trigger on session, role, path, or tool change
   const serializedCases = (legalCases || []).map(c => `${c._id || c.id}-${c.name}-${c.updatedAt}`).join(',');
   useEffect(() => {
-    if (activeSessionId === 'new') {
-      setIsSuggestionsExpanded(false);
-      setQuickSuggestions(generateSuggestions());
-    }
-  }, [activeSessionId, selectedLegalTool, serializedCases]);
+    setIsSuggestionsExpanded(false);
+    setQuickSuggestions(generateSuggestions());
+  }, [activeSessionId, selectedRole, selectedLegalTool, serializedCases, location.pathname]);
 
   const handleSurpriseMeClick = () => {
     let availablePrompts = SURPRISE_ME_PROMPTS.filter(p => !recentSurpriseMe.includes(p));
@@ -4175,7 +4259,7 @@ const LegalWorkspace = () => {
 
       try {
         if (sessionId && sessionId !== 'new') {
-          if (lastLoadedSessionRef.current && lastLoadedSessionRef.current !== sessionId) {
+          if (lastLoadedSessionRef.current && lastLoadedSessionRef.current !== sessionId && lastLoadedSessionRef.current !== 'new') {
             setMessages([]);
           }
 
@@ -4888,6 +4972,12 @@ const LegalWorkspace = () => {
           // Transition global generation state from 'new' to real ID
           useGenerationStore.getState().transitionChatId('new', activeSessionId);
 
+          if (activeCaseId) {
+            setCurrentCaseSessionId(activeSessionId);
+            const searchParams = new URLSearchParams(location.search);
+            searchParams.set('sessionId', activeSessionId);
+            navigate(`/dashboard/cases/${activeCaseId}?${searchParams.toString()}`, { replace: true });
+          }
 
           isFirstMessage = true;
           isNavigatingRef.current = activeSessionId; // Store the ID we are navigating TO
@@ -4932,6 +5022,7 @@ const LegalWorkspace = () => {
             timestamp: new Date(),
             mode: 'LEGAL_TOOLKIT',
             activeTool: activeToolId,
+            conversationType: (selectedRole === 'student' && !activeCaseId) ? 'student_tutor' : undefined,
             attachments: filePreviews.map(fp => ({
               url: fp.url,
               name: fp.name,
@@ -4953,15 +5044,18 @@ const LegalWorkspace = () => {
 
           // 1. First, add an optimistic entry to the sidebar so it shows up IMMEDIATELY
           if (isFirstMessage) {
+            const isStudentRole = selectedRole === 'student';
             const optimisticSession = {
               sessionId: activeSessionId,
               title: "New Chat",
               lastModified: Date.now(),
-              activeTool: activeToolId,
-              detectedMode: MODES.LEGAL_TOOLKIT,
+              activeTool: isStudentRole ? 'legal_tutor' : activeToolId,
+              detectedMode: isStudentRole ? 'STUDENT_TUTOR' : MODES.LEGAL_TOOLKIT,
+              conversationType: isStudentRole ? 'student_tutor' : 'global',
+              assistantType: isStudentRole ? 'legal_tutor' : 'legal_assistant',
               projectId: currentProjectId
             };
-            setSessions(prev => [optimisticSession, ...prev]);
+            setSessions(prev => [optimisticSession, ...(Array.isArray(prev) ? prev : [])]);
           }
 
           const effectiveProjectId = activeCaseId || (currentProjectId !== 'default' && currentProjectId !== 'all' ? currentProjectId : null);
@@ -5271,6 +5365,7 @@ const LegalWorkspace = () => {
         content: displayContent || (filePreviews.length > 0 ? (isDocumentConvert ? "Convert this document" : "Analyze these files") : ""),
         timestamp: Date.now(),
         projectId: currentProjectId,
+        conversationType: (selectedRole === 'student' && !currentProjectId) ? 'student_tutor' : undefined,
         attachments: filePreviews.map(p => ({
           url: p.url,
           name: p.name,
@@ -5446,6 +5541,14 @@ const LegalWorkspace = () => {
 
         const SYSTEM_INSTRUCTION = `
 You are AI LEGAL™, the official AI assistant of the AI LEGAL™ platform. Powered by A-Series.
+${selectedRole === 'student' ? `
+### STUDENT ROLE MODE (AI LEGAL™ TUTOR):
+- You are acting as AI LEGAL™ TUTOR.
+- Be an encouraging, expert, and engaging AI Legal Learning Companion for law students, judiciary aspirants, and moot court competitors.
+- Explain statutory provisions (IPC, BNS, CrPC, BNSS, BSA, Constitution) in simple, easy-to-understand language.
+- Structure case law summaries in concise IRAC format (Issue, Rule, Application, Conclusion).
+- When student asks short follow-up questions like "example?", "exam me kaise puch skte hai?", "mcq do", build seamlessly on the previous turn's context.
+` : ''}
 ${activeAgent.category ? `Your specialization is in ${activeAgent.category}.` : ''}
 
 ${currentCase ? `
@@ -7006,7 +7109,7 @@ ${documentConvertActive ? `### DOCUMENT CONVERSION MODE ENABLED (CRITICAL):
       setEditorMessage(msg);
       setEditorContent(msg.content || msg.text || "");
       const activeToolId = selectedLegalTool?.id || new URLSearchParams(window.location.search).get('tool');
-      const details = getToolDetails(activeToolId);
+      const details = getToolDetails(activeToolId, selectedRole);
       const currentSession = sessions.find(s => s.sessionId === sessionId);
       setEditorTitle(currentSession?.title || details.title || "Legal Draft");
       setIsDraftEditorOpen(true);
@@ -8827,7 +8930,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                 }}
                 placeholder={isLimitReached ? t('limitReached') || "Chat limit reached. Sign in to continue." : (window.innerWidth < 768 ? "Ask anything..." : (() => {
                   const activeToolId = selectedLegalTool?.id || new URLSearchParams(window.location.search).get('tool');
-                  const details = getToolDetails(activeToolId);
+                  const details = getToolDetails(activeToolId, selectedRole);
                   return details.placeholder || typedPlaceholder;
                 })())}
                 rows={1}
@@ -10190,10 +10293,21 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
 
 
                                   {/* Integrated Smart Suggestions (Only for the latest AI response) */}
-                                  {idx === messages.length - 1 && (msg.role === 'model' || msg.role === 'assistant') &&
-                                    suggestions.length > 0 && !isLoading && !typingMessageId && (
+                                  {idx === messages.length - 1 && (msg.role === 'model' || msg.role === 'assistant') && !isLoading && !typingMessageId && (() => {
+                                    const activeSuggestions = (msg.suggestions && Array.isArray(msg.suggestions) && msg.suggestions.length > 0)
+                                      ? msg.suggestions
+                                      : ((suggestions && Array.isArray(suggestions) && suggestions.length > 0)
+                                        ? suggestions
+                                        : [
+                                          "⚖️ Explain IPC & BNS Sections",
+                                          "📝 Draft Legal Notice",
+                                          "📚 Supreme Court Precedents",
+                                          "🔍 Cross-Examination Questions"
+                                        ]);
+
+                                    return (
                                       <div className="flex flex-wrap gap-2 mt-4 animate-in fade-in duration-300 select-none">
-                                        {suggestions.map((item, index) => {
+                                        {activeSuggestions.map((item, index) => {
                                           const cleanItem = String(item || '')
                                             .replace(/^[.\-*•\d\s]+/, '')
                                             .replace(/\*\*/g, '')
@@ -10209,15 +10323,16 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                               key={index}
                                               type="button"
                                               onClick={() => handleSuggestionClick(cleanItem)}
-                                              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-zinc-800/90 text-slate-700 dark:text-zinc-200 hover:text-[#C8A34D] dark:hover:text-[#C8A34D] hover:bg-[#C8A34D]/10 dark:hover:bg-[#C8A34D]/20 border border-slate-200/80 dark:border-zinc-700/60 hover:border-[#C8A34D]/40 transition-all shadow-2xs cursor-pointer text-left flex items-center gap-1.5"
+                                              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-zinc-800/90 text-slate-700 dark:text-zinc-200 hover:text-[#C8A34D] dark:hover:text-[#C8A34D] hover:bg-[#C8A34D]/10 dark:hover:bg-[#C8A34D]/20 border border-slate-200/80 dark:border-zinc-700/60 hover:border-[#C8A34D]/40 transition-all shadow-2xs cursor-pointer text-left flex items-center gap-2 group/chip"
                                             >
-                                              <span className="text-[#C8A34D] font-bold">💡</span>
+                                              <span className="text-[#C8A34D] font-bold group-hover/chip:scale-110 transition-transform">💡</span>
                                               <span>{cleanItem}</span>
                                             </button>
                                           );
                                         })}
                                       </div>
-                                    )}
+                                    );
+                                  })()}
 
 
                                 </div>
@@ -10243,7 +10358,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
 
                     {messages.length === 0 && !isSessionLoading && !isHydrating && (() => {
                       const activeToolId = selectedLegalTool?.id || new URLSearchParams(window.location.search).get('tool');
-                      const details = getToolDetails(activeToolId);
+                      const details = getToolDetails(activeToolId, selectedRole);
                       const IconComponent = details.icon;
                       const isGeneralCopilot = !activeToolId || !['legal_draft_maker', 'legal_research', 'legal_contract_analyzer', 'legal_evidence_checker', 'legal_argument_builder', 'legal_case_predictor', 'legal_strategy_engine', 'legal_research_assistant'].includes(activeToolId);
 
@@ -10274,13 +10389,21 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                           >
                             {/* Hero Section */}
                             <div className="flex flex-col items-center space-y-4">
-                              <motion.div
-                                whileHover={{ scale: 1.05, rotate: 2 }}
-                                className="w-16 h-16 bg-[#C8A34D]/10 rounded-2xl flex items-center justify-center border border-[#C8A34D]/30 shadow-sm relative overflow-hidden"
-                              >
-                                <div className="absolute inset-0 bg-[#C8A34D]/5 backdrop-blur-xs" />
-                                <IconComponent className="w-8 h-8 text-[#C8A34D] relative z-10" strokeWidth={2.2} />
-                              </motion.div>
+                              {isGeneralCopilot ? (
+                                <motion.div
+                                  whileHover={{ scale: 1.05 }}
+                                  className="flex items-center justify-center -mb-2"
+                                >
+                                  <img src="/logo/logo_transparent.png" className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-sm" alt="AI Legal Logo" />
+                                </motion.div>
+                              ) : (
+                                <motion.div
+                                  whileHover={{ scale: 1.05, rotate: 2 }}
+                                  className="w-16 h-16 bg-white dark:bg-zinc-800 rounded-2xl flex items-center justify-center border border-slate-200/90 dark:border-zinc-700 shadow-sm relative overflow-hidden p-2"
+                                >
+                                  <IconComponent className="w-10 h-10 text-[#C8A34D] relative z-10" strokeWidth={2.2} />
+                                </motion.div>
+                              )}
 
                               <div className="text-center space-y-2 select-text">
                                 <div className="flex items-center justify-center gap-3">
@@ -10402,7 +10525,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                 !(legalView === 'DASHBOARD' && currentMode === 'LEGAL_TOOLKIT' && selectedLegalTool?.id === 'legal_my_case') &&
                 (() => {
                   const activeToolId = selectedLegalTool?.id || new URLSearchParams(window.location.search).get('tool');
-                  const details = getToolDetails(activeToolId);
+                  const details = getToolDetails(activeToolId, selectedRole);
                   return (
                     <div className="w-full border-b border-slate-200/60 dark:border-zinc-800/60 bg-white dark:bg-[#0d0e16] shrink-0 select-none z-30 shadow-2xs">
                       <div className="flex items-center justify-between px-4 sm:px-6 py-3 w-full gap-3">
@@ -11372,6 +11495,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
         currentSessionId={activeSessionId}
         onSelectSession={handleSelectSession}
         activeCaseId={activeCaseId}
+        scope={activeCaseId ? 'case' : 'global'}
+        caseName={currentCase?.name || ''}
       />
     </div>
 

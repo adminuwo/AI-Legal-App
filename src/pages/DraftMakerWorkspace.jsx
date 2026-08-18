@@ -15,6 +15,7 @@ import { apiService } from '../services/apiService';
 import { API } from '../types';
 
 import { CATEGORIES, ALL_91_TEMPLATES, getFieldsForTemplate } from '../constants/templatesData';
+import { useSubscription } from '../context/SubscriptionContext';
 
 const LANGUAGES = [
   'English', 'Hindi', 'Marathi', 'Gujarati', 'Telugu', 
@@ -23,6 +24,7 @@ const LANGUAGES = [
 
 export default function DraftMakerWorkspace() {
   const navigate = useNavigate();
+  const { refreshSubscription } = useSubscription();
   
   // Step Management
   const [currentStep, setCurrentStep] = useState(1); // 1: Template, 2: Source, 3: Review, 4: Draft Workspace
@@ -290,6 +292,7 @@ export default function DraftMakerWorkspace() {
       toast.success('Legal draft generated successfully!');
     } finally {
       setIsGenerating(false);
+      refreshSubscription();
     }
   };
 

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
+import { useSubscription } from '../context/SubscriptionContext';
 
 const CONTRACT_CATEGORIES = [
   'Non-Disclosure Agreement (NDA)',
@@ -22,6 +23,7 @@ const CONTRACT_CATEGORIES = [
 
 export default function ContractAnalyzerWorkspace() {
   const navigate = useNavigate();
+  const { refreshSubscription } = useSubscription();
 
   // Navigation / Workflow Steps: 'UPLOAD' | 'SCAN' | 'DASHBOARD'
   const [step, setStep] = useState('UPLOAD');
@@ -261,6 +263,7 @@ export default function ContractAnalyzerWorkspace() {
         setAnalysisResult(resultData);
         setStep('DASHBOARD');
         toast.success('Contract risk audit complete!');
+        refreshSubscription();
       }
     }, 450);
   };

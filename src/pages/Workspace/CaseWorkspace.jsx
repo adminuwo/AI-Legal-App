@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { apiService } from '../../services/apiService';
+import ClientConnectWorkspace from '../ClientConnectWorkspace';
 
 export const CaseWorkspace = ({
   caseId,
@@ -9066,56 +9067,7 @@ Through Counsel
   };
 
   const renderClientConnect = () => {
-    return (
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-[#C8A34D]/15 text-[#C8A34D] rounded-xl border border-[#C8A34D]/30">
-              <MessageSquare size={20} />
-            </div>
-            <div>
-              <h3 className="text-sm font-black text-[#0F172A] dark:text-white uppercase tracking-widest">AI Client Connect Portal</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Generate client case updates, WhatsApp briefs, & manage client consultation notes.</p>
-            </div>
-          </div>
-          <button 
-            onClick={() => {
-              const msg = `Respected ${caseData.clientName || 'Client'},\nHere is the latest status update for your case "${caseData.name}":\n• Presiding Forum: ${caseData.courtName || 'District Court'}\n• Next Hearing: ${caseData.hearings?.[0]?.date || 'To be scheduled'}\n• Case Progress: ${taskProgress}%\nFor further details, please reach out to your advocate office.`;
-              navigator.clipboard.writeText(msg);
-              toast.success("AI Client WhatsApp Update copied to clipboard!");
-            }}
-            className="px-4 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-xs uppercase tracking-wider shadow-xs transition-all cursor-pointer shrink-0"
-          >
-            Generate Client Brief
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-            <h4 className="text-xs font-black text-[#0F172A] dark:text-white uppercase tracking-widest">Client Profile Information</h4>
-            <div className="space-y-2 text-xs text-slate-600 dark:text-slate-300 font-semibold">
-              <p className="flex justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
-                <span>Client Name:</span> <strong className="text-[#0F172A] dark:text-white">{caseData.clientName || 'Private Client'}</strong>
-              </p>
-              <p className="flex justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
-                <span>Contact Phone:</span> <strong className="text-[#0F172A] dark:text-white">{caseData.clientPhone || '+91 98765 43210'}</strong>
-              </p>
-              <p className="flex justify-between py-1.5 border-b border-slate-100 dark:border-slate-800">
-                <span>Email Address:</span> <strong className="text-[#0F172A] dark:text-white">{caseData.clientEmail || 'client@ailegal.in'}</strong>
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-            <h4 className="text-xs font-black text-[#0F172A] dark:text-white uppercase tracking-widest">Automated Client Communication Logs</h4>
-            <div className="p-4 bg-slate-50/50 dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 rounded-xl space-y-2 text-xs font-medium">
-              <span className="text-[10px] font-black text-[#C8A34D] uppercase">Latest Automated Digest</span>
-              <p className="text-slate-600 dark:text-slate-300">Case docket synchronized. Hearing reminders and evidence index verified for client review.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return <ClientConnectWorkspace initialCaseData={caseData} />;
   };
 
   const renderCourtOrders = () => {

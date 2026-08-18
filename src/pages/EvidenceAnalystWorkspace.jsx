@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
+import { useSubscription } from '../context/SubscriptionContext';
 
 const PRIMARY_SOURCES = [
   { id: 'camera', label: 'Camera', desc: 'Capture live exhibit or physical proof', icon: Camera, category: 'capture' },
@@ -28,6 +29,7 @@ const TEXT_SOURCES = [
 
 export default function EvidenceAnalystWorkspace() {
   const navigate = useNavigate();
+  const { refreshSubscription } = useSubscription();
   // Navigation & Flow Steps: 'SELECT_SOURCE' | 'COLLECT' | 'SCAN' | 'DASHBOARD'
   const [step, setStep] = useState('SELECT_SOURCE');
   const [selectedSource, setSelectedSource] = useState('gallery');
@@ -273,6 +275,7 @@ export default function EvidenceAnalystWorkspace() {
         setTimeout(() => {
           setStep('DASHBOARD');
           toast.success('6-Stage Forensic Analysis Complete!');
+          refreshSubscription();
         }, 500);
       } else {
         setCurrentScanStage(Math.floor((progress / 100) * 6));

@@ -95,7 +95,7 @@ const slides = [
   }
 ];
 
-export default function Onboarding() {
+export default function OnboardingPage() {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [visibleCount, setVisibleCount] = useState(0);
@@ -205,7 +205,7 @@ export default function Onboarding() {
     stopAudio();
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     localStorage.setItem('ai_legal_onboarding_completed', 'true');
-    navigate(targetRoute, { replace: true });
+    navigate(targetRoute);
   };
 
   const handleNext = () => {

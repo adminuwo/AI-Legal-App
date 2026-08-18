@@ -16,11 +16,14 @@ import toast from 'react-hot-toast';
 import ExperienceRoleSelector from '../Components/ExperienceRoleSelector';
 import StudentDashboardSection from '../Components/StudentDashboardSection';
 import LawFirmDashboardSection from '../Components/LawFirmDashboardSection';
+import LawFirmOnboardingView from '../Components/LawFirmOnboardingView';
 import CreateCaseWizardModal from '../Tools/AI_Legal/components/CreateCaseWizardModal';
 import NotificationCenter from '../Components/NotificationBar/NotificationCenter';
+import { useSubscription } from '../context/SubscriptionContext';
 
 export default function HomeDashboard() {
   const navigate = useNavigate();
+  const { cases: subCases, storage, features, badge, planDisplayName, triggerUpgradeModal } = useSubscription();
   const currentUser = useRecoilValue(userData);
   const selectedRole = useRecoilValue(selectedRoleState) || 'advocate';
   const userName = currentUser?.user?.name || "Advocate";
@@ -29,9 +32,34 @@ export default function HomeDashboard() {
   const [cases, setCases] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [pendingInvite, setPendingInvite] = useState(null);
+  const [firmWorkspaces, setFirmWorkspaces] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState(null);
+
+  const fetchWorkspaces = async () => {
+    try {
+      const res = await apiService.request('/workspaces');
+      if (res && res.success && Array.isArray(res.workspaces)) {
+        const firms = res.workspaces.filter(w => w.type === 'law_firm');
+        setFirmWorkspaces(firms);
+        if (firms.length > 0) {
+          const activeWsId = localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID');
+          if (!activeWsId || !firms.find(f => (f._id || f.id) === activeWsId)) {
+            localStorage.setItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID', firms[0]._id || firms[0].id);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[HomeDashboard] Failed to fetch workspaces:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedRole === 'law_firm') {
+      fetchWorkspaces();
+    }
+  }, [selectedRole]);
 
   // Modal States
   const [isNewCaseModalOpen, setIsNewCaseModalOpen] = useState(false);
@@ -446,6 +474,22 @@ export default function HomeDashboard() {
     </div>
   );
 
+  if (selectedRole === 'student') {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] p-4 sm:p-6 lg:p-8 w-full max-w-7xl mx-auto text-[#111827] dark:text-white font-sans transition-colors">
+        <StudentDashboardSection user={currentUser?.user} />
+      </div>
+    );
+  }
+
+  if (selectedRole === 'law_firm') {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] p-4 sm:p-6 lg:p-8 w-full max-w-7xl mx-auto text-[#111827] dark:text-white font-sans transition-colors">
+        <LawFirmDashboardSection user={currentUser?.user} cases={cases} workspaces={firmWorkspaces} onRefresh={fetchWorkspaces} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] p-4 sm:p-6 lg:p-8 w-full max-w-7xl mx-auto text-[#111827] dark:text-white font-sans transition-colors">
       
@@ -587,6 +631,48 @@ export default function HomeDashboard() {
                   </div>
                 </div>
               )}
+
+              {/* Subscription Entitlements & Usage Summary */}
+              <div className="p-5 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] shadow-xs space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Subscription & Workspace Quotas</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30">{badge}</span>
+                  </div>
+                  <button
+                    onClick={() => triggerUpgradeModal({ title: 'Manage Subscription', message: 'Upgrade your plan to unlock higher limits.' })}
+                    className="text-xs font-bold text-[#C8A34D] hover:underline cursor-pointer"
+                  >
+                    Upgrade Plan →
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+                  <div>
+                    <p className="text-slate-400 font-semibold">Active Matters</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
+                      {subCases?.used || 0} / {subCases?.limit === -1 ? 'Unlimited' : (subCases?.limit || 3)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-slate-400 font-semibold">Cloud Storage</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
+                      {storage?.usedGB || 0} GB / {storage?.limitGB === -1 ? 'Unlimited' : `${storage?.limitGB || 1} GB`}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-slate-400 font-semibold">AI Assistant Queries</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
+                      {features?.ai_chat ? `${features.ai_chat.used} / ${features.ai_chat.limit === -1 ? 'Unlimited' : features.ai_chat.limit}` : '0 / 50'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-slate-400 font-semibold">Draft Maker</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
+                      {features?.draft_maker ? `${features.draft_maker.used} / ${features.draft_maker.limit === -1 ? 'Unlimited' : features.draft_maker.limit}` : '0 / 2'}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {/* 3. Quick Actions Row */}
               <div className="space-y-3">

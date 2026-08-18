@@ -4,7 +4,7 @@ import {
   MessageSquare, Mail, Sparkles, Send, Copy, RefreshCw, Edit3, CheckCircle2,
   AlertCircle, ArrowLeft, ArrowRight, User, Calendar, Clock, ShieldCheck, Search, Filter,
   FileText, Check, ChevronRight, X, ExternalLink, HelpCircle, UserCheck, Scale, Plus,
-  Users, Building2, UserPlus, FolderOpen, Briefcase
+  Users, Building2, UserPlus, FolderOpen, Briefcase, Phone, PhoneCall, Trash2, Lock, ShieldAlert
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
@@ -55,11 +55,21 @@ const CLIENT_ROLES = [
   'Consultation Client'
 ];
 
-export default function ClientConnectWorkspace() {
+export default function ClientConnectWorkspace({ initialCaseData = null, onBack = null }) {
   const navigate = useNavigate();
 
+  // Role check for permission guard (e.g. Interns)
+  const activeRole = localStorage.getItem('user_selected_role') || 'advocate';
+  const userObj = JSON.parse(localStorage.getItem('user') || '{}');
+  const userDesignation = userObj?.role || userObj?.designation || '';
+  const isIntern = (userDesignation.toLowerCase().includes('intern') || activeRole === 'intern');
+
   // Navigation Stage: 'ENTRY' | 'SELECT_EXISTING_MATTER' | 'SELECT_EXISTING_CLIENT' | 'CONNECT_NEW' | 'WORKSPACE'
-  const [stage, setStage] = useState('ENTRY');
+  const [stage, setStage] = useState(initialCaseData ? 'WORKSPACE' : 'ENTRY');
+
+  // Clear History Modal State
+  const [isClearHistoryModalOpen, setIsClearHistoryModalOpen] = useState(false);
+  const [isClearingLogs, setIsClearingLogs] = useState(false);
 
   // Case & Client State
   const [cases, setCases] = useState([]);
@@ -69,8 +79,35 @@ export default function ClientConnectWorkspace() {
   const [selectedClientForExisting, setSelectedClientForExisting] = useState(null);
 
   // Active Connected Session Context (Matter + Client)
-  const [activeMatter, setActiveMatter] = useState(null);
+  const [activeMatter, setActiveMatter] = useState(initialCaseData);
   const [activeClient, setActiveClient] = useState(null);
+
+  // Auto-hydrate when initialCaseData is provided directly
+  useEffect(() => {
+    if (initialCaseData) {
+      const clientEmail = initialCaseData.clientEmail || initialCaseData.email || initialCaseData.clientId?.email || 'client@ailegal.in';
+      const clientPhone = initialCaseData.clientMobileNumber || initialCaseData.clientPhone || initialCaseData.clientId?.mobileNumber || '+91 98765 43210';
+      const clientWhatsApp = initialCaseData.clientWhatsAppNumber || initialCaseData.clientPhone || initialCaseData.clientMobileNumber || clientPhone;
+      const clientName = initialCaseData.clientName || 'Primary Client';
+
+      const hydratedClient = {
+        id: (initialCaseData._id || 'matter') + '_primary',
+        name: clientName,
+        phone: clientPhone,
+        whatsapp: clientWhatsApp,
+        email: clientEmail,
+        role: initialCaseData.caseType || 'Primary Client',
+        language: initialCaseData.courtroomLanguage || 'English'
+      };
+
+      setActiveMatter(initialCaseData);
+      setActiveClient(hydratedClient);
+      if (initialCaseData.communicationLogs) {
+        setLogs(initialCaseData.communicationLogs);
+      }
+      setStage('WORKSPACE');
+    }
+  }, [initialCaseData]);
 
   // New Client Form State
   const [newClientName, setNewClientName] = useState('');
@@ -82,7 +119,7 @@ export default function ClientConnectWorkspace() {
   const [newClientAssociatedCaseId, setNewClientAssociatedCaseId] = useState('');
 
   // Active Communication Workspace State
-  const [activeChannel, setActiveChannel] = useState('WhatsApp'); // 'WhatsApp' | 'Email'
+  const [activeChannel, setActiveChannel] = useState('WhatsApp'); // 'WhatsApp' | 'Email' | 'Phone Call'
   const [selectedPurpose, setSelectedPurpose] = useState('Hearing Reminder');
   const [customPurpose, setCustomPurpose] = useState('');
   const [advocateInstructions, setAdvocateInstructions] = useState('');
@@ -99,7 +136,7 @@ export default function ClientConnectWorkspace() {
 
   // Communication Timeline & Log State
   const [logs, setLogs] = useState([]);
-  const [timelineTab, setTimelineTab] = useState('ALL'); // 'ALL' | 'WhatsApp' | 'Email'
+  const [timelineTab, setTimelineTab] = useState('ALL'); // 'ALL' | 'WhatsApp' | 'Email' | 'Calls'
   const [searchQuery, setSearchQuery] = useState('');
 
   // Log Detail Modal
@@ -294,8 +331,76 @@ export default function ClientConnectWorkspace() {
     }
   };
 
+  // Direct Phone Call Launcher (tel: protocol with permission check & audit log)
+  const handleDirectPhoneCall = async () => {
+    if (isIntern) {
+      toast.error('Interns do not have direct call permission.');
+      return;
+    }
+    const targetPhone = activeClient?.phone || activeClient?.whatsapp;
+    if (!targetPhone || targetPhone === 'Not Provided') {
+      toast.error('No mobile number available for this client.');
+      return;
+    }
+    const cleanPhone = targetPhone.replace(/[^+\d]/g, '');
+    const telUrl = `tel:${cleanPhone}`;
+
+    const finalPurpose = selectedPurpose === 'Custom Purpose' ? (customPurpose || 'Direct Phone Call') : selectedPurpose;
+
+    try {
+      window.location.href = telUrl;
+      toast.success(`Opening phone dialer for ${activeClient?.name}...`);
+
+      const logEntry = {
+        id: Date.now().toString(),
+        type: 'Phone Call',
+        reason: finalPurpose,
+        mode: 'Native Dialer',
+        body: `Direct phone call initiated to ${activeClient?.name} (${cleanPhone}).`,
+        recipientPhone: targetPhone,
+        status: 'Dialed',
+        timestamp: new Date().toLocaleString(),
+        senderName: 'Advocate'
+      };
+
+      setLogs(prev => [logEntry, ...prev]);
+
+      if (activeMatter?._id) {
+        await apiService.postClientConnectLog(activeMatter._id, logEntry).catch(() => {});
+      }
+    } catch (err) {
+      toast.error('Could not launch phone dialer.');
+    }
+  };
+
+  // Clear Communication History for current case
+  const handleClearCommunicationHistory = async () => {
+    if (!activeMatter?._id) {
+      setLogs([]);
+      setIsClearHistoryModalOpen(false);
+      toast.success('Communication logs cleared.');
+      return;
+    }
+
+    try {
+      setIsClearingLogs(true);
+      await apiService.deleteClientConnectLog(activeMatter._id);
+      setLogs([]);
+      setIsClearHistoryModalOpen(false);
+      toast.success('Communication history cleared for this case.');
+    } catch (err) {
+      toast.error('Failed to clear communication history.');
+    } finally {
+      setIsClearingLogs(false);
+    }
+  };
+
   // OPEN BUILDER FOR CHANNEL
   const handleOpenChannelBuilder = (channel) => {
+    if (channel === 'Phone Call' && isIntern) {
+      toast.error('Interns do not have direct call permission.');
+      return;
+    }
     setActiveChannel(channel);
     setIsManualMode(false);
     setBuilderStep('BUILDER');
@@ -509,90 +614,133 @@ ${advocateSignature}`;
     <div className="min-h-screen bg-white dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8 space-y-6">
 
       {/* =========================================================================
-          STAGE 1: ENTRY SCREEN — CONNECT WITH CLIENT (2 PRIMARY CARDS)
+          STAGE 1: ENTRY SCREEN — DIRECT REGISTERED MATTERS LIST (MATCHING MOBILE APP)
       ========================================================================= */}
       {stage === 'ENTRY' && (
-        <div className="max-w-4xl mx-auto space-y-8 py-6">
-          <div className="flex items-center gap-3">
+        <div className="max-w-5xl mx-auto space-y-6 py-4">
+          {/* TOP HEADER & ACTION BAR */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate('/dashboard/tools')}
+                className="p-2.5 rounded-xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition-all cursor-pointer shadow-sm"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                    {activeRole === 'law_firm' ? 'AI Team Communication' : 'AI Client Connect'}
+                  </h1>
+                  <span className="px-2.5 py-0.5 rounded-md bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-[10px] font-black uppercase tracking-wider">
+                    {activeRole === 'law_firm' ? 'Firm Communication Suite' : 'Client Communication Suite'}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  {activeRole === 'law_firm'
+                    ? 'Select a firm matter or client to start AI WhatsApp, Email & Call communication.'
+                    : 'Select a case or register a new client for AI WhatsApp & Email communication.'}
+                </p>
+              </div>
+            </div>
+
             <button
-              onClick={() => navigate('/dashboard/tools')}
-              className="p-2.5 rounded-xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer shadow-sm"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                  AI Client Connect
-                </h1>
-                <span className="px-2.5 py-0.5 rounded-md bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-[10px] font-black uppercase tracking-wider">
-                  Client Communication Suite
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                Connect with a client from your active matters or register a new client for AI-guided WhatsApp & Email communication.
-              </p>
-            </div>
-          </div>
-
-          <div className="text-center space-y-2 py-4">
-            <h2 className="text-lg font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
-              Connect With Client
-            </h2>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
-              Choose how you would like to select or establish the client communication context.
-            </p>
-          </div>
-
-          {/* 2 PRIMARY ENTRY CARDS */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            {/* OPTION 1: SELECT EXISTING CLIENT */}
-            <div
-              onClick={handleStartSelectExisting}
-              className="p-8 rounded-3xl bg-white dark:bg-[#111622] border-2 border-slate-200 dark:border-slate-800 hover:border-[#C8A34D] transition-all cursor-pointer shadow-sm hover:shadow-xl space-y-5 group relative overflow-hidden"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 flex items-center justify-center font-black text-2xl group-hover:scale-110 transition-transform">
-                <Users className="w-7 h-7" />
-              </div>
-              <div className="space-y-1.5">
-                <h3 className="text-base font-black text-slate-900 dark:text-white group-hover:text-[#C8A34D] transition-colors flex items-center justify-between">
-                  <span>Select Existing Client</span>
-                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Choose a client linked to your registered matters, active court cases, or ongoing litigation files.
-                </p>
-              </div>
-              <div className="pt-2 flex items-center gap-2 text-[11px] font-extrabold text-[#C8A34D]">
-                <span>Browse {cases.length} Registered Matters</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
-            </div>
-
-            {/* OPTION 2: CONNECT NEW CLIENT */}
-            <div
               onClick={() => setStage('CONNECT_NEW')}
-              className="p-8 rounded-3xl bg-white dark:bg-[#111622] border-2 border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition-all cursor-pointer shadow-sm hover:shadow-xl space-y-5 group relative overflow-hidden"
+              className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 shrink-0"
             >
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 flex items-center justify-center font-black text-2xl group-hover:scale-110 transition-transform">
-                <UserPlus className="w-7 h-7" />
-              </div>
-              <div className="space-y-1.5">
-                <h3 className="text-base font-black text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors flex items-center justify-between">
-                  <span>Connect New Client</span>
-                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Add client details manually for immediate consultation, draft generation, or new legal representation.
-                </p>
-              </div>
-              <div className="pt-2 flex items-center gap-2 text-[11px] font-extrabold text-emerald-500">
-                <span>Enter Client Contact Details</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
+              <UserPlus className="w-4 h-4" />
+              <span>+ Connect New Client</span>
+            </button>
+          </div>
+
+          {/* SEARCH BAR */}
+          <div className="relative max-w-xl">
+            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by case name, client name, or forum..."
+              className="w-full pl-11 pr-4 py-3 rounded-2xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:border-[#C8A34D] focus:outline-none shadow-xs"
+            />
+          </div>
+
+          {/* REGISTERED MATTERS DIRECT LIST / GRID */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xs font-black uppercase tracking-wider text-slate-400">
+                Registered Firm Matters & Case Folders ({cases.filter(c => !searchQuery.trim() || c.name?.toLowerCase().includes(searchQuery.toLowerCase()) || c.clientName?.toLowerCase().includes(searchQuery.toLowerCase())).length})
+              </h2>
+              <span className="text-[11px] text-slate-400 font-medium">
+                Click any case to launch AI Communication Workspace
+              </span>
             </div>
 
+            {isLoadingCases ? (
+              <div className="py-16 text-center text-xs text-slate-400 font-bold space-y-2 bg-white dark:bg-[#111622] rounded-3xl border border-slate-200 dark:border-slate-800">
+                <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#C8A34D]" />
+                <p>Loading registered firm matters...</p>
+              </div>
+            ) : cases.filter(c => !searchQuery.trim() || c.name?.toLowerCase().includes(searchQuery.toLowerCase()) || c.clientName?.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 ? (
+              <div className="p-12 text-center bg-white dark:bg-[#111622] border border-dashed border-slate-300 dark:border-slate-800 rounded-3xl space-y-4">
+                <FolderOpen className="w-12 h-12 text-slate-300 mx-auto" />
+                <div className="space-y-1">
+                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                    No Matching Matters Found
+                  </h3>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    {searchQuery.trim()
+                      ? `No case folders match "${searchQuery}". Try a different keyword.`
+                      : 'You currently have no registered court cases. Connect a client manually to begin.'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setStage('CONNECT_NEW')}
+                  className="px-6 py-3 rounded-2xl bg-[#C8A34D] text-[#111] font-black text-xs hover:bg-[#b8933d] transition-all cursor-pointer shadow-md inline-flex items-center gap-2"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Connect New Client</span>
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {cases.filter(c => !searchQuery.trim() || c.name?.toLowerCase().includes(searchQuery.toLowerCase()) || c.clientName?.toLowerCase().includes(searchQuery.toLowerCase())).map((c) => (
+                  <div
+                    key={c._id || c.id}
+                    onClick={() => handleSelectMatter(c)}
+                    className="p-5 rounded-3xl bg-white dark:bg-[#111622] border-2 border-slate-200 dark:border-slate-800 hover:border-[#C8A34D] transition-all cursor-pointer shadow-xs hover:shadow-lg space-y-3 group"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 flex items-center justify-center font-black group-hover:scale-105 transition-transform">
+                          <FolderOpen className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#C8A34D] transition-colors line-clamp-1">
+                            {c.name}
+                          </h3>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                            Forum: {c.courtName || c.caseType || 'District Court'}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0 mt-1" />
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
+                      <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+                        <User className="w-3.5 h-3.5 text-[#C8A34D]" />
+                        <span className="font-bold">{c.clientName || 'Primary Client'}</span>
+                      </div>
+                      <span className="text-[11px] font-extrabold text-[#C8A34D] group-hover:underline flex items-center gap-1">
+                        <span>Launch Workspace</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -927,7 +1075,7 @@ ${advocateSignature}`;
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
-                    AI Client Connect Workspace
+                    {activeRole === 'law_firm' ? 'AI Team Communication Workspace' : 'AI Client Connect Workspace'}
                   </h1>
                   <span className="px-2.5 py-0.5 rounded-md bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-[10px] font-black uppercase tracking-wider">
                     Connected Session
@@ -967,7 +1115,7 @@ ${advocateSignature}`;
                 </div>
               </div>
 
-              {/* Quick Communication Actions (WhatsApp & Email) */}
+              {/* Quick Communication Actions (WhatsApp, Email & Phone Call) */}
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={() => handleOpenChannelBuilder('WhatsApp')}
@@ -988,6 +1136,16 @@ ${advocateSignature}`;
                   }`}
                 >
                   <Mail className="w-4 h-4" /> Email Communication
+                </button>
+                <button
+                  onClick={() => handleOpenChannelBuilder('Phone Call')}
+                  className={`px-4 py-2.5 rounded-xl font-extrabold text-xs transition-all cursor-pointer shadow-sm flex items-center gap-1.5 ${
+                    activeChannel === 'Phone Call'
+                      ? 'bg-amber-500 text-white shadow-md'
+                      : 'bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500 hover:text-white'
+                  }`}
+                >
+                  <PhoneCall className="w-4 h-4" /> Direct Phone Call
                 </button>
               </div>
             </div>
@@ -1036,7 +1194,76 @@ ${advocateSignature}`;
                 </div>
 
                 {/* BUILDER FORM */}
-                {builderStep === 'BUILDER' ? (
+                {activeChannel === 'Phone Call' ? (
+                  <div className="space-y-6">
+                    <div className="p-6 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 rounded-xl bg-amber-500 text-white font-black">
+                          <Phone className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                            Direct Phone Call Launcher
+                          </h4>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                            Initiate direct phone call to client <strong className="text-slate-900 dark:text-white">{activeClient?.name}</strong>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* STEP 1: COMMUNICATION PURPOSE FOR CALL */}
+                      <div className="space-y-2 pt-2">
+                        <label className="text-xs font-black uppercase tracking-wider text-slate-400 block">
+                          Reason / Call Purpose
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {COMMUNICATION_PURPOSES.map((purpose) => (
+                            <button
+                              key={purpose}
+                              onClick={() => setSelectedPurpose(purpose)}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+                                selectedPurpose === purpose
+                                  ? 'bg-amber-500 text-white shadow-sm'
+                                  : 'bg-white dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
+                              }`}
+                            >
+                              {purpose}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-2">
+                        <div className="p-3 rounded-xl bg-white dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 space-y-1">
+                          <span className="text-[10px] font-black uppercase text-slate-400 block">Recipient Phone</span>
+                          <span className="font-extrabold text-amber-500 text-sm">{activeClient?.phone || activeClient?.whatsapp || 'Not Provided'}</span>
+                        </div>
+                        <div className="p-3 rounded-xl bg-white dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 space-y-1">
+                          <span className="text-[10px] font-black uppercase text-slate-400 block">Selected Purpose</span>
+                          <span className="font-extrabold text-slate-900 dark:text-white">{selectedPurpose === 'Custom Purpose' ? (customPurpose || 'Direct Phone Call') : selectedPurpose}</span>
+                        </div>
+                      </div>
+
+                      {isIntern && (
+                        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center gap-2 text-rose-500 text-xs font-bold">
+                          <ShieldAlert className="w-4 h-4 shrink-0" />
+                          <span>Intern Role Restricted: Direct phone calling is disabled for intern accounts.</span>
+                        </div>
+                      )}
+
+                      <div className="pt-2 flex items-center justify-end gap-3">
+                        <button
+                          disabled={isIntern}
+                          onClick={handleDirectPhoneCall}
+                          className="px-6 py-3.5 rounded-2xl bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-black text-xs transition-all cursor-pointer shadow-md flex items-center gap-2"
+                        >
+                          <PhoneCall className="w-4 h-4" />
+                          <span>Launch Native Phone Dialer</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : builderStep === 'BUILDER' ? (
                   <div className="space-y-6">
                     
                     {/* STEP 1: COMMUNICATION PURPOSE */}
@@ -1235,18 +1462,28 @@ ${advocateSignature}`;
                       Communication Timeline ({filteredLogs.length})
                     </h3>
                   </div>
-                  <button
-                    onClick={refreshLogs}
-                    className="p-1.5 rounded-lg bg-slate-100 dark:bg-[#1A2333] text-slate-400 hover:text-slate-900 cursor-pointer"
-                    title="Refresh logs"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={refreshLogs}
+                      className="p-1.5 rounded-lg bg-slate-100 dark:bg-[#1A2333] text-slate-400 hover:text-slate-900 cursor-pointer"
+                      title="Refresh logs"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setIsClearHistoryModalOpen(true)}
+                      className="px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/50 cursor-pointer flex items-center gap-1 text-[10px] font-extrabold"
+                      title="Clear communication history for this case"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Clear</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Channel Tabs */}
                 <div className="flex rounded-xl bg-slate-100 dark:bg-[#1A2333] p-1 gap-1 text-[11px] font-extrabold">
-                  {['ALL', 'WhatsApp', 'Email'].map(tab => (
+                  {['ALL', 'WhatsApp', 'Email', 'Calls'].map(tab => (
                     <button
                       key={tab}
                       onClick={() => setTimelineTab(tab)}
@@ -1374,6 +1611,53 @@ ${advocateSignature}`;
                 className="px-6 py-2.5 rounded-xl bg-[#C8A34D] text-[#111111] font-black text-xs hover:bg-[#b8933d] transition-all cursor-pointer shadow-sm"
               >
                 Close Audit Record
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CLEAR HISTORY CONFIRMATION MODAL */}
+      {isClearHistoryModalOpen && (
+        <div className="fixed inset-0 z-[200000] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#111622] border-2 border-rose-500/50 w-full max-w-md rounded-3xl p-6 space-y-5 shadow-2xl relative">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-rose-500/15 text-rose-500 border border-rose-500/30">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-slate-900 dark:text-white">Clear Communication History?</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  This will permanently remove communication logs for matter <strong className="text-rose-500">{activeMatter?.name || 'this case'}</strong>.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 text-xs text-rose-700 dark:text-rose-300 font-semibold space-y-1">
+              <p>⚠️ Warning: Communication history clearing is case-scoped only.</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">Other cases and system records will remain unaffected.</p>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => setIsClearHistoryModalOpen(false)}
+                className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-700 dark:text-slate-300 text-xs font-bold hover:bg-slate-200 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isClearingLogs}
+                onClick={handleClearCommunicationHistory}
+                className="px-5 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white font-black text-xs transition-all cursor-pointer shadow-md flex items-center gap-1.5"
+              >
+                {isClearingLogs ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+                <span>Clear History</span>
               </button>
             </div>
           </div>

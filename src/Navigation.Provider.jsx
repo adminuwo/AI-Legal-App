@@ -37,6 +37,8 @@ import { lazy, Suspense } from 'react';
 import { Toaster } from 'react-hot-toast';
 import CookieConsentBanner from './landingpage/CookieConsentBanner';
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx';
+import { SubscriptionProvider, useSubscription } from './context/SubscriptionContext';
+import SubscriptionUpgradeModal from './Components/SubscriptionUpgradeModal';
 const AiBase = lazy(() => import('./Tools/AI_Base/AI_Base').catch(() => ({ default: () => <div className="flex h-full items-center justify-center text-subtext">AI Base Module not found.</div> })));
 
 // Vendor Imports Removed
@@ -63,6 +65,8 @@ const CasePredictorWorkspace = lazy(() => import('./pages/CasePredictorWorkspace
 const StrategyEngineWorkspace = lazy(() => import('./pages/StrategyEngineWorkspace'));
 const MockCourtroomWorkspace = lazy(() => import('./pages/MockCourtroomWorkspace'));
 const ClientConnectWorkspace = lazy(() => import('./pages/ClientConnectWorkspace'));
+const QuizPracticeWorkspace = lazy(() => import('./pages/QuizPracticeWorkspace'));
+const NotesMakerWorkspace = lazy(() => import('./pages/NotesMakerWorkspace'));
 
 const isAuthenticated = () => {
   const tokenStr = localStorage.getItem('token');
@@ -74,10 +78,15 @@ const isAuthenticated = () => {
 // ------------------------------
 // Home Redirect Component
 // ------------------------------
-// Always displays the landing page on root to satisfy Google OAuth Branding verification.
-// Users can explicitly enter the dashboard using CTA buttons.
+// Redirects unauthenticated users directly to /onboarding without delay.
 const HomeRedirect = () => {
-  return <SplashScreen />;
+  const hasToken = isAuthenticated();
+
+  if (hasToken) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <Navigate to="/onboarding" replace />;
 };
 
 // ------------------------------
@@ -211,6 +220,7 @@ const useScrollNavbar = () => {
 };
 
 const DashboardLayout = () => {
+  const { isUpgradeModalOpen, closeUpgradeModal, upgradeModalData } = useSubscription();
   const [tglState, setTglState] = useRecoilState(toggleState);
   const isSidebarOpen = tglState.sidebarOpen;
   const setIsSidebarOpen = (val) => setTglState(prev => ({ ...prev, sidebarOpen: val }));
@@ -358,6 +368,11 @@ const DashboardLayout = () => {
           />
         )}
       </AnimatePresence>
+      <SubscriptionUpgradeModal
+        isOpen={isUpgradeModalOpen}
+        onClose={closeUpgradeModal}
+        data={upgradeModalData}
+      />
     </div>
   );
 };
@@ -446,18 +461,19 @@ const NavigateProvider = () => {
   const [tglState] = useRecoilState(toggleState);
 
   return (
-    <SSOInterceptor>
-      <Toaster
-        position="top-right"
-        containerStyle={{ zIndex: 99999 }}
-        toastOptions={{
-          duration: 2500, // Reduced from default to meet user request for 2-3 sec auto-close
-          className: '!bg-white dark:!bg-[#1E2438] !text-slate-800 dark:!text-white !border !border-slate-100 dark:!border-white/10 !shadow-lg',
-        }}
-      />
-      <CreditUpsellPopup />
-      <CookieConsentBanner />
-      <Routes>
+    <SubscriptionProvider>
+      <SSOInterceptor>
+        <Toaster
+          position="top-right"
+          containerStyle={{ zIndex: 99999 }}
+          toastOptions={{
+            duration: 2500, // Reduced from default to meet user request for 2-3 sec auto-close
+            className: '!bg-white dark:!bg-[#1E2438] !text-slate-800 dark:!text-white !border !border-slate-100 dark:!border-white/10 !shadow-lg',
+          }}
+        />
+        <CreditUpsellPopup />
+        <CookieConsentBanner />
+        <Routes>
         {/* Public Routes */}
         <Route path={AppRoute.LANDING} element={<HomeRedirect />} />
         <Route path="/splash" element={<SplashScreen />} />
@@ -510,6 +526,8 @@ const NavigateProvider = () => {
               <ProductGuideWorkspace />
             </Suspense>
           } />
+          <Route path="tools/product-guide" element={<Navigate to="/dashboard/guide" replace />} />
+          <Route path="product-guide" element={<Navigate to="/dashboard/guide" replace />} />
           <Route path="tools/knowledge-hub" element={
             <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Knowledge Hub...</div>}>
               <KnowledgeHubWorkspace />
@@ -575,6 +593,18 @@ const NavigateProvider = () => {
             </Suspense>
           } />
           <Route path="client-connect" element={<Navigate to="/dashboard/tools/client-connect" replace />} />
+          <Route path="tools/quiz-practice" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Quiz & MCQ Practice...</div>}>
+              <QuizPracticeWorkspace />
+            </Suspense>
+          } />
+          <Route path="quiz-practice" element={<Navigate to="/dashboard/tools/quiz-practice" replace />} />
+          <Route path="tools/notes-maker" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Notes Maker...</div>}>
+              <NotesMakerWorkspace />
+            </Suspense>
+          } />
+          <Route path="notes-maker" element={<Navigate to="/dashboard/tools/notes-maker" replace />} />
           <Route path="knowledge-vault" element={<PlaceholderPage title="Knowledge Vault" />} />
           <Route path="court-diary" element={<PlaceholderPage title="Court Diary" />} />
           <Route path="templates" element={<PlaceholderPage title="Templates" />} />
@@ -589,9 +619,9 @@ const NavigateProvider = () => {
 
 
         {/* Catch All */}
-        <Route path="*" element={<Navigate to={AppRoute.LANDING} replace />} />
       </Routes>
     </SSOInterceptor>
+  </SubscriptionProvider>
   );
 };
 

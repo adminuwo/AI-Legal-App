@@ -8,6 +8,7 @@ import { apiService } from '../../../services/apiService';
 import { chatStorageService } from '../../../services/chatStorageService';
 import LegalDashboard from '../components/LegalDashboard';
 import CreateCaseWizardModal from '../components/CreateCaseWizardModal';
+import LawFirmOnboardingView from '../../../Components/LawFirmOnboardingView';
 
 export const useAILegalCRM = ({
   allProjects,
@@ -34,7 +35,7 @@ export const useAILegalCRM = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const legalCases = allProjects.filter(p => p.isLegalCase);
+  const legalCases = (allProjects || []).filter(p => p && p.isLegalCase !== false);
   const [isNewCaseModalOpen, setIsNewCaseModalOpen] = useState(false);
   const [editingCaseId, setEditingCaseId] = useState(null);
   const [newCaseForm, setNewCaseForm] = useState({
@@ -47,9 +48,33 @@ export const useAILegalCRM = ({
   const [isRenamingCase, setIsRenamingCase] = useState(null);
   const [renameValue, setRenameValue] = useState('');
 
+  // Law Firm Workspace State
+  const [firmWorkspaces, setFirmWorkspaces] = useState([]);
+  const [isLoadingWorkspaces, setIsLoadingWorkspaces] = useState(false);
+
+  const fetchWorkspaces = async () => {
+    try {
+      setIsLoadingWorkspaces(true);
+      const res = await apiService.request('/workspaces');
+      if (res && res.success && Array.isArray(res.workspaces)) {
+        const firms = res.workspaces.filter(w => w.type === 'law_firm');
+        setFirmWorkspaces(firms);
+      }
+    } catch (err) {
+      console.warn('[CRM] Failed to fetch workspaces:', err);
+    } finally {
+      setIsLoadingWorkspaces(false);
+    }
+  };
+
   // ─── Direct Case Dashboard Route Handler ───
   useEffect(() => {
     if (location.pathname === '/dashboard/cases') {
+      const activeRole = localStorage.getItem('user_selected_role') || 'advocate';
+      if (activeRole === 'law_firm') {
+        fetchWorkspaces();
+      }
+
       // Set all states atomically to prevent flash of blank/wrong content
       if (currentProjectId !== null) setCurrentProjectId(null);
       if (currentCase !== null) setCurrentCase(null);
@@ -138,22 +163,34 @@ export const useAILegalCRM = ({
   };
 
   const fetchLegalCases = async (force = false) => {
-    if (!force && allProjects && allProjects.length > 0) {
-      return;
-    }
     try {
       const all = await apiService.getProjects();
-      setAllProjects(all);
+      if (Array.isArray(all)) {
+        setAllProjects(all);
+      }
     } catch (err) {
       console.error("Failed to fetch legal cases:", err);
     }
   };
 
+  // Automatic Window Focus Listener to ensure real-time sync with Mobile App updates
+  useEffect(() => {
+    const handleWindowFocus = () => {
+      fetchLegalCases(true);
+      const activeRole = localStorage.getItem('user_selected_role') || 'advocate';
+      if (activeRole === 'law_firm') {
+        fetchWorkspaces();
+      }
+    };
+    window.addEventListener('focus', handleWindowFocus);
+    return () => window.removeEventListener('focus', handleWindowFocus);
+  }, []);
+
   useEffect(() => {
     if (currentMode === 'LEGAL_TOOLKIT' && selectedLegalTool?.id === 'legal_my_case') {
-      fetchLegalCases();
+      fetchLegalCases(true);
     }
-  }, [currentMode, selectedLegalTool?.id, setAllProjects]);
+  }, [currentMode, selectedLegalTool, setAllProjects]);
 
   const handleCreateNewCase = async () => {
     if (!newCaseForm.clientName.trim()) {
@@ -295,30 +332,37 @@ export const useAILegalCRM = ({
     }
   };
 
-  const renderCaseDashboard = () => (
-    <LegalDashboard
-      legalCases={legalCases}
-      currentProjectId={currentProjectId}
-      handleOpenCase={handleOpenCase}
-      handleOpenEditModal={handleOpenEditModal}
-      handleDeleteCase={handleDeleteCase}
-      isRenamingCase={isRenamingCase}
-      renameValue={renameValue}
-      setRenameValue={setRenameValue}
-      handleRenameCase={handleRenameCase}
-      setIsRenamingCase={setIsRenamingCase}
-      setIsNewCaseModalOpen={setIsNewCaseModalOpen}
-      setEditingCaseId={setEditingCaseId}
-      setNewCaseForm={setNewCaseForm}
-      setActiveLegalToolkit={setActiveLegalToolkit}
-      onBack={handleDashboardBack}
-    />
-  );
+  const renderCaseDashboard = () => {
+    return (
+      <LegalDashboard
+        legalCases={legalCases}
+        currentProjectId={currentProjectId}
+        handleOpenCase={handleOpenCase}
+        handleOpenEditModal={handleOpenEditModal}
+        handleDeleteCase={handleDeleteCase}
+        isRenamingCase={isRenamingCase}
+        renameValue={renameValue}
+        setRenameValue={setRenameValue}
+        handleRenameCase={handleRenameCase}
+        setIsRenamingCase={setIsRenamingCase}
+        setIsNewCaseModalOpen={setIsNewCaseModalOpen}
+        setEditingCaseId={setEditingCaseId}
+        setNewCaseForm={setNewCaseForm}
+        setActiveLegalToolkit={setActiveLegalToolkit}
+        onBack={handleDashboardBack}
+      />
+    );
+  };
 
   const renderNewCaseModal = () => {
+    const editingCaseObj = editingCaseId 
+      ? legalCases.find(c => ((c._id || c.id) === editingCaseId))
+      : null;
+
     return (
       <CreateCaseWizardModal
         isOpen={isNewCaseModalOpen}
+        initialData={editingCaseObj}
         onClose={() => {
           setIsNewCaseModalOpen(false);
           setEditingCaseId(null);
@@ -327,10 +371,8 @@ export const useAILegalCRM = ({
           if (fetchLegalCases) {
             fetchLegalCases(true);
           }
-          if (created && (created._id || created.id)) {
-            const caseId = created._id || created.id;
-            handleOpenCase({ ...created, _id: caseId }, true);
-          }
+          setIsNewCaseModalOpen(false);
+          setEditingCaseId(null);
         }}
       />
     );

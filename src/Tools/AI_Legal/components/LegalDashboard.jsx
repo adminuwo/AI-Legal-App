@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Plus, Edit2, Trash2, Archive, ChevronRight, ArrowLeft, Search, LayoutGrid, List,
-  Calendar, FileText, ShieldCheck, Gavel, CheckSquare, Sparkles, FolderOpen, MoreVertical, AlertTriangle
+  Calendar, FileText, ShieldCheck, Gavel, CheckSquare, Sparkles, FolderOpen, MoreVertical, AlertTriangle,
+  UserPlus, Building2, Users, CreditCard, X
 } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
 import { apiService } from '../../../services/apiService';
 import toast from 'react-hot-toast';
+import { useSubscription } from '../../../context/SubscriptionContext';
 
 const LegalDashboard = ({
   legalCases = [],
@@ -35,10 +37,110 @@ const LegalDashboard = ({
   const [typeFilter, setTypeFilter] = useState('All');
   const [courtFilter, setCourtFilter] = useState('All');
   const [sortOption, setSortOption] = useState('lastUpdated');
-  const [viewMode, setViewMode] = useState('grid'); // Default to rich grid view
+  const [viewMode, setViewMode] = useState('list'); // Default to list view
 
   // Active menu dropdown tracking
   const [activeMenuCaseId, setActiveMenuCaseId] = useState(null);
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
+
+  // On Mount: Always fetch latest cases from backend to guarantee sync with Mobile
+  React.useEffect(() => {
+    if (fetchLegalCases) {
+      fetchLegalCases(true);
+    }
+  }, []);
+
+  // Law Firm Invite Member State
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [inviteForm, setInviteForm] = useState({ name: '', email: '', role: 'Associate Advocate' });
+
+  const handleSendInvite = async (e) => {
+    e?.preventDefault();
+    if (!inviteForm.email || !inviteForm.email.trim()) {
+      toast.error("Valid email address is required!");
+      return;
+    }
+
+    const activeWsId = localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID') || 'firm_abc_workspace';
+    try {
+      const tid = toast.loading('Sending team invitation...');
+      const res = await apiService.request(`/workspaces/${activeWsId}/invitations`, {
+        method: 'POST',
+        data: {
+          fullName: inviteForm.name || inviteForm.email.split('@')[0],
+          email: inviteForm.email.trim(),
+          role: inviteForm.role
+        }
+      });
+
+      if (res && res.success) {
+        toast.success(`Invitation sent to ${inviteForm.email}!`, { id: tid });
+        setInviteForm({ name: '', email: '', role: 'Associate Advocate' });
+        setIsInviteModalOpen(false);
+      } else {
+        toast.error(res?.error || 'Failed to send invitation.', { id: tid });
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.error || 'Failed to send invitation.');
+    }
+  };
+
+  const { cases, plan, triggerUpgradeModal } = useSubscription();
+
+  const renderCasesLimitBadge = () => {
+    const used = cases?.used !== undefined ? cases.used : (legalCases?.length || 0);
+    const limit = cases?.limit !== undefined ? cases.limit : 3;
+
+    if (plan === 'ENTERPRISE' || plan === 'SUPER_ADMIN' || limit === -1) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40 shadow-2xs">
+          <span>∞ Unlimited</span>
+        </span>
+      );
+    }
+
+    const isReached = limit > 0 && used >= limit;
+    return (
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold shadow-2xs border ${
+        isReached 
+          ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-900/40' 
+          : 'bg-[#C8A34D]/15 text-[#C8A34D] border-[#C8A34D]/30'
+      }`}>
+        <span>📁 {used} / {limit} {isReached ? ' • Limit Reached' : 'Free'}</span>
+      </span>
+    );
+  };
+
+  const handleCreateCaseClick = () => {
+    if (cases && cases.limit !== -1 && cases.used >= cases.limit) {
+      triggerUpgradeModal({
+        title: 'Matter Limit Reached',
+        message: `You have reached your active case limit of ${cases.limit} cases for your current plan. Upgrade your plan to create more cases.`,
+        used: cases.used,
+        limit: cases.limit,
+        feature: 'cases'
+      });
+      return;
+    }
+    if (setEditingCaseId) setEditingCaseId(null);
+    if (setNewCaseForm) setNewCaseForm({ clientName: '', caseType: '', otherCaseType: '', accused: '', summary: '' });
+    setIsNewCaseModalOpen(true);
+  };
+
+  const handleMenuToggle = (e, caseId) => {
+    e.stopPropagation();
+    if (activeMenuCaseId === caseId) {
+      setActiveMenuCaseId(null);
+    } else {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const menuHeight = 130;
+      const topPos = spaceBelow < menuHeight ? Math.max(10, rect.top - menuHeight) : rect.bottom + 4;
+      const leftPos = Math.max(10, rect.right - 160);
+      setMenuPos({ top: topPos, left: leftPos });
+      setActiveMenuCaseId(caseId);
+    }
+  };
 
   // Distinct case types and courts for filter
   const caseTypes = Array.from(new Set(legalCases.map(c => c.caseType).filter(Boolean)));
@@ -213,26 +315,43 @@ const LegalDashboard = ({
             </motion.button>
           )}
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white">
-              MY MATTERS
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white flex items-center gap-3">
+              <span>
+                {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm'
+                  ? 'FIRM WORKSPACE'
+                  : (localStorage.getItem('user_selected_role') || 'advocate') === 'student'
+                  ? 'MY ACADEMIC MATTERS & MOOTS'
+                  : 'MY MATTERS'}
+              </span>
+              {renderCasesLimitBadge()}
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-              Your litigation case repository and legal workspaces.
+              {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm'
+                ? "Your firm's litigation repository and legal workspaces."
+                : (localStorage.getItem('user_selected_role') || 'advocate') === 'student'
+                ? "Your student moot court memorials and case studies."
+                : "Your litigation case repository and legal workspaces."}
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
+          {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm' && (
+            <button
+              onClick={() => setIsInviteModalOpen(true)}
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-bold text-xs sm:text-sm transition-all border border-slate-200 dark:border-slate-700 cursor-pointer"
+            >
+              <UserPlus className="w-4 h-4 text-[#C8A34D]" />
+              <span>+ Invite Team Member</span>
+            </button>
+          )}
+
           <button
-            onClick={() => {
-              if (setEditingCaseId) setEditingCaseId(null);
-              if (setNewCaseForm) setNewCaseForm({ clientName: '', caseType: '', otherCaseType: '', accused: '', summary: '' });
-              setIsNewCaseModalOpen(true);
-            }}
+            onClick={handleCreateCaseClick}
             className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 whitespace-nowrap cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>+ New Case</span>
+            <span>+ Create</span>
           </button>
         </div>
       </div>
@@ -354,64 +473,54 @@ const LegalDashboard = ({
         {sortedCases.length > 0 ? (
           viewMode === 'grid' ? (
             /* 3A. Premium Grid View — Rich Case Dossier Cards */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {sortedCases.map((c) => {
                 const hearingDate = getNextHearingDate(c);
-                const readinessScore = getCaseReadinessScore(c);
-                const docCount = c.documents?.length || 0;
-                const evidenceCount = c.evidence?.length || 0;
-                const hearingCount = c.hearings?.length || 0;
-                const draftCount = c.drafts?.length || 0;
-                const taskCount = c.tasks?.length || 0;
 
                 return (
                   <div
                     key={c._id || c.id}
-                    className="relative bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs hover:border-[#C8A34D] hover:shadow-md transition-all flex flex-col justify-between group min-h-[380px]"
+                    className="relative bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl p-4 shadow-xs hover:border-[#C8A34D] hover:shadow-md transition-all flex flex-col justify-between group"
                   >
-                    <div className="space-y-4">
-                      {/* Card Header: Folder icon + Name + Badges + 3-Dot Menu */}
-                      <div className="flex items-start justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
-                        <div className="flex items-start gap-2.5 min-w-0">
-                          <div className="p-2 rounded-xl bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25 shrink-0 mt-0.5">
+                    <div className="space-y-3">
+                      {/* Card Header: Icon + Case Name + 3-Dot Menu */}
+                      <div className="flex items-start justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="p-1.5 rounded-lg bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25 shrink-0">
                             <FolderOpen className="w-4 h-4" />
                           </div>
-                          <div className="min-w-0">
-                            <h3 
-                              onClick={() => handleOpenCase(c)}
-                              className="text-base font-extrabold text-[#111111] dark:text-white hover:text-[#C8A34D] transition-colors cursor-pointer truncate"
-                            >
-                              {c.name}
-                            </h3>
-                            <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                              {renderStatusPill(c.status)}
-                              {renderPriorityPill(c.priority)}
-                            </div>
-                          </div>
+                          <h3 
+                            onClick={() => handleOpenCase(c)}
+                            className="text-sm font-extrabold text-[#111111] dark:text-white hover:text-[#C8A34D] transition-colors cursor-pointer truncate"
+                            title={c.name}
+                          >
+                            {c.name}
+                          </h3>
                         </div>
 
                         {/* 3-Dot Action Dropdown */}
                         <div className="relative shrink-0">
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveMenuCaseId(activeMenuCaseId === (c._id || c.id) ? null : (c._id || c.id));
-                            }}
-                            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                            onClick={(e) => handleMenuToggle(e, c._id || c.id)}
+                            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                             title="Actions"
                           >
-                            <MoreVertical size={16} />
+                            <MoreVertical size={15} />
                           </button>
                           {activeMenuCaseId === (c._id || c.id) && (
                             <>
                               <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setActiveMenuCaseId(null); }} />
-                              <div className="absolute right-0 top-8 w-44 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-1.5 z-50 text-left" onClick={(e) => e.stopPropagation()}>
+                              <div 
+                                className="fixed w-40 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-1 z-50 text-left" 
+                                style={{ top: `${menuPos.top}px`, left: `${menuPos.left}px` }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
                                 <button
                                   onClick={() => {
                                     handleOpenEditModal(c);
                                     setActiveMenuCaseId(null);
                                   }}
-                                  className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
+                                  className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
                                 >
                                   <Edit2 size={13} />
                                   Edit Case
@@ -421,7 +530,7 @@ const LegalDashboard = ({
                                     handleToggleArchive(e, c);
                                     setActiveMenuCaseId(null);
                                   }}
-                                  className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
+                                  className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
                                 >
                                   <Archive size={13} />
                                   {c.status === 'Archived' ? 'Restore Case' : 'Archive Case'}
@@ -431,7 +540,7 @@ const LegalDashboard = ({
                                     handleDeleteCase(c._id || c.id);
                                     setActiveMenuCaseId(null);
                                   }}
-                                  className="w-full px-4 py-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-2 transition-colors border-t border-slate-100 dark:border-slate-800 cursor-pointer"
+                                  className="w-full px-3 py-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-2 transition-colors border-t border-slate-100 dark:border-slate-800 cursor-pointer"
                                 >
                                   <Trash2 size={13} />
                                   Delete Case
@@ -442,74 +551,46 @@ const LegalDashboard = ({
                         </div>
                       </div>
 
-                      {/* Parties Block: Client vs Opponent */}
-                      <div className="p-3 bg-slate-50/70 dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800/80 rounded-xl space-y-1 text-xs">
-                        <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Client:</span>
-                          <span className="font-extrabold text-[#111111] dark:text-white truncate max-w-[180px]">{c.clientName || 'Not provided'}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-[10px] font-black text-[#C8A34D] uppercase tracking-widest pl-2">
-                          <span>vs</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Opponent:</span>
-                          <span className="font-extrabold text-[#111111] dark:text-white truncate max-w-[180px]">{c.opponentName || c.accused || 'Not provided'}</span>
+                      {/* Status & Priority Pills */}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {renderStatusPill(c.status)}
+                        {renderPriorityPill(c.priority)}
+                      </div>
+
+                      {/* Parties: Client vs Opponent */}
+                      <div className="p-2 bg-slate-50/70 dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800/80 rounded-lg text-xs">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Parties:</div>
+                        <div className="font-extrabold text-[#111111] dark:text-white truncate">
+                          {c.clientName || 'Not set'} <span className="text-[#C8A34D] font-black text-[10px]">vs</span> {c.opponentName || c.accused || 'Not set'}
                         </div>
                       </div>
 
-                      {/* Case Metadata Grid */}
+                      {/* Case Metadata Grid: Type, Court, Next Hearing, Stage */}
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Type:</span>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Type</span>
                           <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">{c.caseType || 'Civil'}</span>
                         </div>
                         <div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Court:</span>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Court</span>
                           <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">{c.courtName || 'District Court'}</span>
                         </div>
                         <div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Case / FIR No:</span>
-                          <span className="font-semibold text-slate-600 dark:text-slate-400 truncate block">{c.caseNumber || c.number || c.firNumber || 'Pending Filing'}</span>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Next Hearing</span>
+                          <span className="font-bold text-[#C8A34D] truncate block">{hearingDate}</span>
                         </div>
                         <div>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Stage:</span>
-                          <span className="font-semibold text-slate-600 dark:text-slate-400 truncate block">{c.stage || 'Pre-litigation'}</span>
-                        </div>
-                      </div>
-
-                      {/* Next Hearing Banner */}
-                      <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#0F172A] border border-slate-200/60 dark:border-slate-800 flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                          <Calendar className="w-3.5 h-3.5 text-[#C8A34D]" />
-                          <span>Next Hearing:</span>
-                        </div>
-                        <span className="text-xs font-black text-[#C8A34D]">{hearingDate}</span>
-                      </div>
-
-                      {/* Case Health / Metrics Bar */}
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex items-center justify-between text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
-                          <span>Case Readiness Score</span>
-                          <span className="text-[#C8A34D]">{readinessScore}%</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#C8A34D] rounded-full transition-all duration-500" style={{ width: `${readinessScore}%` }} />
-                        </div>
-                        <div className="flex items-center justify-between text-[10px] text-slate-400 font-semibold pt-1">
-                          <span>Docs: {docCount}</span>
-                          <span>Evidence: {evidenceCount}</span>
-                          <span>Hearings: {hearingCount}</span>
-                          <span>Drafts: {draftCount}</span>
-                          <span>Tasks: {taskCount}</span>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Stage</span>
+                          <span className="font-semibold text-slate-500 dark:text-slate-400 truncate block">{c.stage || 'Pre-litigation'}</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Primary Action Button */}
-                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
+                    {/* Primary Action Button: Open Workspace */}
+                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 mt-3">
                       <button
                         onClick={() => handleOpenCase(c)}
-                        className="w-full py-2.5 bg-slate-50 hover:bg-[#111111] dark:bg-[#0F172A] dark:hover:bg-[#333333] border border-slate-200/80 dark:border-slate-800 hover:border-[#C8A34D] text-[#111111] dark:text-white hover:text-[#C8A34D] rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                        className="w-full py-2 bg-slate-50 hover:bg-[#111111] dark:bg-[#0F172A] dark:hover:bg-[#333333] border border-slate-200/80 dark:border-slate-800 hover:border-[#C8A34D] text-[#111111] dark:text-white hover:text-[#C8A34D] rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                       >
                         <span>Open Workspace</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -565,24 +646,26 @@ const LegalDashboard = ({
                           <td className="px-4 py-3.5">{renderPriorityPill(c.priority)}</td>
                           <td className="px-4 py-3.5 text-center relative">
                             <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveMenuCaseId(activeMenuCaseId === (c._id || c.id) ? null : (c._id || c.id));
-                              }}
+                              onClick={(e) => handleMenuToggle(e, c._id || c.id)}
                               className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                              title="Actions"
                             >
                               <MoreVertical size={15} />
                             </button>
                             {activeMenuCaseId === (c._id || c.id) && (
                               <>
                                 <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setActiveMenuCaseId(null); }} />
-                                <div className="absolute right-6 top-8 w-40 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-1.5 z-50 text-left" onClick={(e) => e.stopPropagation()}>
+                                <div 
+                                  className="fixed w-40 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-1 z-50 text-left" 
+                                  style={{ top: `${menuPos.top}px`, left: `${menuPos.left}px` }}
+                                  onClick={(e) => e.stopPropagation()}
+                                >
                                   <button
                                     onClick={() => {
                                       handleOpenEditModal(c);
                                       setActiveMenuCaseId(null);
                                     }}
-                                    className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
+                                    className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
                                   >
                                     <Edit2 size={13} />
                                     Edit Case
@@ -592,7 +675,7 @@ const LegalDashboard = ({
                                       handleToggleArchive(e, c);
                                       setActiveMenuCaseId(null);
                                     }}
-                                    className="w-full px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
+                                    className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
                                   >
                                     <Archive size={13} />
                                     {c.status === 'Archived' ? 'Restore Case' : 'Archive Case'}
@@ -602,7 +685,7 @@ const LegalDashboard = ({
                                       handleDeleteCase(c._id || c.id);
                                       setActiveMenuCaseId(null);
                                     }}
-                                    className="w-full px-4 py-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-2 transition-colors border-t border-slate-100 dark:border-slate-800 cursor-pointer"
+                                    className="w-full px-3 py-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-2 transition-colors border-t border-slate-100 dark:border-slate-800 cursor-pointer"
                                   >
                                     <Trash2 size={13} />
                                     Delete Case
@@ -652,25 +735,104 @@ const LegalDashboard = ({
               <FolderOpen className="w-10 h-10" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-xl font-extrabold text-[#111111] dark:text-white">No case dossiers yet</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
-                Create your first case workspace to organize pleadings, documents, evidence, hearings and litigation strategy.
+              <h3 className="text-xl font-extrabold text-[#111111] dark:text-white">
+                {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm' ? 'No Firm Cases Found' : 'No Matters Found'}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-sm mx-auto">
+                {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm' 
+                  ? 'Create your first firm case workspace to organize pleadings, documents, evidence, hearings and team strategy.' 
+                  : 'Create your first litigation folder to start leveraging AI-powered legal assists.'}
               </p>
             </div>
             <button
-              onClick={() => {
-                if (setEditingCaseId) setEditingCaseId(null);
-                if (setNewCaseForm) setNewCaseForm({ clientName: '', caseType: '', otherCaseType: '', accused: '', summary: '' });
-                setIsNewCaseModalOpen(true);
-              }}
-              className="px-6 py-3 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-xs transition-all shadow-md flex items-center gap-2 active:scale-95 cursor-pointer"
+              onClick={handleCreateCaseClick}
+              className="px-6 py-3.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-2xl text-xs transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer uppercase tracking-wider"
             >
-              <Plus size={16} />
-              <span>+ Create New Case</span>
+              <span>{(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm' ? 'CREATE FIRM CASE' : 'CREATE CASE FOLDER'}</span>
             </button>
           </div>
         )}
       </div>
+
+      {/* Invite Member Modal */}
+      {isInviteModalOpen && (
+        <div className="fixed inset-0 z-[200000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 relative space-y-4">
+            <button
+              onClick={() => setIsInviteModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-[#C8A34D]/15 text-[#C8A34D]">
+                <UserPlus className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Invite Lawyer / Associate</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Add team member to firm workspace</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSendInvite} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  placeholder="Adv. Rajesh Sharma"
+                  value={inviteForm.name}
+                  onChange={(e) => setInviteForm({ ...inviteForm, name: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#C8A34D]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Official Email Address *</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="rajesh@firm.com"
+                  value={inviteForm.email}
+                  onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#C8A34D]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Designation / Role *</label>
+                <select
+                  value={inviteForm.role}
+                  onChange={(e) => setInviteForm({ ...inviteForm, role: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#C8A34D]"
+                >
+                  <option value="Partner / Co-founder">Partner / Co-founder</option>
+                  <option value="Senior Litigation Counsel">Senior Litigation Counsel</option>
+                  <option value="Associate Advocate">Associate Advocate</option>
+                  <option value="Legal Researcher">Legal Researcher</option>
+                  <option value="Paralegal / Intern">Paralegal / Intern</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsInviteModalOpen(false)}
+                  className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-xs uppercase tracking-wider shadow-md cursor-pointer"
+                >
+                  Send Invitation
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

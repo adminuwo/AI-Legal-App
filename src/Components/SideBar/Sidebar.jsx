@@ -6,7 +6,7 @@ import {
   SearchCode, FileCheck, Gavel, Lightbulb, Scale, Calendar, 
   Users, Bell, User, Settings2, LogOut, ChevronRight, ChevronLeft, Binary,
   Sun, Moon, Globe, ChevronDown, Bookmark, HelpCircle, Download,
-  CreditCard, Shield, Zap, GraduationCap, Building2, MessageSquare
+  CreditCard, Shield, Zap, GraduationCap, Building2, MessageSquare, BookOpen
 } from 'lucide-react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userData, selectedRoleState } from '../../userStore/userData';
@@ -14,6 +14,9 @@ import { AppRoute } from '../../types';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import ExperienceRoleSelector from '../ExperienceRoleSelector';
+import { useSubscription } from '../../context/SubscriptionContext';
+import { logo } from '../../constants';
+import { isSuperAdmin } from '../../utils/isSuperAdmin';
 
 const CORE_VIEWS = [
   { name: 'Dashboard', icon: LayoutGrid, path: '/dashboard' },
@@ -33,6 +36,7 @@ const AI_TOOLS = [
 ];
 
 const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
+  const { badge } = useSubscription();
   const navigate = useNavigate();
   const location = useLocation();
   const [currentUserData, setUserRecoil] = useRecoilState(userData);
@@ -56,7 +60,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
   const coreNavigation = [
     { name: 'Home', icon: LayoutGrid, path: '/dashboard' },
     { name: selectedRole === 'law_firm' ? 'Firm Workspace' : 'My Matters', icon: Briefcase, path: '/dashboard/cases' },
-    { name: 'AI Legal Assistant', icon: Scale, path: '/dashboard/chat/new' },
+    { name: selectedRole === 'law_firm' ? 'AI Firm Assistant' : selectedRole === 'student' ? 'AI Legal Tutor' : 'AI Legal Assistant', icon: Scale, useLogoIcon: true, path: '/dashboard/chat/new' },
     { name: 'AI Tools', icon: Zap, path: '/dashboard/tools' },
   ];
 
@@ -69,9 +73,9 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
     { name: 'MCQ & Quiz Prep', icon: GraduationCap, path: '/dashboard/tools' },
   ] : selectedRole === 'law_firm' ? [
     { name: 'Firm Workspace', icon: Briefcase, path: '/dashboard/cases' },
-    { name: 'AI Client Connect', icon: Users, path: '/dashboard/chat/new?prompt=AI%20Client%20Connect' },
-    { name: 'Contract Analyzer', icon: FileCheck, path: '/dashboard/chat/new?tool=legal_contract_analyzer' },
-    { name: 'Strategy Engine', icon: Brain, path: '/dashboard/chat/new?tool=legal_strategy_engine' },
+    { name: 'AI Team Communication', icon: Users, path: '/dashboard/tools/client-connect' },
+    { name: 'Contract Review', icon: FileCheck, path: '/dashboard/tools/contract-analyzer' },
+    { name: 'Strategy Engine', icon: Brain, path: '/dashboard/tools/strategy-engine' },
     { name: 'Enterprise Toolkit', icon: Zap, path: '/dashboard/tools' },
   ] : [
     { name: 'Legal Research', icon: Search, path: '/dashboard/chat/new?tool=legal_research' },
@@ -194,7 +198,11 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
         }`}
       >
         <div className="flex items-center gap-3">
-          <item.icon className={`w-4 h-4 ${isLinkActive ? 'text-[#C8A34D]' : 'text-slate-400'}`} />
+          {item.useLogoIcon ? (
+            <img src={logo} className="w-4 h-4 object-contain" alt="Logo" />
+          ) : (
+            <item.icon className={`w-4 h-4 ${isLinkActive ? 'text-[#C8A34D]' : 'text-slate-400'}`} />
+          )}
           <span className="text-sm">{item.name}</span>
         </div>
       </button>
@@ -208,10 +216,16 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
       ? 'Law Firm Profile' 
       : 'My Advocate Profile';
 
+    const isAdminUser = user?.role === 'SUPER_ADMIN' || user?.role === 'admin' || user?.email?.toLowerCase() === 'admin@uwo24.com' || user?.email?.toLowerCase() === 'aditi@uwo24.com' || isSuperAdmin(user);
+
     const menuItems = [
       { name: profileLabel, icon: User, action: 'profile' },
       { name: 'Settings', icon: Settings2, path: '/dashboard/settings' },
       { name: 'Pricing & Plans', icon: CreditCard, path: '/legal-pricing' },
+      ...(isAdminUser ? [
+        { name: 'AI Product Guide Knowledge', icon: BookOpen, path: '/dashboard/guide' },
+        { name: 'Admin Portal', icon: Shield, path: '/dashboard/admin' }
+      ] : []),
       { isDivider: true },
       { name: 'Logout', icon: LogOut, action: 'logout', danger: true },
     ];
@@ -231,7 +245,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
             <p className="text-sm font-extrabold text-slate-800 dark:text-white truncate leading-tight capitalize">{user.name || 'Advocate Profile'}</p>
             <p className="text-[11px] font-semibold text-slate-400 truncate mt-0.5">{user.email || 'Advocate Account'}</p>
             <span className="inline-block mt-1 px-2 py-0.5 rounded bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/20 text-[9px] font-bold uppercase tracking-wider">
-              {selectedRole === 'student' ? 'Law Student' : selectedRole === 'law_firm' ? 'Law Firm Associate' : 'Advocate / Practitioner'}
+              {isAdminUser ? 'SUPER ADMIN' : selectedRole === 'student' ? 'Law Student' : selectedRole === 'law_firm' ? 'Law Firm Associate' : 'Advocate / Practitioner'}
             </span>
           </div>
         </div>
@@ -375,7 +389,10 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-[#111827] dark:text-white truncate leading-tight capitalize">{user.name}</p>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <p className="text-sm font-bold text-[#111827] dark:text-white truncate leading-tight capitalize">{user.name}</p>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 shrink-0">{badge}</span>
+                  </div>
                   <p className="text-xs text-[#6B7280] dark:text-slate-400 truncate mt-0.5">{user.email}</p>
                 </div>
               </div>

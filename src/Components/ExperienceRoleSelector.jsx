@@ -45,6 +45,9 @@ export default function ExperienceRoleSelector({ compact = false }) {
     setSelectedRole(roleId);
     try {
       localStorage.setItem('user_selected_role', roleId);
+      localStorage.removeItem('aisa_current_case');
+      localStorage.removeItem('aisa_active_project_id');
+      window.dispatchEvent(new CustomEvent('user_role_changed', { detail: { role: roleId } }));
     } catch (e) {
       console.warn('Failed to save role to localStorage', e);
     }

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { selectedRoleState } from '../userStore/userData';
 import { motion } from 'framer-motion';
 import { 
   Zap, FileText, Scale, Binary, FileCheck, 
@@ -7,6 +9,7 @@ import {
   Mic, Users, BookMarked, HelpCircle, FileCheck2, ShieldCheck
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useSubscription } from '../context/SubscriptionContext';
 
 const ALL_TOOLS = [
   // Core Litigation & Drafting
@@ -113,6 +116,155 @@ const ALL_TOOLS = [
 
 ];
 
+const STUDENT_TOOLS_CATALOG = [
+  {
+    id: 'draft-maker',
+    title: 'Draft Maker',
+    category: 'academic',
+    roleTarget: 'student',
+    description: 'Draft moot court memorials (Appellant/Respondent), academic legal essays, petitions & legal notices under BNS/CPC.',
+    highlights: ['Moot Memorial Template', 'Pleadings Layout', 'PDF/Word Export'],
+    icon: GraduationCap,
+    badge: 'Academic',
+    path: '/dashboard/tools/draft-maker',
+  },
+  {
+    id: 'legal-precedents',
+    title: 'Legal Precedent',
+    category: 'academic',
+    roleTarget: 'student',
+    description: 'Explain Constitution, IPC, BNS, CrPC, BNSS & important statutory sections and landmark Supreme Court judgments.',
+    highlights: ['BNS vs IPC Comparison', 'Section Breakdown', 'Landmark Precedents'],
+    icon: BookOpen,
+    badge: 'Study Tool',
+    path: '/dashboard/tools/legal-precedents',
+  },
+  {
+    id: 'mock-courtroom',
+    title: 'AI Mock Courtroom',
+    category: 'interactive',
+    roleTarget: 'student',
+    description: 'Interactive voice & text moot court practice with simulated AI Judge, opposing counsel objections & trial scoring.',
+    highlights: ['Voice AI Judge', 'Objection Handling', 'Courtroom Score'],
+    icon: Mic,
+    badge: 'Voice AI',
+    path: '/dashboard/tools/mock-courtroom',
+  },
+  {
+    id: 'quiz-practice',
+    title: 'Quiz & MCQ Practice',
+    category: 'exam',
+    roleTarget: 'student',
+    description: 'Generate interactive MCQs, topic quizzes & prelims practice for Judiciary (PCS-J) & AIBE exams.',
+    highlights: ['Judiciary PCS-J MCQs', 'AIBE Exam Practice', 'Instant Explanations'],
+    icon: FileCheck2,
+    badge: 'Exam Prep',
+    path: '/dashboard/tools/quiz-practice',
+  },
+  {
+    id: 'ai-notes-maker',
+    title: 'AI Notes Maker',
+    category: 'notes',
+    roleTarget: 'student',
+    description: 'Create, structure, and auto-summarize study notes, judgment takeaways & exam revision outlines.',
+    highlights: ['Note Auto-Structure', 'Exam Outlines', 'Judiciary Flashcards'],
+    icon: BookMarked,
+    badge: 'Notes Workspace',
+    path: '/dashboard/tools/notes-maker',
+  },
+];
+
+const FIRM_TOOLS_CATALOG = [
+  {
+    id: 'draft-maker',
+    title: 'Draft Maker',
+    category: 'litigation',
+    roleTarget: 'law_firm',
+    description: 'Architect FIRs, Affidavits, Petitions, Plaints, Bail Applications, Commercial Agreements & Legal Notices under BNS/CPC.',
+    highlights: ['FIR & Petitions', 'Order VII CPC', 'PDF/Word Export'],
+    icon: FileText,
+    badge: 'Enterprise Core',
+    path: '/dashboard/tools/draft-maker',
+  },
+  {
+    id: 'argument-builder',
+    title: 'Court Prep Workspace',
+    category: 'litigation',
+    roleTarget: 'law_firm',
+    description: 'Hearing intelligence, 5-point oral submissions, opposition counter-pleas, judge profiling & submission checklist.',
+    highlights: ['Oral Submissions', 'Counter-Rebuttals', 'Court Prep Intelligence'],
+    icon: Gavel,
+    badge: 'Popular',
+    path: '/dashboard/tools/argument-builder',
+  },
+  {
+    id: 'legal-precedents',
+    title: 'Legal Precedents',
+    category: 'research',
+    roleTarget: 'law_firm',
+    description: 'Search Supreme Court & High Court landmark judgments with auto-citations, ratio decidendi & SCC/AIR citation format.',
+    highlights: ['Supreme Court & HCs', 'Ratio Decidendi', 'AIR/SCC Citations'],
+    icon: BookOpen,
+    badge: 'Precedents',
+    path: '/dashboard/tools/legal-precedents',
+  },
+  {
+    id: 'evidence-analyst',
+    title: 'Evidence Analysis',
+    category: 'litigation',
+    roleTarget: 'law_firm',
+    description: 'OCR exhibit scanning, admissibility score dial (0-100%), witness deposition contradiction table & missing proof alerts.',
+    highlights: ['Sec 65B BSA OCR', 'Admissibility Gauge', 'Deposition Contradictions'],
+    icon: Binary,
+    badge: 'Forensics',
+    path: '/dashboard/tools/evidence-analyst',
+  },
+  {
+    id: 'contract-analyzer',
+    title: 'Contract Review',
+    category: 'litigation',
+    roleTarget: 'law_firm',
+    description: 'Clause risk audit cards, executive risk rating (Low/Med/High/Critical), redline replacement suggestions & missing indemnity alerts.',
+    highlights: ['Clause Audit', 'Redline Suggestions', 'Risk Rating Badge'],
+    icon: FileCheck,
+    badge: 'Audit',
+    path: '/dashboard/tools/contract-analyzer',
+  },
+  {
+    id: 'case-predictor',
+    title: 'Case Predictor',
+    category: 'litigation',
+    roleTarget: 'law_firm',
+    description: 'Statistical success probability dial, judicial trend analysis, litigation duration forecast & settlement value range.',
+    highlights: ['Win Probability %', 'Judicial Bench Trends', 'Settlement Range'],
+    icon: Scale,
+    badge: 'Analytics',
+    path: '/dashboard/tools/case-predictor',
+  },
+  {
+    id: 'strategy-engine',
+    title: 'Strategy Engine',
+    category: 'litigation',
+    roleTarget: 'law_firm',
+    description: 'Custom tactical litigation roadmap under BNS/CrPC/CPC, cross-examination question builder & interim relief timing.',
+    highlights: ['Tactical Roadmap', 'Cross-Exam Questions', 'Interim Reliefs'],
+    icon: Brain,
+    badge: 'AI Engine',
+    path: '/dashboard/tools/strategy-engine',
+  },
+  {
+    id: 'client-connect',
+    title: 'AI Team Communication',
+    category: 'firm',
+    roleTarget: 'law_firm',
+    description: 'Automated team broadcasts, internal associate case updates, WhatsApp hearing reminders & client CRM notes.',
+    highlights: ['Team Broadcasts', 'WhatsApp Reminders', 'Status Broadcasts'],
+    icon: Users,
+    badge: 'Team CRM',
+    path: '/dashboard/tools/client-connect',
+  },
+];
+
 import LegalDraftMakerModal from '../Components/LegalDraftMakerModal';
 import LegalArgumentBuilderModal from '../Components/LegalArgumentBuilderModal';
 import LegalPrecedentsModal from '../Components/LegalPrecedentsModal';
@@ -124,6 +276,8 @@ import LegalMockCourtroomModal from '../Components/LegalMockCourtroomModal';
 
 export default function AiToolsPage() {
   const navigate = useNavigate();
+  const { plan, getFeatureUsage, isFeatureLocked, isFeatureLimitReached, triggerUpgradeModal } = useSubscription();
+  const selectedRole = useRecoilValue(selectedRoleState) || 'advocate';
   const [isDraftModalOpen, setIsDraftModalOpen] = useState(false);
   const [isArgumentModalOpen, setIsArgumentModalOpen] = useState(false);
   const [isPrecedentsModalOpen, setIsPrecedentsModalOpen] = useState(false);
@@ -133,7 +287,72 @@ export default function AiToolsPage() {
   const [isStrategyModalOpen, setIsStrategyModalOpen] = useState(false);
   const [isCourtroomModalOpen, setIsCourtroomModalOpen] = useState(false);
 
+  const activeCatalog = selectedRole === 'law_firm' ? FIRM_TOOLS_CATALOG : selectedRole === 'student' ? STUDENT_TOOLS_CATALOG : ALL_TOOLS;
+
+  const getToolUsageStatus = (toolId) => {
+    const keyMap = {
+      'draft-maker': 'draft_maker',
+      'argument-builder': 'court_prep',
+      'legal-precedents': 'legal_precedent',
+      'evidence-analyst': 'evidence_analysis',
+      'contract-analyzer': 'contract_review',
+      'case-predictor': 'case_predictor',
+      'strategy-engine': 'strategy_engine',
+      'client-connect': 'client_connect',
+      'mock-courtroom': 'mock_courtroom',
+      'notes-maker': 'notes_maker',
+      'quiz-practice': 'quiz_practice'
+    };
+    const featureKey = keyMap[toolId] || toolId.replace(/-/g, '_');
+    const feat = getFeatureUsage(featureKey);
+    const locked = isFeatureLocked(featureKey);
+    const limitReached = isFeatureLimitReached(featureKey);
+
+    if (plan === 'SUPER_ADMIN' || plan === 'ENTERPRISE' || feat.limit === -1) {
+      return { 
+        status: 'UNLIMITED', 
+        text: plan === 'SUPER_ADMIN' || plan === 'ENTERPRISE' ? 'Enterprise' : '∞ Unlimited', 
+        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-900/40' 
+      };
+    }
+
+    const defaultLimit = ['mock_courtroom', 'client_connect'].includes(featureKey) ? 1 : 2;
+    const limit = (feat && typeof feat.limit === 'number' && feat.limit > 0) ? feat.limit : defaultLimit;
+    const used = (feat && typeof feat.used === 'number') ? feat.used : 0;
+    const remaining = (feat && typeof feat.remaining === 'number' && feat.remaining >= 0) ? feat.remaining : Math.max(0, limit - used);
+
+    const isExhausted = remaining <= 0 || limitReached;
+
+    if (locked) {
+      return { status: 'LOCKED BY PLAN', text: 'LOCKED BY PLAN', badgeClass: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:border-rose-900/40' };
+    }
+    if (isExhausted) {
+      return { status: 'LIMIT REACHED', text: 'Upgrade Needed', badgeClass: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:border-rose-900/40 font-black uppercase tracking-wider' };
+    }
+
+    return { 
+      status: 'AVAILABLE', 
+      text: `${remaining}/${limit} Free`, 
+      badgeClass: 'bg-[#C8A34D]/15 text-[#C8A34D] border-[#C8A34D]/30 font-extrabold' 
+    };
+  };
+
   const handleLaunchTool = (tool) => {
+    const usage = getToolUsageStatus(tool.id);
+    if (usage.status === 'LOCKED BY PLAN' || usage.status === 'LIMIT REACHED') {
+      triggerUpgradeModal({
+        title: usage.status === 'LOCKED BY PLAN' ? 'Feature Locked by Plan' : 'Limit Reached',
+        message: usage.status === 'LOCKED BY PLAN' 
+          ? `The ${tool.title} feature is locked under your current plan.` 
+          : `You have reached your usage limit for ${tool.title}.`,
+        feature: tool.id
+      });
+      return;
+    }
+    if (tool.path) {
+      navigate(tool.path);
+      return;
+    }
     if (tool.id === 'draft-maker') {
       navigate('/dashboard/tools/draft-maker');
     } else if (tool.id === 'argument-builder') {
@@ -164,21 +383,24 @@ export default function AiToolsPage() {
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#C8A34D]/10 border border-[#C8A34D]/30 text-[#C8A34D] text-[11px] font-semibold">
             <Zap className="w-3.5 h-3.5 text-[#C8A34D]" />
-            <span>Advocate Enterprise AI Suite • Rolex Minimalist Theme</span>
+            <span>{selectedRole === 'student' ? 'Student AI Learning Suite • Rolex Minimalist Theme' : 'Advocate Enterprise AI Suite • Rolex Minimalist Theme'}</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-black tracking-tight text-[#0F172A] dark:text-white">
-            Advocate AI Tools Suite ⚡
+            {selectedRole === 'student' ? 'Student AI Tools Suite ⚡' : 'Advocate AI Tools Suite ⚡'}
           </h1>
           <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-snug">
-            Empower your litigation, courtroom argument building, evidence forensics, contract risk auditing, case outcome prediction, and legal drafting with Soft Gold enterprise AI tools.
+            {selectedRole === 'student' 
+              ? 'Accelerate your legal education, moot court argument building, IRAC judgment analysis, statutory bare act study, and judicial exam preparation.'
+              : 'Empower your litigation, courtroom argument building, evidence forensics, contract risk auditing, case outcome prediction, and legal drafting with Soft Gold enterprise AI tools.'}
           </p>
         </div>
       </div>
 
       {/* Tools Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {ALL_TOOLS.map((t) => {
+        {activeCatalog.map((t) => {
           const IconComp = t.icon;
+          const usage = getToolUsageStatus(t.id);
           return (
             <motion.div
               key={t.id}
@@ -191,6 +413,9 @@ export default function AiToolsPage() {
                   <div className="p-2.5 rounded-lg bg-[#C8A34D]/10 border border-[#C8A34D]/25 text-[#C8A34D]">
                     <IconComp className="w-5 h-5 text-[#C8A34D]" />
                   </div>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${usage.badgeClass}`}>
+                    {usage.text}
+                  </span>
                 </div>
                 <h3 className="text-base font-bold text-[#111111] dark:text-white group-hover:text-[#C8A34D] transition-colors leading-tight">
                   {t.title}

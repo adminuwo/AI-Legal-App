@@ -70,15 +70,38 @@ apiClient.interceptors.request.use(
     }
 
     const userLocale = getLocaleForLanguage(userLang);
-    const activeWsId = localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID') || 'personal_practice';
-    const activeWsType = localStorage.getItem('AI_LEGAL_ACTIVE_WORKSPACE_TYPE') || (activeWsId === 'personal_practice' ? 'personal' : 'law_firm');
+    const activeRole = localStorage.getItem('user_selected_role') || 'advocate';
+    const activeWsId = activeRole === 'law_firm' ? (localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID') || 'personal_practice') : 'personal_practice';
 
-    if (config.data && typeof config.data === 'object' && !(config.data instanceof FormData)) {
+    const getBaseUrl = () => {
+      if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        return 'http://localhost:8080/api';
+      }
+      return API;
+    };
+
+    config.baseURL = getBaseUrl();
+
+    config.headers['X-User-Role'] = activeRole;
+    config.headers['X-Workspace-Type'] = activeRole;
+    config.headers['X-Active-Workspace-Id'] = activeWsId;
+
+    const isGet = (config.method || '').toLowerCase() === 'get';
+
+    if (isGet) {
+      config.params = {
+        role: activeRole,
+        workspaceType: activeRole,
+        workspaceId: activeWsId,
+        ...(config.params || {}),
+      };
+    } else if (config.data && typeof config.data === 'object' && !(config.data instanceof FormData)) {
       config.data.preferred_response_language = userLang;
       config.data.language = userLang;
       config.data.locale = userLocale;
+      if (!config.data.role) config.data.role = activeRole;
+      if (!config.data.workspaceType) config.data.workspaceType = activeRole;
       if (!config.data.workspaceId) config.data.workspaceId = activeWsId;
-      if (!config.data.workspaceType) config.data.workspaceType = activeWsType;
     }
 
     return config;
@@ -1600,6 +1623,25 @@ export const apiService = {
       console.error('Failed to delete client connect log:', error);
       throw error;
     }
+  },
+
+  async request(urlOrConfig, config) {
+    if (typeof urlOrConfig === 'string') {
+      return apiClient.get(urlOrConfig, config);
+    }
+    return apiClient.request(urlOrConfig);
+  },
+  async get(url, config) {
+    return apiClient.get(url, config);
+  },
+  async post(url, data, config) {
+    return apiClient.post(url, data, config);
+  },
+  async put(url, data, config) {
+    return apiClient.put(url, data, config);
+  },
+  async delete(url, config) {
+    return apiClient.delete(url, config);
   },
 
   async triggerPersonalAnalysis(caseId) {
