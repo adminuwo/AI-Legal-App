@@ -8,27 +8,11 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
-
-const CASE_TYPES = [
-  'General Civil Suit & Money Recovery',
-  'Commercial Contract Breach Arbitration',
-  'Sec 138 NI Act Cheque Bounce',
-  'Property Injunction & Title Dispute',
-  'Consumer Protection Appeal (COPRA)',
-  'Criminal Defense & Bail Application',
-  'IP & Copyright Infringement Action',
-  'Labor & Employment Industrial Dispute'
-];
-
-const COURT_LEVELS = [
-  'District & Sessions Court',
-  'High Court of Judicature',
-  'Supreme Court of India',
-  'Commercial Appellate Tribunal (NCLT / NCDRC)'
-];
+import { useSubscription } from '../context/SubscriptionContext';
 
 export default function StrategyEngineWorkspace() {
   const navigate = useNavigate();
+  const { deductToolUsage } = useSubscription();
 
   // Navigation Steps: 'INPUT_SELECT' | 'PRE_REVIEW' | 'SCAN' | 'DASHBOARD'
   const [step, setStep] = useState('INPUT_SELECT');
@@ -139,6 +123,7 @@ export default function StrategyEngineWorkspace() {
 
   // Start 6-Stage Strategy AI Pipeline
   const handleStartStrategyPipeline = async () => {
+    try { deductToolUsage('strategy_engine'); } catch(e) {}
     setStep('SCAN');
     setScanProgress(10);
     setCurrentScanStage(0);

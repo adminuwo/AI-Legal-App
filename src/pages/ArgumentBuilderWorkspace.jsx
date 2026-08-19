@@ -9,6 +9,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { apiService } from '../services/apiService';
+import { useSubscription } from '../context/SubscriptionContext';
 
 const CASE_TYPES = [
   'Cheque Bounce (Sec 138 NI Act)', 
@@ -32,6 +33,7 @@ const SUPPORTED_LANGUAGES = [
 
 export default function ArgumentBuilderWorkspace() {
   const navigate = useNavigate();
+  const { deductToolUsage } = useSubscription();
 
   // Workflow Steps: 1 = Input Source, 2 = Review, 3 = Generation, 4 = Workspace
   const [currentStep, setCurrentStep] = useState(1);
@@ -152,6 +154,7 @@ export default function ArgumentBuilderWorkspace() {
   };
 
   const handleConfirmGenerate = () => {
+    try { deductToolUsage('argument_builder'); } catch(e) {}
     setCurrentStep(3); // Go to Generation progress
     setIsGenerating(true);
     setProgressPct(10);

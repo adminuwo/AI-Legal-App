@@ -24,7 +24,7 @@ const LANGUAGES = [
 
 export default function DraftMakerWorkspace() {
   const navigate = useNavigate();
-  const { refreshSubscription } = useSubscription();
+  const { refreshSubscription, deductToolUsage } = useSubscription();
   
   // Step Management
   const [currentStep, setCurrentStep] = useState(1); // 1: Template, 2: Source, 3: Review, 4: Draft Workspace
@@ -215,6 +215,7 @@ export default function DraftMakerWorkspace() {
 
   // Step 4: AI Generation Call
   const handleGenerateDraft = async () => {
+    try { deductToolUsage('draft_maker'); } catch(e) {}
     setCurrentStep(4);
     setIsGenerating(true);
     setHasSaved(false);

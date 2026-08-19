@@ -9,7 +9,7 @@ import {
   CreditCard, Shield, Zap, GraduationCap, Building2, MessageSquare, BookOpen
 } from 'lucide-react';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { userData, selectedRoleState } from '../../userStore/userData';
+import { userData, selectedRoleState, clearUser } from '../../userStore/userData';
 import { AppRoute } from '../../types';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -113,9 +113,9 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.clear();
+    clearUser();
     setUserRecoil({ user: null });
-    navigate(AppRoute.LANDING);
+    navigate(AppRoute.LOGIN);
   };
 
   const isActive = (path) => {
@@ -175,7 +175,11 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <item.icon className={`w-5 h-5 ${isLinkActive ? 'text-[#C8A34D]' : 'text-slate-400 dark:text-slate-400'}`} />
+          {item.useLogoIcon ? (
+            <img src="/logo/logo_gold_emblem.png" className="w-6 h-6 object-contain shrink-0" alt="AI LEGAL Emblem" />
+          ) : (
+            <item.icon className={`w-5 h-5 ${isLinkActive ? 'text-[#C8A34D]' : 'text-slate-400 dark:text-slate-400'}`} />
+          )}
         </button>
       );
     }
@@ -199,7 +203,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
       >
         <div className="flex items-center gap-3">
           {item.useLogoIcon ? (
-            <img src={logo} className="w-4 h-4 object-contain" alt="Logo" />
+            <img src="/logo/logo_gold_emblem.png" className="w-5.5 h-5.5 object-contain shrink-0" alt="AI LEGAL Emblem" />
           ) : (
             <item.icon className={`w-4 h-4 ${isLinkActive ? 'text-[#C8A34D]' : 'text-slate-400'}`} />
           )}
@@ -216,7 +220,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
       ? 'Law Firm Profile' 
       : 'My Advocate Profile';
 
-    const isAdminUser = user?.role === 'SUPER_ADMIN' || user?.role === 'admin' || user?.email?.toLowerCase() === 'admin@uwo24.com' || user?.email?.toLowerCase() === 'aditi@uwo24.com' || isSuperAdmin(user);
+    const isAdminUser = isSuperAdmin(user);
 
     const menuItems = [
       { name: profileLabel, icon: User, action: 'profile' },
@@ -314,8 +318,8 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
         <div className={`h-16 flex items-center ${isCollapsed ? 'justify-center px-2' : 'justify-between px-5'} border-b border-[#E5E7EB] dark:border-slate-800 shrink-0 transition-all`}>
           {!isCollapsed ? (
             <>
-              <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/dashboard')}>
-                <Scale className="w-7 h-7 text-[#C8A34D]" strokeWidth={2.5} />
+              <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate('/dashboard')}>
+                <img src="/logo/logo_transparent.png" alt="AI LEGAL Logo" className="w-8 h-8 object-contain drop-shadow-xs" />
                 <span className="text-xl font-black tracking-tight text-[#111827] dark:text-white">AI LEGAL<span className="text-[#C8A34D]">.</span></span>
               </div>
               <button
@@ -333,8 +337,8 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
                 title="Expand Sidebar"
                 className="w-12 h-10 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-[#C8A34D]/20 border border-slate-200 dark:border-slate-700 hover:border-[#C8A34D]/50 flex items-center justify-center gap-1 text-slate-700 dark:text-slate-200 hover:text-[#C8A34D] transition-all cursor-pointer shadow-xs"
               >
-                <Scale className="w-4 h-4 text-[#C8A34D]" strokeWidth={2.5} />
-                <ChevronRight className="w-4 h-4 text-[#C8A34D]" strokeWidth={3} />
+                <img src="/logo/logo_transparent.png" className="w-5 h-5 object-contain" alt="AI LEGAL Logo" />
+                <ChevronRight className="w-3.5 h-3.5 text-[#C8A34D]" strokeWidth={3} />
               </button>
             </div>
           )}
@@ -391,7 +395,9 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <p className="text-sm font-bold text-[#111827] dark:text-white truncate leading-tight capitalize">{user.name}</p>
-                    <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 shrink-0">{badge}</span>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-black uppercase bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 shrink-0">
+                      {isSuperAdmin(user) ? 'SUPER ADMIN' : badge === 'SUPER ADMIN' ? 'Free' : badge}
+                    </span>
                   </div>
                   <p className="text-xs text-[#6B7280] dark:text-slate-400 truncate mt-0.5">{user.email}</p>
                 </div>

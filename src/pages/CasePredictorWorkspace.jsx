@@ -8,27 +8,11 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
-
-const CASE_TYPES = [
-  'Sec 138 NI Act Cheque Bounce',
-  'Civil Suit for Recovery of Money',
-  'Commercial Arbitration Breach',
-  'Property & Permanent Injunction Dispute',
-  'Consumer Protection Dispute (COPRA)',
-  'Bail Application (Sec 439 CrPC / Sec 483 BNS)',
-  'Copyright & IP Infringement Suit',
-  'Labor & Industrial Employment Dispute'
-];
-
-const COURT_LEVELS = [
-  'District & Sessions Court',
-  'High Court of Judicature',
-  'Supreme Court of India',
-  'Commercial Appellate Tribunal (NCLT / NCDRC)'
-];
+import { useSubscription } from '../context/SubscriptionContext';
 
 export default function CasePredictorWorkspace() {
   const navigate = useNavigate();
+  const { deductToolUsage } = useSubscription();
 
   // Navigation / Workflow Steps: 'INPUT_SELECT' | 'PRE_REVIEW' | 'SCAN' | 'DASHBOARD'
   const [step, setStep] = useState('INPUT_SELECT');
@@ -139,6 +123,7 @@ export default function CasePredictorWorkspace() {
 
   // Start 10-Stage Neural Prediction Pipeline
   const handleStartPrediction = async () => {
+    try { deductToolUsage('case_predictor'); } catch(e) {}
     setStep('SCAN');
     setScanProgress(5);
     setCurrentScanStage(0);

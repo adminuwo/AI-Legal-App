@@ -86,6 +86,11 @@ const HomeRedirect = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
+  const onboardingDone = localStorage.getItem('ai_legal_onboarding_completed');
+  if (onboardingDone) {
+    return <Navigate to="/login" replace />;
+  }
+
   return <Navigate to="/onboarding" replace />;
 };
 

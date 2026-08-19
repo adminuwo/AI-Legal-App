@@ -9,6 +9,7 @@ import {
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
+import { useSubscription } from '../context/SubscriptionContext';
 
 // 18 Legal Directory Categories (Mobile Parity)
 const RESEARCH_CATEGORIES = [
@@ -237,6 +238,7 @@ const LANDMARK_PRECEDENTS_DB = [
 
 export default function LegalPrecedentsWorkspace() {
   const navigate = useNavigate();
+  const { deductToolUsage } = useSubscription();
   const [searchParams] = useSearchParams();
   const initialCaseId = searchParams.get('caseId');
 
@@ -297,6 +299,7 @@ export default function LegalPrecedentsWorkspace() {
 
   // Perform Precedents Search
   const handlePerformSearch = async (overrideQuery = null, categoryFilter = null) => {
+    try { deductToolUsage('legal_precedent'); } catch(e) {}
     const q = (overrideQuery !== null ? overrideQuery : searchQuery).trim();
     const cat = categoryFilter !== null ? categoryFilter : selectedCategory;
 

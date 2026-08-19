@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { generateChatResponse } from '../services/geminiService';
+import { useSubscription } from '../context/SubscriptionContext';
 
 // CATALOG CATEGORIES (30+ Subjects)
 const CATALOG_CATEGORIES = [
@@ -95,6 +96,7 @@ const TRENDING_TOPICS = [
 
 export default function QuizPracticeWorkspace() {
   const navigate = useNavigate();
+  const { deductToolUsage } = useSubscription();
 
   // State
   const [outputLanguage, setOutputLanguage] = useState('English');
@@ -352,6 +354,7 @@ export default function QuizPracticeWorkspace() {
 
   // Start AI Quiz Execution
   const startQuiz = async () => {
+    try { deductToolUsage('quiz_practice'); } catch(e) {}
     setSetupModalOpen(false);
     setQuizState('loading');
     setCurrentIdx(0);

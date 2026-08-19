@@ -208,6 +208,23 @@ export function parseAuthError(err, context, navigate, onAction) {
     };
   }
 
+  // 9b. Terms & Conditions Required
+  if (
+    lowerMsg.includes("accept the terms") || 
+    lowerMsg.includes("terms & conditions") || 
+    lowerMsg.includes("terms of service")
+  ) {
+    return {
+      title: "Terms & Conditions Required",
+      description: "You must accept the Terms of Service, Privacy Policy, and Cookie Policy to create an account.",
+      icon: "file-warning",
+      primaryLabel: "I Accept",
+      primaryAction: () => {
+        if (onAction) onAction("focusTerms");
+      }
+    };
+  }
+
   // 10. Incorrect Password (Login)
   if (lowerMsg.includes("incorrect password") || lowerMsg.includes("wrong password")) {
     return {

@@ -29,7 +29,7 @@ const TEXT_SOURCES = [
 
 export default function EvidenceAnalystWorkspace() {
   const navigate = useNavigate();
-  const { refreshSubscription } = useSubscription();
+  const { refreshSubscription, deductToolUsage } = useSubscription();
   // Navigation & Flow Steps: 'SELECT_SOURCE' | 'COLLECT' | 'SCAN' | 'DASHBOARD'
   const [step, setStep] = useState('SELECT_SOURCE');
   const [selectedSource, setSelectedSource] = useState('gallery');
@@ -221,6 +221,7 @@ export default function EvidenceAnalystWorkspace() {
 
   // Trigger 6-Stage Forensic Scan
   const handleStartForensicScan = () => {
+    try { deductToolUsage('evidence_analysis'); } catch(e) {}
     if (!evidenceFile && selectedSource !== 'manual' && selectedSource !== 'drive') {
       toast.error('Please pick or capture an evidence file first.');
       return;

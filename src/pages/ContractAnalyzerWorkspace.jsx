@@ -23,7 +23,7 @@ const CONTRACT_CATEGORIES = [
 
 export default function ContractAnalyzerWorkspace() {
   const navigate = useNavigate();
-  const { refreshSubscription } = useSubscription();
+  const { refreshSubscription, deductToolUsage } = useSubscription();
 
   // Navigation / Workflow Steps: 'UPLOAD' | 'SCAN' | 'DASHBOARD'
   const [step, setStep] = useState('UPLOAD');
@@ -120,6 +120,7 @@ export default function ContractAnalyzerWorkspace() {
 
   // Start 9-Stage AI Audit
   const handleStartAnalysis = async () => {
+    try { deductToolUsage('contract_review'); } catch(e) {}
     if (!contractFile && !contractName) {
       toast.error('Please upload a contract document first.');
       return;

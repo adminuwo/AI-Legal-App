@@ -319,20 +319,24 @@ export default function AiToolsPage() {
     const defaultLimit = ['mock_courtroom', 'client_connect'].includes(featureKey) ? 1 : 2;
     const limit = (feat && typeof feat.limit === 'number' && feat.limit > 0) ? feat.limit : defaultLimit;
     const used = (feat && typeof feat.used === 'number') ? feat.used : 0;
-    const remaining = (feat && typeof feat.remaining === 'number' && feat.remaining >= 0) ? feat.remaining : Math.max(0, limit - used);
+    const remaining = (feat && typeof feat.remaining === 'number') ? Math.max(0, limit - used) : (feat?.remaining !== undefined ? feat.remaining : Math.max(0, limit - used));
 
     const isExhausted = remaining <= 0 || limitReached;
 
     if (locked) {
-      return { status: 'LOCKED BY PLAN', text: 'LOCKED BY PLAN', badgeClass: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:border-rose-900/40' };
+      return { status: 'LOCKED BY PLAN', text: 'LOCKED BY PLAN', badgeClass: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:border-rose-900/40 font-bold' };
     }
     if (isExhausted) {
-      return { status: 'LIMIT REACHED', text: 'Upgrade Needed', badgeClass: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:border-rose-900/40 font-black uppercase tracking-wider' };
+      return { 
+        status: 'LIMIT REACHED', 
+        text: `0/${limit} UPGRADE NEEDED`, 
+        badgeClass: 'bg-rose-500/15 text-rose-600 border-rose-300 dark:bg-rose-950/60 dark:border-rose-800/60 font-black uppercase tracking-wider shadow-2xs' 
+      };
     }
 
     return { 
       status: 'AVAILABLE', 
-      text: `${remaining}/${limit} Free`, 
+      text: `${remaining}/${limit} ${plan === 'FREE' ? 'FREE' : 'LEFT'}`, 
       badgeClass: 'bg-[#C8A34D]/15 text-[#C8A34D] border-[#C8A34D]/30 font-extrabold' 
     };
   };

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { generateChatResponse } from '../services/geminiService';
+import { useSubscription } from '../context/SubscriptionContext';
 
 // NOTE FORMAT CHIPS
 const NOTE_CHIPS = [
@@ -127,6 +128,7 @@ const CleanMarkdownRenderer = ({ rawText }) => {
 
 export default function NotesMakerWorkspace() {
   const navigate = useNavigate();
+  const { deductToolUsage } = useSubscription();
 
   // Screen View State
   const [screenState, setScreenState] = useState('home'); // home | workspace
@@ -418,6 +420,7 @@ CRITICAL RULES:
 
   // ACTION 3: GENERATE FULL STRUCTURED STUDY NOTES
   const handleGenerateNotes = async (overrideTopic) => {
+    try { deductToolUsage('notes_maker'); } catch(e) {}
     let topicToUse = '';
 
     if (inputMode === 'ai_topic') {

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import apiService from '../services/apiService';
 import { useRecoilValue } from 'recoil';
 import { selectedRoleState } from '../userStore/userData';
+import { initSocket, getSocket } from '../services/socketService';
 
 const SubscriptionContext = createContext(null);
 
@@ -68,6 +69,67 @@ export const SubscriptionProvider = ({ children }) => {
     return () => window.removeEventListener('focus', handleFocus);
   }, [selectedRole, fetchSubscription]);
 
+  // Real-Time Socket.IO Listener for Cross-Platform Usage Sync (Web ↔ Mobile)
+  useEffect(() => {
+    const token = localStorage.getItem('token') || localStorage.getItem('user');
+    const userStr = localStorage.getItem('user');
+    let userId = null;
+    try {
+      if (userStr) {
+        const parsed = JSON.parse(userStr);
+        userId = parsed?.id || parsed?._id;
+      }
+    } catch (e) {}
+
+    if (!token) return;
+
+    let socket = getSocket();
+    if (!socket || !socket.connected) {
+      socket = initSocket(token);
+    }
+
+    if (socket) {
+      if (userId) socket.emit('join', userId);
+
+      const handleUsageUpdated = (data) => {
+        console.log('📡 [Web SubscriptionContext] Real-time feature_usage_updated received:', data);
+        if (!data || !data.featureKey) return;
+        const normKey = data.featureKey;
+        const newUsed = data.usedCount;
+        const newRemaining = data.remainingCount !== undefined ? data.remainingCount : data.remaining;
+
+        // Update local storage cache
+        try {
+          localStorage.setItem(`AI_LEGAL_USAGE_${normKey}`, JSON.stringify({ used: newUsed, remaining: newRemaining }));
+        } catch (e) {}
+
+        // Update active subscription React state
+        setSubscription((prevSub) => {
+          if (!prevSub) return prevSub;
+          const currentFeatures = prevSub.features || {};
+          const oldFeat = currentFeatures[normKey] || {};
+          return {
+            ...prevSub,
+            features: {
+              ...currentFeatures,
+              [normKey]: {
+                ...oldFeat,
+                used: newUsed,
+                limit: data.limit || oldFeat.limit || 5,
+                remaining: newRemaining
+              }
+            }
+          };
+        });
+      };
+
+      socket.on('feature_usage_updated', handleUsageUpdated);
+      return () => {
+        socket.off('feature_usage_updated', handleUsageUpdated);
+      };
+    }
+  }, []);
+
   // Utility Methods
   const getFeatureUsage = useCallback((featureKey) => {
     const normKey = (featureKey || '')
@@ -78,6 +140,7 @@ export const SubscriptionProvider = ({ children }) => {
 
     const defaultFreeLimits = {
       draft_maker: 2,
+      argument_builder: 2,
       court_prep: 2,
       legal_precedent: 2,
       evidence_analysis: 2,
@@ -93,23 +156,74 @@ export const SubscriptionProvider = ({ children }) => {
 
     const fallbackLimit = defaultFreeLimits[normKey] !== undefined ? defaultFreeLimits[normKey] : 2;
 
+    let cachedUsage = null;
+    try {
+      const rawCache = localStorage.getItem(`AI_LEGAL_USAGE_${normKey}`);
+      if (rawCache) cachedUsage = JSON.parse(rawCache);
+    } catch (e) {}
+
     if (!subscription || !subscription.features) {
-      return { used: 0, limit: fallbackLimit, remaining: fallbackLimit };
+      const used = cachedUsage ? cachedUsage.used : 0;
+      const remaining = cachedUsage ? cachedUsage.remaining : Math.max(0, fallbackLimit - used);
+      return { used, limit: fallbackLimit, remaining };
     }
 
     const feat = subscription.features[normKey] || subscription.features[featureKey];
     if (feat) {
       const limit = feat.limit === undefined ? fallbackLimit : feat.limit;
-      const used = feat.used || 0;
-      const remaining = feat.remaining === undefined ? Math.max(0, limit - used) : feat.remaining;
+      const used = Math.max(feat.used || 0, cachedUsage?.used || 0);
+      const remaining = limit === -1 ? -1 : Math.max(0, limit - used);
       return {
         used,
         limit,
         remaining
       };
     }
-    return { used: 0, limit: fallbackLimit, remaining: fallbackLimit };
+
+    const used = cachedUsage ? cachedUsage.used : 0;
+    const remaining = cachedUsage ? cachedUsage.remaining : Math.max(0, fallbackLimit - used);
+    return { used, limit: fallbackLimit, remaining };
   }, [subscription]);
+
+  const deductToolUsage = useCallback((featureKey) => {
+    const normKey = (featureKey || '')
+      .replace(/([a-z])([A-Z])/g, '$1_$2')
+      .toLowerCase()
+      .replace(/-/g, '_')
+      .trim();
+
+    setSubscription((prevSub) => {
+      const currentSub = prevSub || {};
+      const currentFeatures = currentSub.features || {};
+      const currentFeat = currentFeatures[normKey] || { used: 0, limit: 2, remaining: 2 };
+
+      const newUsed = (currentFeat.used || 0) + 1;
+      const limit = currentFeat.limit !== undefined ? currentFeat.limit : 2;
+      const newRemaining = limit === -1 ? -1 : Math.max(0, limit - newUsed);
+
+      const updatedFeatures = {
+        ...currentFeatures,
+        [normKey]: {
+          ...currentFeat,
+          used: newUsed,
+          remaining: newRemaining,
+        }
+      };
+
+      try {
+        localStorage.setItem(`AI_LEGAL_USAGE_${normKey}`, JSON.stringify({ used: newUsed, remaining: newRemaining }));
+      } catch (e) {}
+
+      return {
+        ...currentSub,
+        features: updatedFeatures
+      };
+    });
+
+    try {
+      apiService.post('/subscription/record-usage', { featureKey: normKey, workspaceType: selectedRole }).catch(() => {});
+    } catch (e) {}
+  }, [selectedRole]);
 
   const isFeatureAvailable = useCallback((featureKey) => {
     if (!subscription) return true;
@@ -161,6 +275,7 @@ export const SubscriptionProvider = ({ children }) => {
     refreshSubscription: fetchSubscription,
     isFeatureAvailable,
     getFeatureUsage,
+    deductToolUsage,
     isFeatureLocked,
     isFeatureLimitReached,
     isUpgradeModalOpen,

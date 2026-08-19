@@ -10,13 +10,40 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
 import { useSubscription } from '../context/SubscriptionContext';
+import InviteTeamMemberModal from '../Tools/AI_Legal/components/InviteTeamMemberModal';
 
-export default function LawFirmDashboardSection({ user, cases = [] }) {
+export default function LawFirmDashboardSection({ user, cases = [], workspaces = [], onRefresh }) {
   const navigate = useNavigate();
   const { triggerUpgradeModal } = useSubscription();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [inviteForm, setInviteForm] = useState({ name: '', email: '', role: 'Associate Advocate' });
   const [activeMenuMemberId, setActiveMenuMemberId] = useState(null);
+  const [activeWsId, setActiveWsId] = useState(() => localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID') || 'firm_abc_workspace');
+
+  React.useEffect(() => {
+    const handleWorkspaceChange = () => {
+      const current = localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID') || 'firm_abc_workspace';
+      setActiveWsId(current);
+      if (typeof onRefresh === 'function') {
+        onRefresh();
+      }
+    };
+    window.addEventListener('workspace_changed', handleWorkspaceChange);
+    window.addEventListener('user_role_changed', handleWorkspaceChange);
+    return () => {
+      window.removeEventListener('workspace_changed', handleWorkspaceChange);
+      window.removeEventListener('user_role_changed', handleWorkspaceChange);
+    };
+  }, [onRefresh]);
+
+  const activeWorkspaceObj = useMemo(() => {
+    if (Array.isArray(workspaces) && workspaces.length > 0) {
+      return workspaces.find(w => (w._id || w.id) === activeWsId) || workspaces[0];
+    }
+    return null;
+  }, [workspaces, activeWsId]);
+
+  const activeWsName = activeWorkspaceObj?.name || 'Firm Overview';
 
   // Filter firm cases strictly (workspaceType === 'law_firm' or firm cases)
   const firmCases = useMemo(() => {
@@ -40,9 +67,9 @@ export default function LawFirmDashboardSection({ user, cases = [] }) {
   // Fetch real team members from API
   React.useEffect(() => {
     const fetchRealTeamMembers = async () => {
-      const activeWsId = localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID') || 'firm_abc_workspace';
+      const currentWsId = localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID') || activeWsId || 'firm_abc_workspace';
       try {
-        const res = await apiService.get(`/workspaces/${activeWsId}/members`);
+        const res = await apiService.get(`/workspaces/${currentWsId}/members`);
         const membersList = res?.data?.members || res?.members || res?.data;
         if (Array.isArray(membersList) && membersList.length > 0) {
           const mapped = membersList.map(m => ({
@@ -66,7 +93,7 @@ export default function LawFirmDashboardSection({ user, cases = [] }) {
       }
     };
     fetchRealTeamMembers();
-  }, [user, ownerMember]);
+  }, [user, ownerMember, activeWsId]);
 
   const maxSeats = user?.maxSeats || 10;
   const usedSeats = teamMembers.length;
@@ -194,8 +221,13 @@ export default function LawFirmDashboardSection({ user, cases = [] }) {
             <Building2 className="w-3.5 h-3.5" />
             <span>Law Firm Enterprise Workspace</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Firm Overview
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
+            <span>{activeWsName}</span>
+            {activeWorkspaceObj?.badge && (
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#C8A34D]/20 text-[#C8A34D] font-bold border border-[#C8A34D]/30">
+                {activeWorkspaceObj.badge}
+              </span>
+            )}
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium">
             Multi-advocate case pipeline & team collaboration metrics
@@ -484,91 +516,13 @@ export default function LawFirmDashboardSection({ user, cases = [] }) {
       </div>
 
       {/* 5. Invite Team Member Modal */}
-      <AnimatePresence>
-        {isInviteModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 relative"
-            >
-              <button
-                onClick={() => setIsInviteModalOpen(false)}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="flex items-center gap-3 mb-5">
-                <div className="p-3 rounded-xl bg-[#C8A34D]/15 text-[#C8A34D]">
-                  <UserPlus className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">Invite Lawyer / Associate</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Add a team member to your firm's enterprise seat license</p>
-                </div>
-              </div>
-
-              <form onSubmit={handleSendInvite} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
-                  <input
-                    type="text"
-                    placeholder="Adv. Rajesh Sharma"
-                    value={inviteForm.name}
-                    onChange={(e) => setInviteForm({ ...inviteForm, name: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#C8A34D]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Email Address *</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="rajesh@firm.com"
-                    value={inviteForm.email}
-                    onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#C8A34D]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Designation / Role</label>
-                  <select
-                    value={inviteForm.role}
-                    onChange={(e) => setInviteForm({ ...inviteForm, role: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#C8A34D]"
-                  >
-                    <option value="Partner / Co-founder">Partner / Co-founder</option>
-                    <option value="Senior Litigation Counsel">Senior Litigation Counsel</option>
-                    <option value="Associate Advocate">Associate Advocate</option>
-                    <option value="Legal Researcher">Legal Researcher</option>
-                    <option value="Paralegal / Intern">Paralegal / Intern</option>
-                  </select>
-                </div>
-
-                <div className="pt-3 flex justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsInviteModalOpen(false)}
-                    className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2.5 rounded-xl bg-[#C8A34D] hover:bg-[#b59240] text-slate-950 font-black text-xs shadow-md transition-all cursor-pointer"
-                  >
-                    Send Invitation
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      <InviteTeamMemberModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        onSuccess={() => {
+          if (onRefresh) onRefresh();
+        }}
+      />
     </div>
   );
 }

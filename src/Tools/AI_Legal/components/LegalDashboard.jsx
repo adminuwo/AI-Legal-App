@@ -9,6 +9,8 @@ import { useLanguage } from '../../../context/LanguageContext';
 import { apiService } from '../../../services/apiService';
 import toast from 'react-hot-toast';
 import { useSubscription } from '../../../context/SubscriptionContext';
+import CaseOperationsHubModal from './CaseOperationsHubModal';
+import InviteTeamMemberModal from './InviteTeamMemberModal';
 
 const LegalDashboard = ({
   legalCases = [],
@@ -52,6 +54,7 @@ const LegalDashboard = ({
 
   // Law Firm Invite Member State
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isCaseOperationsHubOpen, setIsCaseOperationsHubOpen] = useState(false);
   const [inviteForm, setInviteForm] = useState({ name: '', email: '', role: 'Associate Advocate' });
 
   const handleSendInvite = async (e) => {
@@ -112,6 +115,28 @@ const LegalDashboard = ({
   };
 
   const handleCreateCaseClick = () => {
+    const isLawFirm = (localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm';
+    if (isLawFirm) {
+      setIsCaseOperationsHubOpen(true);
+      return;
+    }
+
+    if (cases && cases.limit !== -1 && cases.used >= cases.limit) {
+      triggerUpgradeModal({
+        title: 'Matter Limit Reached',
+        message: `You have reached your active case limit of ${cases.limit} cases for your current plan. Upgrade your plan to create more cases.`,
+        used: cases.used,
+        limit: cases.limit,
+        feature: 'cases'
+      });
+      return;
+    }
+    if (setEditingCaseId) setEditingCaseId(null);
+    if (setNewCaseForm) setNewCaseForm({ clientName: '', caseType: '', otherCaseType: '', accused: '', summary: '' });
+    setIsNewCaseModalOpen(true);
+  };
+
+  const handleLaunchCreateCaseFromHub = () => {
     if (cases && cases.limit !== -1 && cases.used >= cases.limit) {
       triggerUpgradeModal({
         title: 'Matter Limit Reached',
@@ -336,16 +361,6 @@ const LegalDashboard = ({
         </div>
 
         <div className="flex items-center gap-3">
-          {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm' && (
-            <button
-              onClick={() => setIsInviteModalOpen(true)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-bold text-xs sm:text-sm transition-all border border-slate-200 dark:border-slate-700 cursor-pointer"
-            >
-              <UserPlus className="w-4 h-4 text-[#C8A34D]" />
-              <span>+ Invite Team Member</span>
-            </button>
-          )}
-
           <button
             onClick={handleCreateCaseClick}
             className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 whitespace-nowrap cursor-pointer"
@@ -754,85 +769,23 @@ const LegalDashboard = ({
         )}
       </div>
 
-      {/* Invite Member Modal */}
-      {isInviteModalOpen && (
-        <div className="fixed inset-0 z-[200000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 relative space-y-4">
-            <button
-              onClick={() => setIsInviteModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
-            >
-              <X className="w-5 h-5" />
-            </button>
+      {/* Invite Team Member Modal */}
+      <InviteTeamMemberModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        onSuccess={() => {
+          if (fetchLegalCases) fetchLegalCases(true);
+        }}
+      />
 
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl bg-[#C8A34D]/15 text-[#C8A34D]">
-                <UserPlus className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Invite Lawyer / Associate</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Add team member to firm workspace</p>
-              </div>
-            </div>
-
-            <form onSubmit={handleSendInvite} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
-                <input
-                  type="text"
-                  placeholder="Adv. Rajesh Sharma"
-                  value={inviteForm.name}
-                  onChange={(e) => setInviteForm({ ...inviteForm, name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#C8A34D]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Official Email Address *</label>
-                <input
-                  type="email"
-                  required
-                  placeholder="rajesh@firm.com"
-                  value={inviteForm.email}
-                  onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#C8A34D]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Designation / Role *</label>
-                <select
-                  value={inviteForm.role}
-                  onChange={(e) => setInviteForm({ ...inviteForm, role: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:ring-[#C8A34D]"
-                >
-                  <option value="Partner / Co-founder">Partner / Co-founder</option>
-                  <option value="Senior Litigation Counsel">Senior Litigation Counsel</option>
-                  <option value="Associate Advocate">Associate Advocate</option>
-                  <option value="Legal Researcher">Legal Researcher</option>
-                  <option value="Paralegal / Intern">Paralegal / Intern</option>
-                </select>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsInviteModalOpen(false)}
-                  className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-xs uppercase tracking-wider shadow-md cursor-pointer"
-                >
-                  Send Invitation
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Case Operations Hub Modal */}
+      <CaseOperationsHubModal
+        isOpen={isCaseOperationsHubOpen}
+        onClose={() => setIsCaseOperationsHubOpen(false)}
+        onLaunchCreateCase={handleLaunchCreateCaseFromHub}
+        onLaunchInviteTeam={() => setIsInviteModalOpen(true)}
+        cases={legalCases}
+      />
     </div>
   );
 };

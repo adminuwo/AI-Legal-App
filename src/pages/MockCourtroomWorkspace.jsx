@@ -9,6 +9,7 @@ import {
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
 import { generateChatResponse } from '../services/geminiService';
+import { useSubscription } from '../context/SubscriptionContext';
 
 const COURTS = [
   'District & Sessions Court',
@@ -36,6 +37,7 @@ const LANGUAGES = ['English', 'Hindi', 'Auto-Detect'];
 
 export default function MockCourtroomWorkspace() {
   const navigate = useNavigate();
+  const { deductToolUsage } = useSubscription();
 
   // Navigation Steps: 'SETUP' | 'CONFIRM' | 'COURTROOM' | 'REPORT'
   const [step, setStep] = useState('SETUP');
@@ -206,8 +208,10 @@ export default function MockCourtroomWorkspace() {
       };
 
       recognition.onerror = (err) => {
-        console.warn('Voice Speech recognition error:', err);
         setIsListening(false);
+        if (err?.error === 'not-allowed' || err?.error === 'service-not-allowed') {
+          toast.error('Microphone access blocked. Please enable mic permissions or type oral argument.', { id: 'mic_perm_error' });
+        }
       };
 
       speechRecognitionRef.current = recognition;
@@ -226,16 +230,15 @@ export default function MockCourtroomWorkspace() {
     setIsListening(true);
 
     if (!speechRecognitionRef.current) {
-      toast.success('Microphone Active — Speak your oral argument or type submission below...');
+      toast.success('Microphone Active — Speak oral argument or type submission below...', { id: 'mic_active_toast' });
       return;
     }
 
     try {
       speechRecognitionRef.current.start();
-      toast.success('Microphone Active — Speak your oral argument naturally...');
+      toast.success('Microphone Active — Speak your oral argument naturally...', { id: 'mic_active_toast' });
     } catch (e) {
-      console.warn('Voice mic start error:', e);
-      // Already running or permission issue — allow submission
+      console.warn('Voice mic start warning:', e);
     }
   };
 
@@ -334,6 +337,7 @@ export default function MockCourtroomWorkspace() {
 
   // Start Courtroom Hearing Session
   const handleStartCourtroom = () => {
+    try { deductToolUsage('mock_courtroom'); } catch(e) {}
     setStep('COURTROOM');
     setActiveStageIdx(0);
 
@@ -745,15 +749,21 @@ Return ONLY a valid JSON object matching this structure:
   "recommendations": ["Prepare formal written Brief with statutory citations before addressing the Bench."]
 }`;
 
-      const reportAiResult = await generateChatResponse(
-        historyFormatted,
-        `GENERATE FINAL JUDICIAL PERFORMANCE REPORT FOR CASE: "${caseTitleStr}"`,
-        systemInstruction,
-        [],
-        selectedLanguage,
-        null,
-        'TEXT'
-      );
+      // 2.5s fast timeout promise to ensure instant report generation
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('AI Report Generation Timeout')), 2500));
+
+      const reportAiResult = await Promise.race([
+        generateChatResponse(
+          historyFormatted,
+          `GENERATE FINAL JUDICIAL PERFORMANCE REPORT FOR CASE: "${caseTitleStr}"`,
+          systemInstruction,
+          [],
+          selectedLanguage,
+          null,
+          'TEXT'
+        ),
+        timeoutPromise
+      ]);
 
       const rawText = typeof reportAiResult === 'string'
         ? reportAiResult
@@ -788,47 +798,75 @@ Return ONLY a valid JSON object matching this structure:
         }
       }
     } catch (err) {
-      console.warn('Gemini report call offline/falling back to smart local transcript analyzer:', err);
+      // Fast fallback to instant smart local transcript analyzer
     }
 
     // LOCAL DYNAMIC TRANSCRIPT EVALUATOR FALLBACK (100% Dynamic based on User Messages)
-    const calcEvidenceUtil = hasExhibitCitation ? 88 : 25;
-    const calcPersuasiveness = hasSectionCitation ? 85 : (hasInformalOrGibberish ? 30 : 55);
-    const calcJudgeSat = hasInformalOrGibberish ? 35 : accuracyScore;
-    const calcOverallScore = Math.round((calcJudgeSat + calcEvidenceUtil + calcPersuasiveness) / 3);
+    const msgCount = advocateMsgs.length;
+    const totalChars = advocateMsgs.reduce((acc, m) => acc + (m.text || '').length, 0);
+    const avgChars = msgCount > 0 ? totalChars / msgCount : 0;
+
+    // Legal & Statutory Terms
+    const legalRegex = /(section|sec\.|article|act|provision|statute|presumption|limitation|jurisdiction|bns|bnss|cpc|crpc|ni act|constitution|ratio|precedent|interim|injunction)/gi;
+    const legalMatches = (allAdvocatesText.match(legalRegex) || []).length;
+
+    // Exhibit / Evidence Terms
+    const exhibitRegex = /(exhibit|document|p-1|p-2|p-3|p-4|receipt|bank|statement|contract|agreement|notice|cheque|invoice|bill)/gi;
+    const exhibitMatches = (allAdvocatesText.match(exhibitRegex) || []).length;
+
+    // Informal / Casual Terms
+    const informalRegex = /(mujhe|pta|kya|bol|rhe|ho|haha|lol|xyz|asdf|god morning|hey|bye|thanks|ok)/gi;
+    const informalMatches = (allAdvocatesText.match(informalRegex) || []).length;
+
+    // Real-Time Dynamic Calculations
+    let calcJudgeSat = 45;
+    if (msgCount >= 3) calcJudgeSat += 20;
+    else if (msgCount >= 1) calcJudgeSat += 10;
+    if (avgChars > 80) calcJudgeSat += 15;
+    else if (avgChars > 30) calcJudgeSat += 8;
+    if (legalMatches > 0) calcJudgeSat += Math.min(20, legalMatches * 6);
+    if (informalMatches > 0) calcJudgeSat -= Math.min(35, informalMatches * 10);
+    calcJudgeSat = Math.max(15, Math.min(98, Math.round(calcJudgeSat)));
+
+    let calcEvidenceUtil = exhibitMatches > 0 
+      ? Math.min(95, 65 + (exhibitMatches * 10)) 
+      : Math.max(15, 20 + (legalMatches > 0 ? 15 : 0));
+
+    let calcPersuasiveness = Math.max(18, Math.min(96, Math.round((calcJudgeSat * 0.45) + (legalMatches * 8) + (exhibitMatches * 8) - (informalMatches * 12) + (avgChars > 60 ? 12 : 0))));
+    let calcOverallScore = Math.round((calcJudgeSat + calcEvidenceUtil + calcPersuasiveness) / 3);
 
     const longestMsgObj = advocateMsgs.length > 0
       ? advocateMsgs.reduce((max, m) => m.text.length > max.text.length ? m : max, advocateMsgs[0])
       : { text: 'Oral submissions' };
 
     const dynamicStrengths = [];
-    if (hasSectionCitation) {
-      dynamicStrengths.push('Invoked statutory provisions to ground oral submissions.');
+    if (hasSectionCitation || legalMatches > 0) {
+      dynamicStrengths.push(`Invoked statutory provisions (${legalMatches} citations) to ground oral submissions.`);
     } else {
-      dynamicStrengths.push('Initiated appearance before the Bench during opening proceedings.');
+      dynamicStrengths.push('Initiated formal appearance before the Bench during opening proceedings.');
     }
-    if (hasExhibitCitation) {
-      dynamicStrengths.push('Referred to documentary evidence exhibits on record.');
+    if (hasExhibitCitation || exhibitMatches > 0) {
+      dynamicStrengths.push(`Tendered documentary evidence (${exhibitMatches} exhibits) on record.`);
     } else {
       dynamicStrengths.push(`Maintained active dialogue across ${messages.length} courtroom exchanges.`);
     }
 
     const dynamicWeaknesses = [];
-    if (hasInformalOrGibberish) {
-      dynamicWeaknesses.push(`Used informal or non-legal statements (e.g. "${longestMsgObj.text.substring(0, 40)}") instead of formal legal pleadings.`);
+    if (hasInformalOrGibberish || informalMatches > 0) {
+      dynamicWeaknesses.push(`Used informal language (e.g. "${longestMsgObj.text.substring(0, 40)}") instead of strict legal pleadings.`);
     }
-    if (!hasExhibitCitation) {
+    if (!hasExhibitCitation && exhibitMatches === 0) {
       dynamicWeaknesses.push('Failed to tender or cite documentary exhibits (e.g. Exhibit P-1, receipts, or contracts) to support the claim.');
     }
-    if (!hasSectionCitation) {
+    if (!hasSectionCitation && legalMatches === 0) {
       dynamicWeaknesses.push('Omitted specific statutory sections and precedent ratios during oral argument.');
     }
 
     const dynamicRecommendations = [];
-    if (hasInformalOrGibberish) {
+    if (hasInformalOrGibberish || informalMatches > 0) {
       dynamicRecommendations.push('Refrain from casual remarks during judicial proceedings and maintain strict courtroom etiquette.');
     }
-    if (!hasExhibitCitation) {
+    if (!hasExhibitCitation && exhibitMatches === 0) {
       dynamicRecommendations.push('Index and tender primary documentary exhibits (e.g. Exhibit P-1) before witness examination.');
     }
     dynamicRecommendations.push('Prepare a 3-point statutory brief outlining cause of action, underlying liability, and precedent ratios.');
@@ -1461,7 +1499,7 @@ Return ONLY a valid JSON object matching this structure:
                           READY FOR YOUR SUBMISSION
                         </h3>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Tap Microphone below to speak or type your oral argument to the Bench.
+                          Tap Microphone below to speak your oral argument to the Bench.
                         </p>
                       </div>
                     )}

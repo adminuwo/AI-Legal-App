@@ -82,9 +82,11 @@ apiClient.interceptors.request.use(
 
     config.baseURL = getBaseUrl();
 
+    const deviceId = localStorage.getItem('aisa_device_id') || 'web_client';
     config.headers['X-User-Role'] = activeRole;
     config.headers['X-Workspace-Type'] = activeRole;
     config.headers['X-Active-Workspace-Id'] = activeWsId;
+    config.headers['X-Device-Id'] = deviceId;
 
     const isGet = (config.method || '').toLowerCase() === 'get';
 
@@ -143,9 +145,18 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      const isRevoked = error.response?.data?.code === 'SESSION_REVOKED';
       // Clear user data and redirect to login on unauthorized
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+        if (isRevoked) {
+          sessionStorage.setItem('aisa_revoked_toast', 'Your session was signed out because the account was logged in from another device.');
+        }
+        window.location.href = '/login';
+      }
     }
 
     if (error.response?.status === 403 && error.response?.data?.code === 'OUT_OF_CREDITS') {
