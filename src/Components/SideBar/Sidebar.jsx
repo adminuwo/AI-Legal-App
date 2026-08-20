@@ -60,7 +60,11 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
   const coreNavigation = [
     { name: 'Home', icon: LayoutGrid, path: '/dashboard' },
     { name: selectedRole === 'law_firm' ? 'Firm Workspace' : 'My Matters', icon: Briefcase, path: '/dashboard/cases' },
-    { name: selectedRole === 'law_firm' ? 'AI Firm Assistant' : selectedRole === 'student' ? 'AI Legal Tutor' : 'AI Legal Assistant', icon: Scale, useLogoIcon: true, path: '/dashboard/chat/new' },
+    { 
+      name: selectedRole === 'law_firm' ? 'AI Firm Assistant' : selectedRole === 'student' ? 'AI Legal Tutor' : 'AI Legal Assistant', 
+      icon: selectedRole === 'student' ? GraduationCap : selectedRole === 'law_firm' ? Building2 : Scale, 
+      path: '/dashboard/chat/new' 
+    },
     { name: 'AI Tools', icon: Zap, path: '/dashboard/tools' },
     { name: 'Mobile App', icon: Smartphone, path: '/dashboard/mobile-app' },
   ];
@@ -203,11 +207,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
         }`}
       >
         <div className="flex items-center gap-3">
-          {item.useLogoIcon ? (
-            <img src="/logo/logo_gold_emblem.png" className="w-5.5 h-5.5 object-contain shrink-0" alt="AI LEGAL Emblem" />
-          ) : (
-            <item.icon className={`w-4 h-4 ${isLinkActive ? 'text-[#C8A34D]' : 'text-slate-400'}`} />
-          )}
+          <item.icon className={`w-4 h-4 ${isLinkActive ? 'text-[#C8A34D]' : 'text-slate-400'}`} />
           <span className="text-sm">{item.name}</span>
         </div>
       </button>

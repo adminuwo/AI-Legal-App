@@ -34,8 +34,8 @@ export default function ProductGuideWorkspace() {
     );
   }, [user]);
 
-  // Tab Mode: 'knowledge' (Admin Calibrator) or 'chat' (Interactive Assistant)
-  const [activeWorkspaceMode, setActiveWorkspaceMode] = useState('knowledge');
+  // Tab Mode: 'chat' (Interactive Assistant) or 'knowledge' (Admin Calibrator)
+  const [activeWorkspaceMode, setActiveWorkspaceMode] = useState('chat');
 
   // State Management
   const [documents, setDocuments] = useState([]);
@@ -60,7 +60,7 @@ export default function ProductGuideWorkspace() {
   const [testLoading, setTestLoading] = useState(false);
   const [testResult, setTestResult] = useState(null);
 
-  // Interactive Product Guide Chat States (For non-admin or interactive testing)
+  // Interactive Product Guide Chat States
   const [chatMessages, setChatMessages] = useState([
     {
       id: 'welcome',
@@ -73,7 +73,7 @@ export default function ProductGuideWorkspace() {
   const [chatThinking, setChatThinking] = useState(false);
   const chatEndRef = useRef(null);
 
-  // Load Documents from Backend (/api/knowledge/list)
+  // Load Documents from Backend
   const loadDocuments = async () => {
     if (!isAdmin) {
       setLoading(false);
@@ -88,8 +88,7 @@ export default function ProductGuideWorkspace() {
 
       if (res.data && res.data.success && res.data.data) {
         const allDocs = res.data.data.documents || [];
-        const filtered = allDocs.filter(d => d.category === 'PRODUCT_GUIDE');
-        setDocuments(filtered);
+        setDocuments(allDocs);
       } else {
         setDocuments([]);
       }
@@ -106,120 +105,91 @@ export default function ProductGuideWorkspace() {
     loadDocuments();
   }, [isAdmin]);
 
-  // Statistics Calculation
-  const stats = useMemo(() => {
-    const totalDocs = documents.length;
-    const totalChunks = documents.reduce((acc, doc) => acc + (doc.totalChunks || 0), 0);
-    const totalSizeBytes = documents.reduce((acc, doc) => acc + (doc.size || 0), 0);
-    const storageUsed = totalSizeBytes > 1024 * 1024
-      ? `${(totalSizeBytes / (1024 * 1024)).toFixed(2)} MB`
-      : `${(totalSizeBytes / 1024).toFixed(1)} KB`;
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, chatThinking]);
 
-    return {
-      totalDocs,
-      totalChunks,
-      storageUsed,
-      lastUpdated: documents.length > 0
-        ? new Date(documents[0].uploadDate || Date.now()).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-          })
-        : 'Never'
-    };
-  }, [documents]);
-
-  // Filtered Documents
-  const filteredDocuments = useMemo(() => {
-    return documents.filter(doc => {
-      const matchSearch = doc.filename?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          doc.category?.toLowerCase().includes(searchQuery.toLowerCase());
-      const ext = (doc.filename || '').split('.').pop().toLowerCase();
-      const matchType = typeFilter === 'all' ||
-                        (typeFilter === 'pdf' && ext === 'pdf') ||
-                        (typeFilter === 'docx' && (ext === 'docx' || ext === 'doc')) ||
-                        (typeFilter === 'txt' && (ext === 'txt' || ext === 'md'));
-      return matchSearch && matchType;
-    });
-  }, [documents, searchQuery, typeFilter]);
-
-  // File Upload Handlers
-  const handleFileSelect = (file) => {
-    if (!file) return;
-    const validExts = ['pdf', 'docx', 'doc', 'txt', 'md', 'json', 'csv', 'html'];
-    const ext = file.name.split('.').pop().toLowerCase();
-
-    if (!validExts.includes(ext)) {
-      toast.error(`Unsupported file type (.${ext}). Please select PDF, DOCX, TXT, MD, CSV or JSON.`);
-      return;
+  // Handle Drag Events
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setSelectedFile(e.dataTransfer.files[0]);
     }
-
-    if (file.size > 25 * 1024 * 1024) {
-      toast.error('File size exceeds 25 MB limit.');
-      return;
-    }
-
-    setSelectedFile(file);
-    toast.success(`Selected file: ${file.name}`);
   };
 
-  const handleUploadSubmit = async () => {
+  // Upload Knowledge File Handler
+  const handleUploadFile = async () => {
     if (!selectedFile) {
-      toast.error('Please select a knowledge document first.');
+      toast.error('Please select a document file to upload.');
       return;
     }
-
     setUploading(true);
-    setUploadStep('Uploading document...');
-
-    const playStepAnimation = async () => {
-      const steps = [
-        'Uploading document...',
-        'Extracting document text...',
-        'Parsing knowledge sections...',
-        'Building vector embeddings index...',
-        'Finalizing RAG calibration...'
-      ];
-      for (const step of steps) {
-        setUploadStep(step);
-        await new Promise(res => setTimeout(res, 500));
-      }
-    };
+    setUploadStep('Uploading file to Product Guide storage...');
 
     try {
       const token = user?.token || localStorage.getItem('token');
       const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('category', 'PRODUCT_GUIDE');
+      formData.append('document', selectedFile);
 
-      const uploadPromise = axios.post(`${API}/knowledge/upload`, formData, {
+      setUploadStep('Extracting text & generating vector embeddings...');
+      const res = await axios.post(`${API}/knowledge/upload`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
         }
       });
 
-      const [res] = await Promise.all([uploadPromise, playStepAnimation()]);
-
       if (res.data && res.data.success) {
-        setUploadStep('Completed Successfully');
-        await new Promise(r => setTimeout(r, 400));
         toast.success('Knowledge Added Successfully! AI Product Guide is now calibrated with this file.');
         setSelectedFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
         loadDocuments();
       } else {
-        throw new Error(res.data?.message || 'Ingestion failed');
+        toast.error(res.data?.error || 'Failed to upload knowledge document.');
       }
     } catch (err) {
-      console.error('Upload Error:', err);
-      toast.error(err.response?.data?.message || err.message || 'Failed to upload document');
+      console.error('Knowledge Upload Error:', err);
+      toast.error(err.response?.data?.error || 'Failed to ingest knowledge document.');
     } finally {
       setUploading(false);
       setUploadStep('');
     }
   };
 
-  // Re-index Document
+  // Delete Knowledge File Handler
+  const handleDeleteDoc = async (id) => {
+    const token = user?.token || localStorage.getItem('token');
+    try {
+      const res = await axios.delete(`${API}/knowledge/document/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data && res.data.success) {
+        toast.success('Document deleted permanently from Product Guide knowledge base.');
+        setDocuments(prev => prev.filter(d => d._id !== id && d.id !== id));
+        if (selectedDoc && (selectedDoc._id === id || selectedDoc.id === id)) {
+          setSelectedDoc(null);
+        }
+      } else {
+        toast.error(res.data?.error || 'Failed to delete document.');
+      }
+    } catch (err) {
+      console.error('Delete Document Error:', err);
+      toast.error('Failed to delete document.');
+    } finally {
+      setDeleteModalConfig({ isOpen: false, id: null, name: '' });
+    }
+  };
+
+  // Re-index Document Handler
   const handleReindex = async (id) => {
     try {
       const token = user?.token || localStorage.getItem('token');
@@ -235,52 +205,22 @@ export default function ProductGuideWorkspace() {
     }
   };
 
-  // Delete Document
-  const handleDeleteConfirm = async () => {
-    if (!deleteModalConfig.id) return;
-    try {
-      const token = user?.token || localStorage.getItem('token');
-      const res = await axios.delete(`${API}/knowledge/${deleteModalConfig.id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.data && res.data.success) {
-        toast.success('Document deleted permanently from Product Guide knowledge base.');
-        setDeleteModalConfig({ isOpen: false, id: null, name: '' });
-        loadDocuments();
-      }
-    } catch (err) {
-      toast.error('Failed to delete document.');
-      setDeleteModalConfig({ isOpen: false, id: null, name: '' });
-    }
-  };
-
-  // RAG Test Sandbox Query
-  const handleTestQuerySubmit = async (e) => {
-    if (e) e.preventDefault();
+  // RAG Search Test Handler
+  const handleTestRAG = async (e) => {
+    e.preventDefault();
     if (!testQuery.trim()) return;
-
     setTestLoading(true);
     setTestResult(null);
 
     try {
       const token = user?.token || localStorage.getItem('token');
-      const res = await axios.post(`${API}/knowledge/test-query`, {
-        query: testQuery,
-        category: 'PRODUCT_GUIDE'
-      }, {
+      const res = await axios.post(`${API}/knowledge/search`, { query: testQuery }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
-      if (res.data && res.data.success) {
-        setTestResult({
-          answer: res.data.answer || 'Query processed.',
-          chunks: res.data.chunks || []
-        });
-      } else {
-        toast.error('No matching knowledge chunks retrieved.');
-      }
+      setTestResult(res.data);
     } catch (err) {
-      toast.error('Test query failed.');
+      console.error('RAG Test Query Error:', err);
+      toast.error('Failed to run RAG vector search query.');
     } finally {
       setTestLoading(false);
     }
@@ -288,65 +228,61 @@ export default function ProductGuideWorkspace() {
 
   // Interactive Product Guide Chat Handler
   const handleSendChatMessage = async (e) => {
-    if (e) e.preventDefault();
+    e.preventDefault();
     if (!chatInput.trim() || chatThinking) return;
 
-    const userMsg = {
-      id: Date.now().toString(),
-      sender: 'user',
-      text: chatInput,
-      timestamp: new Date()
-    };
-
+    const userText = chatInput.trim();
+    const userMsg = { id: Date.now(), sender: 'user', text: userText, timestamp: new Date() };
     setChatMessages(prev => [...prev, userMsg]);
-    const currentText = chatInput;
     setChatInput('');
     setChatThinking(true);
 
     try {
       const token = user?.token || localStorage.getItem('token');
-      const res = await axios.post(`${API}/knowledge/query-guide`, {
-        message: currentText,
-        question: currentText
-      }, {
+      const res = await axios.post(`${API}/knowledge/chat`, { prompt: userText, message: userText }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       const replyText = res.data?.reply || res.data?.answer || "I'm the AI LEGAL Product Guide. I can help you navigate every feature of the AI LEGAL application.";
-      const guideMsg = {
-        id: (Date.now() + 1).toString(),
-        sender: 'guide',
-        text: replyText,
-        timestamp: new Date()
-      };
-      setChatMessages(prev => [...prev, guideMsg]);
+      setChatMessages(prev => [
+        ...prev,
+        { id: Date.now() + 1, sender: 'guide', text: replyText, timestamp: new Date() }
+      ]);
     } catch (err) {
-      console.error("Guide chat error:", err);
-      const fallbackMsg = {
-        id: (Date.now() + 1).toString(),
-        sender: 'guide',
-        text: "I am the AI LEGAL™ Product Guide. You can ask me how to create case workspaces, generate legal drafts, analyze contracts, or search precedents.",
-        timestamp: new Date()
-      };
-      setChatMessages(prev => [...prev, fallbackMsg]);
+      console.error('Product Guide Chat Error:', err);
+      setChatMessages(prev => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          sender: 'guide',
+          text: "I am the AI LEGAL™ Product Guide. You can ask me how to create case workspaces, generate legal drafts, analyze contracts, or search precedents.",
+          timestamp: new Date()
+        }
+      ]);
     } finally {
       setChatThinking(false);
     }
   };
 
+  // Summary Metrics Calculation
+  const totalFiles = documents.length;
+  const totalChunks = documents.reduce((acc, d) => acc + (d.totalChunks || d.chunkCount || 0), 0);
+  const totalBytes = documents.reduce((acc, d) => acc + (d.fileSize || d.size || 0), 0);
+  const formattedStorage = (totalBytes / 1024).toFixed(1) + ' KB';
+  const lastUpdatedDoc = documents.length > 0 ? documents[0] : null;
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F19] text-slate-800 dark:text-zinc-100 flex flex-col">
-      {/* Top Navigation Header */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#1E293B]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-zinc-800 shadow-xs px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-[#F5F5F5] dark:bg-[#111111] font-sans flex flex-col transition-colors duration-200 select-none">
+      {/* Header Bar */}
+      <header className="bg-white dark:bg-[#1E293B] border-b border-slate-200/80 dark:border-zinc-800 px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between sticky top-0 z-20 shadow-xs">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer"
+            onClick={() => navigate('/dashboard')}
+            className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-xl text-slate-500 dark:text-zinc-400 transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
           </button>
-
           <div className="h-5 w-[1px] bg-slate-200 dark:bg-zinc-700" />
 
           <div className="flex items-center gap-3">
@@ -355,19 +291,19 @@ export default function ProductGuideWorkspace() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">AI Product Guide Knowledge</h1>
-                {isAdmin ? (
+                <h1 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
+                  {activeWorkspaceMode === 'chat' ? 'AI Product Guide Assistant' : 'AI Product Guide Knowledge'}
+                </h1>
+                {isAdmin && (
                   <span className="px-2 py-0.5 rounded bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-[10px] font-black uppercase tracking-wider">
                     {isSuperAdmin(user) ? 'SUPER ADMIN' : 'ADMIN'}
-                  </span>
-                ) : (
-                  <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-500 border border-slate-200 text-[10px] font-bold uppercase tracking-wider">
-                    USER
                   </span>
                 )}
               </div>
               <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium">
-                Manage the internal RAG knowledge base used by AI Legal™ Product Guide.
+                {activeWorkspaceMode === 'chat' 
+                  ? 'Interactive AI coach & guide for navigating AI LEGAL™ platform features.' 
+                  : 'Manage the internal RAG knowledge base used by AI Legal™ Product Guide.'}
               </p>
             </div>
           </div>
@@ -375,8 +311,19 @@ export default function ProductGuideWorkspace() {
 
         {/* Tab Switcher & Action Controls */}
         <div className="flex items-center gap-3">
-          {isAdmin && (
-            <div className="flex items-center p-1 bg-slate-100 dark:bg-zinc-800 rounded-xl border border-slate-200/80 dark:border-zinc-700">
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-zinc-800 rounded-xl border border-slate-200/80 dark:border-zinc-700">
+            <button
+              onClick={() => setActiveWorkspaceMode('chat')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeWorkspaceMode === 'chat'
+                  ? 'bg-white dark:bg-zinc-900 text-[#C8A34D] shadow-xs'
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>AI Guide Chat</span>
+            </button>
+            {isAdmin && (
               <button
                 onClick={() => setActiveWorkspaceMode('knowledge')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
@@ -388,25 +335,13 @@ export default function ProductGuideWorkspace() {
                 <Database className="w-3.5 h-3.5" />
                 <span>RAG Knowledge Calibrator</span>
               </button>
-              <button
-                onClick={() => setActiveWorkspaceMode('chat')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  activeWorkspaceMode === 'chat'
-                    ? 'bg-white dark:bg-zinc-900 text-[#C8A34D] shadow-xs'
-                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>AI Guide Chat</span>
-              </button>
-            </div>
-          )}
+            )}
+          </div>
 
           {isAdmin && activeWorkspaceMode === 'knowledge' && (
             <button
               onClick={() => { setRefreshing(true); loadDocuments(); }}
               className="p-2.5 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 rounded-xl border border-slate-200/80 dark:border-zinc-700 transition-all cursor-pointer"
-              title="Refresh Knowledge List"
             >
               <RefreshCw className={`w-4 h-4 text-[#C8A34D] ${refreshing ? 'animate-spin' : ''}`} />
             </button>
@@ -416,36 +351,7 @@ export default function ProductGuideWorkspace() {
 
       {/* Main Workspace Body */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-        {/* NON-ADMIN ACCESS RESTRICTED GUARD */}
-        {!isAdmin ? (
-          <div className="bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-200/80 dark:border-zinc-800 p-8 sm:p-12 text-center space-y-6 max-w-2xl mx-auto shadow-sm my-12">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center mx-auto">
-              <ShieldAlert className="w-8 h-8" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-black text-slate-900 dark:text-white">Admin Access Restricted</h2>
-              <p className="text-sm text-slate-600 dark:text-zinc-400 font-medium leading-relaxed">
-                Only authorized administrators can manage and calibrate the AI Product Guide RAG Knowledge Base.
-              </p>
-            </div>
-
-            <div className="pt-4 border-t border-slate-100 dark:border-zinc-800 flex flex-col sm:flex-row gap-3 justify-center">
-              <button
-                onClick={() => setActiveWorkspaceMode('chat')}
-                className="px-6 py-3 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>Chat with AI Product Guide</span>
-              </button>
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="px-6 py-3 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 text-slate-800 dark:text-zinc-200 font-bold rounded-xl text-xs transition-all cursor-pointer"
-              >
-                Go to Dashboard
-              </button>
-            </div>
-          </div>
-        ) : activeWorkspaceMode === 'chat' ? (
+        {activeWorkspaceMode === 'chat' ? (
           /* INTERACTIVE PRODUCT GUIDE CHAT INTERFACE */
           <div className="bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-sm flex flex-col h-[75vh] overflow-hidden">
             <div className="p-4 border-b border-slate-200/80 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-900/50 flex items-center justify-between">
@@ -496,6 +402,35 @@ export default function ProductGuideWorkspace() {
                 <span>Ask</span>
               </button>
             </form>
+          </div>
+        ) : !isAdmin ? (
+          /* NON-ADMIN ACCESS RESTRICTED GUARD */
+          <div className="bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-200/80 dark:border-zinc-800 p-8 sm:p-12 text-center space-y-6 max-w-2xl mx-auto shadow-sm my-12">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center justify-center mx-auto">
+              <ShieldAlert className="w-8 h-8" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-black text-slate-900 dark:text-white">Admin Access Restricted</h2>
+              <p className="text-sm text-slate-600 dark:text-zinc-400 font-medium leading-relaxed">
+                Only authorized administrators can manage and calibrate the AI Product Guide RAG Knowledge Base.
+              </p>
+            </div>
+
+            <div className="pt-4 border-t border-slate-100 dark:border-zinc-800 flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => setActiveWorkspaceMode('chat')}
+                className="px-6 py-3 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Chat with AI Product Guide</span>
+              </button>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="px-6 py-3 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 text-slate-800 dark:text-zinc-200 font-bold rounded-xl text-xs transition-all cursor-pointer"
+              >
+                Go to Dashboard
+              </button>
+            </div>
           </div>
         ) : (
           /* ADMIN RAG KNOWLEDGE CALIBRATOR WORKSPACE */
@@ -895,7 +830,7 @@ export default function ProductGuideWorkspace() {
       <DeleteConfirmModal
         isOpen={deleteModalConfig.isOpen}
         onClose={() => setDeleteModalConfig({ isOpen: false, id: null, name: '' })}
-        onConfirm={handleDeleteConfirm}
+        onConfirm={() => handleDeleteDoc(deleteModalConfig.id)}
         title="Delete Knowledge Document?"
         description={`Are you sure you want to permanently delete "${deleteModalConfig.name}"? This action will remove the document and all vector embeddings from the Product Guide knowledge base.`}
       />
