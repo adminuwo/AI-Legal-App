@@ -4,7 +4,7 @@ import {
   Gavel, Mic, MicOff, Volume2, VolumeX, Sparkles, Copy, Download, ShieldAlert, CheckCircle2, 
   AlertTriangle, ShieldCheck, ArrowRight, ArrowLeft, RefreshCw, FileCheck, Layers,
   HardDrive, Eye, Search, Edit3, User, Calendar, Clock, DollarSign, MessageSquare,
-  AlertCircle, Scale, ChevronRight, Zap, Check, Lock, BookOpen, Trophy, Swords, Send, UserCheck, Play, Square, Pause, Trash2
+  AlertCircle, Scale, ChevronRight, Zap, Check, Lock, BookOpen, Trophy, Swords, Send, UserCheck, Play, Square, Pause, Trash2, Menu
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
@@ -1109,52 +1109,52 @@ Return ONLY a valid JSON object matching this structure:
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 font-sans pb-16">
       
-      {/* HEADER BAR */}
-      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 px-6 py-4 sticky top-0 z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+      {/* HEADER BAR — 1 SINGLE ROW ON MOBILE & DESKTOP */}
+      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 px-2.5 sm:px-6 py-2 sm:py-3.5 sticky top-0 z-30 shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
             <button
               onClick={() => navigate('/dashboard/tools')}
-              className="p-2.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-600 dark:text-slate-300 hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 text-xs font-bold shadow-sm"
+              className="p-1.5 sm:p-2.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-600 dark:text-slate-300 hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 text-xs font-bold shadow-xs shrink-0"
               title="Back to AI Tools Suite"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back to AI Tools</span>
+              <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden md:inline">Back to AI Tools</span>
             </button>
-            <div className="w-10 h-10 rounded-2xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D]">
-              <Gavel className="w-5 h-5" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D] shrink-0">
+              <Gavel className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h1 className="text-xs sm:text-xl font-black tracking-tight text-slate-900 dark:text-white truncate">
                   AI Mock Courtroom
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[10px] font-extrabold uppercase tracking-wider">
+                <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider shrink-0 hidden md:inline-block">
                   {simulationMode.toUpperCase()} SIMULATOR
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 hidden md:block">
                 Simulated judicial bench, voice speech-to-text, real-time AI coach, opponent objections & verdict evaluation.
               </p>
             </div>
           </div>
 
           {/* Header Action Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={handleOpenSavedVaultModal}
-              className="px-3.5 py-2 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 text-[#C8A34D] text-xs font-bold hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 text-[#C8A34D] text-[10.5px] sm:text-xs font-bold hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer flex items-center gap-1.5 shadow-xs shrink-0 whitespace-nowrap"
               title="View Saved Courtroom Sessions"
             >
-              <HardDrive className="w-3.5 h-3.5" /> Saved Sessions
+              <HardDrive className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Saved Sessions</span><span className="sm:hidden">Saved</span>
             </button>
 
             {step !== 'SETUP' && (
               <button
                 onClick={() => { setStep('SETUP'); if (speechSynthesis) speechSynthesis.cancel(); }}
-                className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold hover:bg-slate-200 dark:hover:bg-[#242F42] transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-[10.5px] sm:text-xs font-bold hover:bg-slate-200 dark:hover:bg-[#242F42] transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap"
               >
-                <RefreshCw className="w-3.5 h-3.5" /> Start New Hearing
+                <RefreshCw className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Start New Hearing</span><span className="sm:hidden">New</span>
               </button>
             )}
           </div>
@@ -1421,19 +1421,19 @@ Return ONLY a valid JSON object matching this structure:
             {simulationMode === 'voice' && (
               <div className="max-w-4xl mx-auto space-y-6">
                 
-                {/* Header Stage Status */}
-                <div className="p-4 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-rose-500 animate-ping" />
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                {/* Header Stage Status Bar — Responsive Single/Two Row Mobile Layout */}
+                <div className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-4 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-rose-500 animate-ping shrink-0" />
+                    <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white truncate min-w-0">
                       🎙️ VOICE COURTROOM HEARING IN SESSION
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 self-end sm:self-auto">
                     <button
                       onClick={() => setIsTtsMuted(!isTtsMuted)}
-                      className={`p-2 rounded-xl border text-xs font-bold cursor-pointer ${
+                      className={`p-1.5 sm:p-2 rounded-xl border text-xs font-bold cursor-pointer shrink-0 ${
                         isTtsMuted ? 'bg-rose-500/15 text-rose-500 border-rose-500/30' : 'bg-slate-100 dark:bg-[#1A2333] text-slate-600 dark:text-slate-300'
                       }`}
                       title="Toggle AI Voice Mute"
@@ -1443,7 +1443,7 @@ Return ONLY a valid JSON object matching this structure:
 
                     <button
                       onClick={() => setIsHearingPaused(!isHearingPaused)}
-                      className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold hover:bg-slate-200 transition-all cursor-pointer flex items-center gap-1"
+                      className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-[11px] sm:text-xs font-bold hover:bg-slate-200 transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
                     >
                       {isHearingPaused ? <Play className="w-3.5 h-3.5 text-emerald-500" /> : <Pause className="w-3.5 h-3.5" />}
                       <span>{isHearingPaused ? 'Resume' : 'Pause'}</span>
@@ -1451,7 +1451,7 @@ Return ONLY a valid JSON object matching this structure:
 
                     <button
                       onClick={handleEndHearingAndGenerateReport}
-                      className="px-3.5 py-1.5 rounded-xl bg-rose-500/15 text-rose-500 font-extrabold text-xs hover:bg-rose-500 hover:text-white transition-all cursor-pointer"
+                      className="px-3 sm:px-3.5 py-1.5 rounded-xl bg-rose-500/15 text-rose-500 font-extrabold text-[11px] sm:text-xs hover:bg-rose-500 hover:text-white transition-all cursor-pointer whitespace-nowrap shrink-0"
                     >
                       End Hearing
                     </button>
@@ -1459,19 +1459,19 @@ Return ONLY a valid JSON object matching this structure:
                 </div>
 
                 {/* VOICE HERO SPEAKER CARD (Theme-Aware Light/Dark) */}
-                <div className="p-8 rounded-3xl bg-white dark:bg-gradient-to-br dark:from-[#111622] dark:to-[#1A2333] border-2 border-[#C8A34D]/40 text-center space-y-6 shadow-xl relative overflow-hidden">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[11px] font-extrabold uppercase tracking-wider border border-[#C8A34D]/30">
-                    <Scale className="w-4 h-4" /> Bench Status: Active Voice Proceeding
+                <div className="p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-white dark:bg-gradient-to-br dark:from-[#111622] dark:to-[#1A2333] border-2 border-[#C8A34D]/40 text-center space-y-4 sm:space-y-6 shadow-xl relative overflow-hidden">
+                  <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider border border-[#C8A34D]/30 max-w-full truncate">
+                    <Scale className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> <span className="truncate">Bench Status: Active Voice Proceeding</span>
                   </div>
 
                   {/* Active Speaker Dynamic Display */}
-                  <div className="space-y-3 py-4">
+                  <div className="space-y-3 py-2 sm:py-4">
                     {isTtsSpeaking ? (
                       <div className="space-y-2">
-                        <div className="w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-500 flex items-center justify-center mx-auto text-amber-500 animate-pulse">
-                          <Volume2 className="w-10 h-10" />
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-amber-500/20 border-2 border-amber-500 flex items-center justify-center mx-auto text-amber-500 animate-pulse">
+                          <Volume2 className="w-8 h-8 sm:w-10 sm:h-10" />
                         </div>
-                        <h3 className="text-lg font-black text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                        <h3 className="text-sm sm:text-lg font-black text-amber-600 dark:text-amber-400 uppercase tracking-wide">
                           AI JUDGE (Judge Shrivastava) IS SPEAKING...
                         </h3>
                         <p className="text-xs text-slate-700 dark:text-slate-300 italic max-w-lg mx-auto leading-relaxed">
@@ -1480,10 +1480,10 @@ Return ONLY a valid JSON object matching this structure:
                       </div>
                     ) : isListening ? (
                       <div className="space-y-2">
-                        <div className="w-20 h-20 rounded-full bg-rose-500/20 border-2 border-rose-500 flex items-center justify-center mx-auto text-rose-500 animate-ping">
-                          <Mic className="w-10 h-10" />
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-rose-500/20 border-2 border-rose-500 flex items-center justify-center mx-auto text-rose-500 animate-ping">
+                          <Mic className="w-8 h-8 sm:w-10 sm:h-10" />
                         </div>
-                        <h3 className="text-lg font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+                        <h3 className="text-sm sm:text-lg font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
                           YOUR TURN — LISTENING TO YOUR ARGUMENT...
                         </h3>
                         <p className="text-xs font-mono bg-slate-100 dark:bg-black/40 text-slate-900 dark:text-slate-100 p-3 rounded-2xl max-w-lg mx-auto border border-slate-200 dark:border-white/10">
@@ -1492,10 +1492,10 @@ Return ONLY a valid JSON object matching this structure:
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        <div className="w-20 h-20 rounded-full bg-[#C8A34D]/20 border-2 border-[#C8A34D] flex items-center justify-center mx-auto text-[#C8A34D]">
-                          <Gavel className="w-10 h-10" />
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#C8A34D]/20 border-2 border-[#C8A34D] flex items-center justify-center mx-auto text-[#C8A34D]">
+                          <Gavel className="w-8 h-8 sm:w-10 sm:h-10" />
                         </div>
-                        <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">
+                        <h3 className="text-sm sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">
                           READY FOR YOUR SUBMISSION
                         </h3>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1507,27 +1507,27 @@ Return ONLY a valid JSON object matching this structure:
 
                   {/* Primary Pure Voice Controls */}
                   <div className="pt-4 border-t border-slate-200 dark:border-slate-800 max-w-xl mx-auto">
-                    <div className="flex flex-wrap items-center justify-center gap-3">
+                    <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
                       <button
                         type="button"
                         onClick={isListening ? () => handleFinishSpeakingTurn() : startVoiceMicrophone}
-                        className={`px-8 py-4 rounded-2xl font-black text-xs transition-all cursor-pointer shadow-lg flex items-center gap-2 ${
+                        className={`px-5 sm:px-8 py-3 sm:py-4 rounded-2xl font-black text-xs transition-all cursor-pointer shadow-lg flex items-center gap-2 ${
                           isListening
                             ? 'bg-rose-500 text-white animate-pulse'
                             : 'bg-[#C8A34D] text-[#111111] hover:bg-[#b8933d]'
                         }`}
                       >
-                        {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-                        <span>{isListening ? 'Listening... Tap to Finish & Submit' : 'Tap to Speak Oral Argument'}</span>
+                        {isListening ? <MicOff className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" /> : <Mic className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />}
+                        <span className="leading-snug">{isListening ? 'Listening... Tap to Finish & Submit' : 'Tap to Speak Oral Argument'}</span>
                       </button>
 
                       {isListening && (
                         <button
                           type="button"
                           onClick={() => handleFinishSpeakingTurn()}
-                          className="px-6 py-4 rounded-2xl bg-emerald-500 text-white font-black text-xs hover:bg-emerald-600 transition-all cursor-pointer flex items-center gap-1.5 shadow-md"
+                          className="px-4 sm:px-6 py-3 sm:py-4 rounded-2xl bg-emerald-500 text-white font-black text-xs hover:bg-emerald-600 transition-all cursor-pointer flex items-center gap-1.5 shadow-md"
                         >
-                          <CheckCircle2 className="w-4 h-4" /> Finish Speaking Turn
+                          <CheckCircle2 className="w-4 h-4 shrink-0" /> Finish Speaking Turn
                         </button>
                       )}
                     </div>
@@ -1535,10 +1535,10 @@ Return ONLY a valid JSON object matching this structure:
                 </div>
 
                 {/* Supporting Collapsible Transcript Feed */}
-                <div className="p-5 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-                    <span>Hearing Audio Transcript History</span>
-                    <span className="text-[10px] text-[#C8A34D] font-bold">{messages.length} Entries</span>
+                <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-3 shadow-xs">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2 gap-2">
+                    <span className="truncate">Hearing Audio Transcript History</span>
+                    <span className="text-[10px] text-[#C8A34D] font-bold whitespace-nowrap shrink-0">{messages.length} Entries</span>
                   </h4>
 
                   <div className="max-h-[220px] overflow-y-auto space-y-3 pr-1">
@@ -1563,32 +1563,32 @@ Return ONLY a valid JSON object matching this structure:
               <div className="max-w-4xl mx-auto space-y-4">
 
                 {/* Header Stages */}
-                <div className="p-4 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-sky-500 animate-ping" />
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                <div className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-4 min-w-0">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-sky-500 animate-ping shrink-0" />
+                    <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white truncate">
                       💬 TEXT COURTROOM HEARING IN SESSION
                     </span>
                   </div>
 
                   <button
                     onClick={handleEndHearingAndGenerateReport}
-                    className="px-3.5 py-1.5 rounded-xl bg-rose-500/15 text-rose-500 font-extrabold text-xs hover:bg-rose-500 hover:text-white transition-all cursor-pointer"
+                    className="px-3 sm:px-3.5 py-1.5 rounded-xl bg-rose-500/15 text-rose-500 font-extrabold text-[11px] sm:text-xs hover:bg-rose-500 hover:text-white transition-all cursor-pointer whitespace-nowrap shrink-0 self-end sm:self-auto"
                   >
                     End Hearing & Report
                   </button>
                 </div>
 
                 {/* Text Feed Transcript */}
-                <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 min-h-[400px] max-h-[480px] overflow-y-auto space-y-4 shadow-sm">
+                <div className="p-3 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 min-h-[350px] sm:min-h-[400px] max-h-[480px] overflow-y-auto space-y-3 sm:space-y-4 shadow-xs">
                   {messages.map((m) => {
                     const isAdv = m.sender === 'advocate';
                     const isJdg = m.sender === 'judge';
                     const isOpp = m.sender === 'opponent';
 
                     return (
-                      <div key={m.id} className={`flex gap-3 text-xs ${isAdv ? 'flex-row-reverse' : ''}`}>
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-[10px] shrink-0 ${
+                      <div key={m.id} className={`flex gap-2 sm:gap-3 text-xs ${isAdv ? 'flex-row-reverse' : ''}`}>
+                        <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center font-black text-[9.5px] sm:text-[10px] shrink-0 ${
                           isAdv ? 'bg-[#C8A34D] text-[#111]' :
                           isJdg ? 'bg-amber-500/20 text-amber-500' :
                           isOpp ? 'bg-rose-500/20 text-rose-500' :
@@ -1597,46 +1597,47 @@ Return ONLY a valid JSON object matching this structure:
                           {isAdv ? 'YOU' : isJdg ? 'JDG' : isOpp ? 'OPP' : 'CLK'}
                         </div>
 
-                        <div className={`p-4 rounded-2xl max-w-[80%] space-y-1 ${
+                        <div className={`p-3 sm:p-4 rounded-2xl max-w-[85%] sm:max-w-[80%] space-y-1 min-w-0 ${
                           isAdv ? 'bg-[#C8A34D] text-[#111] font-bold' :
                           isJdg ? 'bg-amber-500/10 border border-amber-500/20 text-slate-900 dark:text-white' :
                           isOpp ? 'bg-rose-500/10 border border-rose-500/20 text-slate-900 dark:text-white' :
                           'bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800'
                         }`}>
-                          <div className="flex items-center justify-between gap-4 text-[10px] opacity-80 border-b border-black/10 dark:border-white/10 pb-1">
-                            <span className="font-extrabold">{m.senderName}</span>
-                            <span>{m.timestamp}</span>
+                          <div className="flex items-center justify-between gap-2 text-[10px] opacity-80 border-b border-black/10 dark:border-white/10 pb-1">
+                            <span className="font-extrabold truncate">{m.senderName}</span>
+                            <span className="whitespace-nowrap shrink-0">{m.timestamp}</span>
                           </div>
-                          <p className="leading-relaxed whitespace-pre-wrap font-medium">{m.text}</p>
+                          <p className="leading-relaxed whitespace-pre-wrap font-medium text-xs break-words">{m.text}</p>
                         </div>
                       </div>
                     );
                   })}
 
                   {isAiThinking && (
-                    <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-500 flex items-center gap-2">
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      <span>AI Bench is evaluating argument & framing judicial response...</span>
+                    <div className="p-3 sm:p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-500 flex items-center gap-2">
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin shrink-0" />
+                      <span className="leading-snug">AI Bench is evaluating argument & framing judicial response...</span>
                     </div>
                   )}
                   <div ref={transcriptEndRef} />
                 </div>
 
                 {/* Text Input Form (Pure Text Mode) */}
-                <form onSubmit={(e) => { e.preventDefault(); handleSubmitAdvocateTurn(); }} className="flex gap-2 p-4 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-sm">
+                <form onSubmit={(e) => { e.preventDefault(); handleSubmitAdvocateTurn(); }} className="flex items-center gap-2 p-2.5 sm:p-4 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-xs min-w-0">
                   <input
                     type="text"
                     value={userTextInput}
                     onChange={(e) => setUserTextInput(e.target.value)}
                     placeholder="Type written oral submission to the Bench..."
-                    className="flex-1 p-3 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none"
+                    className="flex-1 min-w-0 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none"
                   />
                   <button
                     type="submit"
                     disabled={isAiThinking}
-                    className="px-6 py-3 rounded-2xl bg-[#C8A34D] text-[#111111] font-black text-xs hover:bg-[#b8933d] transition-all cursor-pointer shadow-md flex items-center gap-1.5"
+                    className="px-3.5 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-[#C8A34D] text-[#111111] font-black text-xs hover:bg-[#b8933d] transition-all cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap shrink-0"
                   >
-                    <Send className="w-4 h-4" /> Submit
+                    <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                    <span>Submit</span>
                   </button>
                 </form>
 
@@ -1761,80 +1762,80 @@ Return ONLY a valid JSON object matching this structure:
 
         {/* STEP 4: FINAL PERFORMANCE REPORT & VERDICT */}
         {step === 'REPORT' && courtroomReport && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
 
             {/* Top Action Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-sm">
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 rounded-xl bg-emerald-500/15 text-emerald-500 font-extrabold text-xs flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4" /> Session Concluded ({simulationMode.toUpperCase()} MODE)
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-xs">
+              <div className="flex items-center gap-2 flex-wrap min-w-0">
+                <span className="px-2.5 py-1 rounded-xl bg-emerald-500/15 text-emerald-500 font-extrabold text-[11px] sm:text-xs flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Session Concluded ({simulationMode.toUpperCase()} MODE)
                 </span>
-                <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-bold truncate min-w-0">
                   {courtroomReport.caseTitle}
                 </span>
               </div>
               
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
                 <button
                   onClick={handleSaveReportInstant}
-                  className="px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold hover:bg-[#C8A34D] hover:text-[#111] transition-all cursor-pointer flex items-center gap-1.5"
+                  className="px-3 sm:px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-[11px] sm:text-xs font-bold hover:bg-[#C8A34D] hover:text-[#111] transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0"
                 >
                   <Gavel className="w-3.5 h-3.5 text-[#C8A34D]" /> Save Report
                 </button>
                 <button
                   onClick={handleExportTranscriptPDF}
-                  className="px-4 py-1.5 rounded-xl bg-[#C8A34D] text-[#111111] font-extrabold text-xs hover:bg-[#b8933d] transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+                  className="px-3.5 sm:px-4 py-1.5 rounded-xl bg-[#C8A34D] text-[#111111] font-extrabold text-[11px] sm:text-xs hover:bg-[#b8933d] transition-all cursor-pointer shadow-xs flex items-center gap-1.5 whitespace-nowrap shrink-0"
                 >
                   <Download className="w-3.5 h-3.5" /> Export PDF
                 </button>
               </div>
             </div>
 
-            {/* 4 PERFORMANCE SCORES */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-5 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">OVERALL ADVOCACY SCORE</span>
-                <span className="text-3xl font-black text-emerald-500 block">{courtroomReport.advocacyScore} / 100</span>
-                <span className="text-[10px] text-slate-500 block">Performance Rating</span>
+            {/* 4 PERFORMANCE SCORES (GRID 2x2 ON MOBILE) */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+              <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-xs">
+                <span className="text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">OVERALL ADVOCACY SCORE</span>
+                <span className="text-2xl sm:text-3xl font-black text-emerald-500 block">{courtroomReport.advocacyScore} / 100</span>
+                <span className="text-[9.5px] sm:text-[10px] text-slate-500 block truncate">Performance Rating</span>
               </div>
 
-              <div className="p-5 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">JUDGE SATISFACTION / ACCURACY</span>
-                <span className="text-3xl font-black text-sky-500 block">{courtroomReport.judgeSatisfaction || courtroomReport.accuracy} / 100</span>
-                <span className="text-[10px] text-slate-500 block">Legal Accuracy Rating</span>
+              <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-xs">
+                <span className="text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">JUDGE SATISFACTION / ACCURACY</span>
+                <span className="text-2xl sm:text-3xl font-black text-sky-500 block">{courtroomReport.judgeSatisfaction || courtroomReport.accuracy} / 100</span>
+                <span className="text-[9.5px] sm:text-[10px] text-slate-500 block truncate">Legal Accuracy Rating</span>
               </div>
 
-              <div className="p-5 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">EVIDENCE UTILIZATION</span>
-                <span className="text-3xl font-black text-amber-500 block">{courtroomReport.evidenceUtilization || courtroomReport.evidence} / 100</span>
-                <span className="text-[10px] text-slate-500 block">Exhibit Integration</span>
+              <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-xs">
+                <span className="text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">EVIDENCE UTILIZATION</span>
+                <span className="text-2xl sm:text-3xl font-black text-amber-500 block">{courtroomReport.evidenceUtilization || courtroomReport.evidence} / 100</span>
+                <span className="text-[9.5px] sm:text-[10px] text-slate-500 block truncate">Exhibit Integration</span>
               </div>
 
-              <div className="p-5 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">PERSUASIVENESS INDEX</span>
-                <span className="text-3xl font-black text-indigo-500 block">{courtroomReport.persuasivenessIndex || courtroomReport.persuasion} / 100</span>
-                <span className="text-[10px] text-slate-500 block">Argument Impact</span>
+              <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-xs">
+                <span className="text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">PERSUASIVENESS INDEX</span>
+                <span className="text-2xl sm:text-3xl font-black text-indigo-500 block">{courtroomReport.persuasivenessIndex || courtroomReport.persuasion} / 100</span>
+                <span className="text-[9.5px] sm:text-[10px] text-slate-500 block truncate">Argument Impact</span>
               </div>
             </div>
 
             {/* VERDICT OR PRACTICE SUMMARY */}
-            <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+            <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-3 sm:space-y-4 shadow-xs">
               <h3 className="text-xs font-black uppercase tracking-wider text-[#C8A34D] flex items-center gap-2">
                 <Scale className="w-4 h-4" /> {simulationMode === 'practice' ? 'Oral Advocacy Performance Summary' : 'Simulated AI Judicial Verdict Summary'}
               </h3>
-              <p className="text-sm font-bold text-slate-900 dark:text-white leading-relaxed">
+              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-relaxed">
                 {courtroomReport.verdictSummary || 'Oral Advocacy Practice Recording analyzed with high vocal clarity and statutory precision.'}
               </p>
               {simulationMode !== 'practice' && (
-                <span className="px-2.5 py-1 rounded bg-amber-500/15 text-amber-500 text-[10px] font-extrabold inline-block">
+                <span className="px-2.5 py-1 rounded bg-amber-500/15 text-amber-500 text-[9.5px] sm:text-[10px] font-extrabold inline-block">
                   SIMULATED RESULT — NOT AN ACTUAL COURT JUDGMENT
                 </span>
               )}
             </div>
 
             {/* STRENGTHS, WEAKNESSES & RECOMMENDATIONS GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-3 shadow-xs">
                 <h4 className="text-xs font-black uppercase tracking-wider text-emerald-500 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4" /> Key Advocacy Strengths
                 </h4>
@@ -1842,13 +1843,13 @@ Return ONLY a valid JSON object matching this structure:
                   {courtroomReport.strengths && courtroomReport.strengths.map((s, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                      <span>{s}</span>
+                      <span className="leading-snug text-[11px] sm:text-xs">{s}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-3 shadow-xs">
                 <h4 className="text-xs font-black uppercase tracking-wider text-rose-500 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" /> Key Weaknesses & Omissions
                 </h4>
@@ -1856,13 +1857,13 @@ Return ONLY a valid JSON object matching this structure:
                   {courtroomReport.weaknesses && courtroomReport.weaknesses.map((w, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                      <span>{w}</span>
+                      <span className="leading-snug text-[11px] sm:text-xs">{w}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-3 shadow-xs">
                 <h4 className="text-xs font-black uppercase tracking-wider text-[#C8A34D] flex items-center gap-2">
                   <Sparkles className="w-4 h-4" /> Court Prep Recommendations
                 </h4>
@@ -1870,7 +1871,7 @@ Return ONLY a valid JSON object matching this structure:
                   {courtroomReport.recommendations && courtroomReport.recommendations.map((r, idx) => (
                     <li key={idx} className="flex items-start gap-2">
                       <ArrowRight className="w-4 h-4 text-[#C8A34D] shrink-0 mt-0.5" />
-                      <span>{r}</span>
+                      <span className="leading-snug text-[11px] sm:text-xs">{r}</span>
                     </li>
                   ))}
                 </ul>
@@ -1878,24 +1879,24 @@ Return ONLY a valid JSON object matching this structure:
             </div>
 
             {/* BOTTOM REPORT ACTION BAR */}
-            <div className="flex flex-wrap items-center justify-between gap-4 p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-xs">
               <button
                 onClick={handleStartNewHearing}
-                className="px-6 py-3.5 rounded-2xl bg-slate-100 dark:bg-[#1A2333] text-slate-700 dark:text-slate-200 font-extrabold text-xs hover:bg-slate-200 transition-all cursor-pointer flex items-center gap-2"
+                className="px-5 sm:px-6 py-3 rounded-2xl bg-slate-100 dark:bg-[#1A2333] text-slate-700 dark:text-slate-200 font-extrabold text-xs hover:bg-slate-200 transition-all cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap shrink-0"
               >
                 <RefreshCw className="w-4 h-4 text-[#C8A34D]" /> Start New Hearing
               </button>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-end gap-2.5 sm:gap-3">
                 <button
                   onClick={handleSaveReportInstant}
-                  className="px-6 py-3.5 rounded-2xl bg-[#C8A34D]/15 text-[#C8A34D] font-extrabold text-xs hover:bg-[#C8A34D] hover:text-[#111] transition-all cursor-pointer flex items-center gap-2"
+                  className="px-4 sm:px-6 py-3 rounded-2xl bg-[#C8A34D]/15 text-[#C8A34D] font-extrabold text-xs hover:bg-[#C8A34D] hover:text-[#111] transition-all cursor-pointer flex items-center gap-2 whitespace-nowrap shrink-0"
                 >
                   <Gavel className="w-4 h-4" /> Save Session
                 </button>
                 <button
                   onClick={handleExportTranscriptPDF}
-                  className="px-8 py-3.5 rounded-2xl bg-[#C8A34D] text-[#111111] font-black text-xs hover:bg-[#b8933d] transition-all cursor-pointer shadow-md flex items-center gap-2"
+                  className="px-5 sm:px-8 py-3 rounded-2xl bg-[#C8A34D] text-[#111111] font-black text-xs hover:bg-[#b8933d] transition-all cursor-pointer shadow-md flex items-center gap-2 whitespace-nowrap shrink-0"
                 >
                   <Download className="w-4 h-4" /> Export PDF Report
                 </button>

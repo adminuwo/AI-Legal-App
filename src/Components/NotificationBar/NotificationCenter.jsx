@@ -156,7 +156,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[1000] flex justify-end">
+        <div className="fixed inset-0 z-[9999] flex justify-end">
             {/* Backdrop */}
             <motion.div 
                 initial={{ opacity: 0 }}
@@ -172,33 +172,33 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                className="relative w-full max-w-md bg-white dark:bg-[#0F172A] h-screen shadow-2xl flex flex-col border-l border-slate-200 dark:border-slate-800 text-[#0F172A] dark:text-white"
+                className="relative w-full sm:max-w-md bg-white dark:bg-[#0F172A] h-full max-h-screen shadow-2xl flex flex-col border-l border-slate-200 dark:border-slate-800 text-[#0F172A] dark:text-white z-10 overflow-hidden"
             >
                 {/* Header */}
-                <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between sticky top-0 z-10 bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-md">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-[#C8A34D]/15 rounded-xl flex items-center justify-center text-[#C8A34D] border border-[#C8A34D]/30 relative">
-                            <Bell className="w-5 h-5" />
+                <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between sticky top-0 z-10 bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md">
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-[#C8A34D]/15 rounded-xl flex items-center justify-center text-[#C8A34D] border border-[#C8A34D]/30 relative shrink-0">
+                            <Bell className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                             {unreadCount > 0 && (
                                 <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white dark:ring-[#0F172A] animate-pulse" />
                             )}
                         </div>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h2 className="text-lg font-black tracking-tight text-[#0F172A] dark:text-white">Notifications</h2>
+                        <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                                <h2 className="text-base sm:text-lg font-black tracking-tight text-[#0F172A] dark:text-white truncate">Notifications</h2>
                                 {unreadCount > 0 && (
-                                    <span className="px-2 py-0.5 rounded-full bg-[#C8A34D] text-[#111111] text-[10px] font-black">
+                                    <span className="px-2 py-0.5 rounded-full bg-[#C8A34D] text-[#111111] text-[9px] sm:text-[10px] font-black shrink-0">
                                         {unreadCount} New
                                     </span>
                                 )}
                             </div>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">
-                                AI LEGAL™ Real-Time Docket & System Updates
+                            <p className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider truncate mt-0.5">
+                                AI LEGAL™ Real-Time Updates
                             </p>
                         </div>
                     </div>
                     
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                         <button 
                             onClick={fetchLiveCaseAlerts} 
                             disabled={isRefreshing}
@@ -214,7 +214,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Filter Tabs & Search Bar */}
-                <div className="p-4 border-b border-slate-100 dark:border-slate-800/80 space-y-3 bg-slate-50/50 dark:bg-[#1E293B]/40">
+                <div className="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-800/80 space-y-2.5 sm:space-y-3 bg-slate-50/50 dark:bg-[#1E293B]/40">
                     <div className="relative">
                         <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                         <input 
@@ -226,12 +226,12 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                         />
                     </div>
 
-                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
+                    <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
                         {['All', 'Hearings', 'Cases', 'System'].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer whitespace-nowrap ${
                                     activeTab === tab
                                         ? 'bg-[#C8A34D] text-[#111111] shadow-xs'
                                         : 'bg-white dark:bg-[#0F172A] text-slate-600 dark:text-slate-400 hover:text-[#C8A34D] border border-slate-200 dark:border-slate-800'
@@ -244,7 +244,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Notification List */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2.5 sm:space-y-3 custom-scrollbar">
                     <AnimatePresence mode="popLayout">
                         {allNotifications.length > 0 ? (
                             allNotifications.map((notif) => (
@@ -254,45 +254,45 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                                     initial={{ opacity: 0, y: 15 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
-                                    className={`p-4 rounded-2xl border transition-all relative group ${
+                                    className={`p-3.5 sm:p-4 rounded-2xl border transition-all relative group ${
                                         notif.isRead 
                                             ? 'bg-white/60 dark:bg-[#1E293B]/40 border-slate-200/80 dark:border-slate-800/80 opacity-75' 
                                             : 'bg-white dark:bg-[#1E293B] border-[#C8A34D]/40 shadow-xs ring-1 ring-[#C8A34D]/20'
                                     }`}
                                 >
-                                    <div className="flex items-start gap-3">
-                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                                    <div className="flex items-start gap-2.5 sm:gap-3">
+                                        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
                                             notif.type === 'success' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
                                             notif.type === 'alert' || notif.type === 'error' ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20' : 
                                             'bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30'
                                         }`}>
-                                            {notif.category === 'Hearings' ? <Gavel className="w-4.5 h-4.5" /> :
-                                             notif.type === 'success' ? <CheckCircle className="w-4.5 h-4.5" /> :
-                                             notif.type === 'alert' || notif.type === 'error' ? <AlertCircle className="w-4.5 h-4.5" /> : 
-                                             <Info className="w-4.5 h-4.5" />}
+                                            {notif.category === 'Hearings' ? <Gavel className="w-4 h-4 sm:w-4.5 sm:h-4.5" /> :
+                                             notif.type === 'success' ? <CheckCircle className="w-4 h-4 sm:w-4.5 sm:h-4.5" /> :
+                                             notif.type === 'alert' || notif.type === 'error' ? <AlertCircle className="w-4 h-4 sm:w-4.5 sm:h-4.5" /> : 
+                                             <Info className="w-4 h-4 sm:w-4.5 sm:h-4.5" />}
                                         </div>
 
-                                        <div className="flex-1 min-w-0 pr-12">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <h4 className={`text-xs font-black truncate ${notif.isRead ? 'text-slate-600 dark:text-slate-400' : 'text-[#0F172A] dark:text-white'}`}>
+                                        <div className="flex-1 min-w-0 pr-10 sm:pr-12">
+                                            <div className="flex items-center gap-1.5 mb-1">
+                                                <h4 className={`text-xs sm:text-sm font-black truncate ${notif.isRead ? 'text-slate-600 dark:text-slate-400' : 'text-[#0F172A] dark:text-white'}`}>
                                                     {(notif.title || '').replace(/AISA/gi, 'AI LEGAL™')}
                                                 </h4>
                                                 {!notif.isRead && (
                                                     <span className="w-2 h-2 bg-[#C8A34D] rounded-full shrink-0 animate-pulse" />
                                                 )}
                                             </div>
-                                            <p className={`text-xs leading-relaxed ${notif.isRead ? 'text-slate-400 dark:text-slate-500' : 'text-slate-600 dark:text-slate-300 font-medium'}`}>
+                                            <p className={`text-[11px] sm:text-xs leading-relaxed ${notif.isRead ? 'text-slate-400 dark:text-slate-500' : 'text-slate-600 dark:text-slate-300 font-medium'}`}>
                                                 {(notif.desc || '').replace(/AISA/gi, 'AI LEGAL™')}
                                             </p>
                                             
-                                            <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/60">
-                                                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                                            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/60 flex-wrap gap-1">
+                                                <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
                                                     <Clock className="w-3 h-3 text-[#C8A34D]" />
                                                     {new Date(notif.time || Date.now()).toLocaleDateString([], { month: 'short', day: 'numeric' })} · {new Date(notif.time || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </span>
 
                                                 {notif.isRealtime && (
-                                                    <span className="text-[9px] font-black text-[#C8A34D] bg-[#C8A34D]/10 px-2 py-0.5 rounded-md border border-[#C8A34D]/20 uppercase">
+                                                    <span className="text-[9px] font-black text-[#C8A34D] bg-[#C8A34D]/10 px-1.5 py-0.5 rounded-md border border-[#C8A34D]/20 uppercase shrink-0">
                                                         Realtime
                                                     </span>
                                                 )}
@@ -300,7 +300,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                                         </div>
 
                                         {/* Action Icons Overlay (Delete & Read Toggle) */}
-                                        <div className="absolute top-3.5 right-3.5 flex items-center gap-1">
+                                        <div className="absolute top-3 right-3 flex items-center gap-1">
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -313,7 +313,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                                                 }`}
                                                 title={notif.isRead ? 'Marked as Read' : 'Mark as Read'}
                                             >
-                                                <CheckCircle className="w-4 h-4" />
+                                                <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                             </button>
 
                                             <button
@@ -324,7 +324,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                                                 className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
                                                 title="Delete Notification"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                             </button>
                                         </div>
                                     </div>
@@ -334,13 +334,13 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                             <motion.div 
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="py-20 text-center px-6"
+                                className="py-16 sm:py-20 text-center px-4 sm:px-6"
                             >
-                                <div className="w-16 h-16 bg-[#C8A34D]/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[#C8A34D]/30 relative">
-                                    <Bell className="w-8 h-8 text-[#C8A34D]" />
+                                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[#C8A34D]/10 rounded-2xl flex items-center justify-center mx-auto mb-3.5 border border-[#C8A34D]/30 relative">
+                                    <Bell className="w-7 h-7 sm:w-8 sm:h-8 text-[#C8A34D]" />
                                 </div>
-                                <h3 className="font-extrabold text-base text-[#0F172A] dark:text-white">Your inbox is clear</h3>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed font-medium">
+                                <h3 className="font-extrabold text-sm sm:text-base text-[#0F172A] dark:text-white">Your inbox is clear</h3>
+                                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed font-medium">
                                     No active notifications or court hearing reminders right now. Real-time updates will appear here automatically.
                                 </p>
                             </motion.div>
@@ -350,22 +350,22 @@ const NotificationCenter = ({ isOpen, onClose }) => {
 
                 {/* Footer Controls */}
                 {allNotifications.length > 0 && (
-                    <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A] flex items-center gap-3">
+                    <div className="p-3.5 sm:p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0F172A] flex items-center gap-2.5 sm:gap-3">
                         {unreadCount > 0 && (
                             <button
                                 onClick={handleMarkAllRead}
-                                className="flex-1 py-2.5 px-3 text-xs font-black uppercase tracking-wider text-[#111111] bg-[#C8A34D] hover:bg-[#b08d3b] rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                                className="flex-1 py-2 sm:py-2.5 px-2.5 sm:px-3 text-[11px] sm:text-xs font-black uppercase tracking-wider text-[#111111] bg-[#C8A34D] hover:bg-[#b08d3b] rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                             >
-                                <CheckCheck className="w-4 h-4" />
+                                <CheckCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 Mark All Read
                             </button>
                         )}
 
                         <button
                             onClick={handleClearAll}
-                            className="flex-1 py-2.5 px-3 text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-900/40 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                            className="flex-1 py-2 sm:py-2.5 px-2.5 sm:px-3 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 border border-rose-200 dark:border-rose-900/40 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                         >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             Clear All
                         </button>
                     </div>

@@ -4,7 +4,7 @@ import {
   ArrowLeft, Search, Sparkles, BookOpen, Clock, Layers, FileText,
   Bookmark, Share2, Copy, Edit3, Trash2, Mic, MicOff, Check, X,
   Brain, Zap, GraduationCap, Flame, Globe, CheckSquare, RefreshCw,
-  HelpCircle, ChevronRight, ChevronDown, Award, Send, Save, ArrowRight
+  HelpCircle, ChevronRight, ChevronDown, Award, Send, Save, ArrowRight, Menu
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { generateChatResponse } from '../services/geminiService';
