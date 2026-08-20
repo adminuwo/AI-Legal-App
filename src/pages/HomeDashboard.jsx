@@ -20,17 +20,20 @@ import LawFirmOnboardingView from '../Components/LawFirmOnboardingView';
 import CreateCaseWizardModal from '../Tools/AI_Legal/components/CreateCaseWizardModal';
 import NotificationCenter from '../Components/NotificationBar/NotificationCenter';
 import { useSubscription } from '../context/SubscriptionContext';
+import { usePersonalization } from '../context/PersonalizationContext';
 
 export default function HomeDashboard() {
   const navigate = useNavigate();
   const { cases: subCases, storage, features, badge, planDisplayName, triggerUpgradeModal } = useSubscription();
+  const { notifications, fetchNotifications } = usePersonalization();
   const currentUser = useRecoilValue(userData);
   const selectedRole = useRecoilValue(selectedRoleState) || 'advocate';
   const userName = currentUser?.user?.name || "Advocate";
 
+  const unreadNotifCount = (notifications || []).filter(n => !n.isRead).length;
+
   // State Management
   const [cases, setCases] = useState([]);
-  const [notifications, setNotifications] = useState([]);
   const [pendingInvite, setPendingInvite] = useState(null);
   const [firmWorkspaces, setFirmWorkspaces] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -99,9 +102,8 @@ export default function HomeDashboard() {
       const data = await apiService.getProjects();
       setCases(data || []);
 
-      // Fetch AI Notifications
-      const notifs = await apiService.getNotifications();
-      setNotifications(notifs || []);
+      // Fetch AI Notifications via PersonalizationContext
+      if (fetchNotifications) fetchNotifications();
 
       // Fetch Pending Workspace Invitations
       try {
@@ -520,14 +522,14 @@ export default function HomeDashboard() {
               >
                 <div className="relative">
                   <Bell className="w-4.5 h-4.5 text-[#C8A34D]" />
-                  {notifications?.length > 0 && (
+                  {unreadNotifCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white dark:ring-[#0F172A] animate-pulse" />
                   )}
                 </div>
                 <span>Updates & Notifications</span>
-                {notifications?.length > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-[#C8A34D] text-[#111111] text-[10px] font-black ml-1">
-                    {notifications.length}
+                {unreadNotifCount > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black ml-1">
+                    {unreadNotifCount > 99 ? '99+' : unreadNotifCount}
                   </span>
                 )}
               </button>
@@ -646,7 +648,7 @@ export default function HomeDashboard() {
                     Upgrade Plan →
                   </button>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
                   <div>
                     <p className="text-slate-400 font-semibold">Active Matters</p>
                     <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
@@ -663,12 +665,6 @@ export default function HomeDashboard() {
                     <p className="text-slate-400 font-semibold">AI Assistant Queries</p>
                     <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
                       {features?.ai_chat ? `${features.ai_chat.used} / ${features.ai_chat.limit === -1 ? 'Unlimited' : features.ai_chat.limit}` : '0 / 50'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-slate-400 font-semibold">Draft Maker</p>
-                    <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
-                      {features?.draft_maker ? `${features.draft_maker.used} / ${features.draft_maker.limit === -1 ? 'Unlimited' : features.draft_maker.limit}` : '0 / 2'}
                     </p>
                   </div>
                 </div>

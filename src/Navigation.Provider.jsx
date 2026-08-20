@@ -67,6 +67,7 @@ const MockCourtroomWorkspace = lazy(() => import('./pages/MockCourtroomWorkspace
 const ClientConnectWorkspace = lazy(() => import('./pages/ClientConnectWorkspace'));
 const QuizPracticeWorkspace = lazy(() => import('./pages/QuizPracticeWorkspace'));
 const NotesMakerWorkspace = lazy(() => import('./pages/NotesMakerWorkspace'));
+const MobileAppPage = lazy(() => import('./pages/MobileAppPage'));
 
 const isAuthenticated = () => {
   const tokenStr = localStorage.getItem('token');
@@ -498,6 +499,7 @@ const NavigateProvider = () => {
         <Route path="/legal-pricing" element={<LegalPricingPortal />} />
         <Route path="/subscription-checkout" element={<LegalPricingPortal />} />
         <Route path="/share/:shareId" element={<SharedChat />} />
+        <Route path="/mobile-app" element={<Navigate to="/dashboard/mobile-app" replace />} />
 
         {/* Dashboard (Protected) */}
         <Route
@@ -616,6 +618,11 @@ const NavigateProvider = () => {
           <Route path="calculator" element={<PlaceholderPage title="Legal Calculator" />} />
           <Route path="downloads" element={<PlaceholderPage title="Downloads" />} />
           <Route path="bookmarks" element={<PlaceholderPage title="Bookmarks" />} />
+          <Route path="mobile-app" element={
+            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Mobile App Ecosystem...</div>}>
+              <MobileAppPage />
+            </Suspense>
+          } />
           <Route path="help-support" element={<HelpSupport />} />
         </Route>
 

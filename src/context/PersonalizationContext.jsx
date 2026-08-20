@@ -602,6 +602,7 @@ export const PersonalizationProvider = ({ children }) => {
             addNotification,
             deleteNotification,
             clearAllNotifications,
+            fetchNotifications,
             chatSessions,
             refreshChatSessions: fetchChatSessions,
             getSystemPromptExtensions,

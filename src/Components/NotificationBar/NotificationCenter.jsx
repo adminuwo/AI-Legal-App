@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 const NotificationCenter = ({ isOpen, onClose }) => {
     const { 
       notifications: contextNotifications, 
+      fetchNotifications,
       markNotificationRead, 
       deleteNotification, 
       clearAllNotifications 
@@ -95,6 +96,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (isOpen) {
+            fetchNotifications();
             fetchLiveCaseAlerts();
         }
     }, [isOpen]);
@@ -273,14 +275,14 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                                         <div className="flex-1 min-w-0 pr-12">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <h4 className={`text-xs font-black truncate ${notif.isRead ? 'text-slate-600 dark:text-slate-400' : 'text-[#0F172A] dark:text-white'}`}>
-                                                    {notif.title}
+                                                    {(notif.title || '').replace(/AISA/gi, 'AI LEGAL™')}
                                                 </h4>
                                                 {!notif.isRead && (
                                                     <span className="w-2 h-2 bg-[#C8A34D] rounded-full shrink-0 animate-pulse" />
                                                 )}
                                             </div>
                                             <p className={`text-xs leading-relaxed ${notif.isRead ? 'text-slate-400 dark:text-slate-500' : 'text-slate-600 dark:text-slate-300 font-medium'}`}>
-                                                {notif.desc}
+                                                {(notif.desc || '').replace(/AISA/gi, 'AI LEGAL™')}
                                             </p>
                                             
                                             <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/60">

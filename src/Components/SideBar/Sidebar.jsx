@@ -6,7 +6,7 @@ import {
   SearchCode, FileCheck, Gavel, Lightbulb, Scale, Calendar, 
   Users, Bell, User, Settings2, LogOut, ChevronRight, ChevronLeft, Binary,
   Sun, Moon, Globe, ChevronDown, Bookmark, HelpCircle, Download,
-  CreditCard, Shield, Zap, GraduationCap, Building2, MessageSquare, BookOpen
+  CreditCard, Shield, Zap, GraduationCap, Building2, MessageSquare, BookOpen, Smartphone
 } from 'lucide-react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userData, selectedRoleState, clearUser } from '../../userStore/userData';
@@ -62,6 +62,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
     { name: selectedRole === 'law_firm' ? 'Firm Workspace' : 'My Matters', icon: Briefcase, path: '/dashboard/cases' },
     { name: selectedRole === 'law_firm' ? 'AI Firm Assistant' : selectedRole === 'student' ? 'AI Legal Tutor' : 'AI Legal Assistant', icon: Scale, useLogoIcon: true, path: '/dashboard/chat/new' },
     { name: 'AI Tools', icon: Zap, path: '/dashboard/tools' },
+    { name: 'Mobile App', icon: Smartphone, path: '/dashboard/mobile-app' },
   ];
 
   // Dynamic Role-Specific AI Tools

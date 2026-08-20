@@ -55,6 +55,7 @@ export const AppRoute = {
   TERMS_OF_SERVICE: "/terms",
   COOKIE_POLICY: "/cookie-policy",
   ADMIN_DASHBOARD: "/dashboard/admin",
+  MOBILE_APP: "/dashboard/mobile-app",
 };
 
 const getApiUrl = () => {
@@ -121,6 +122,7 @@ const apis = {
 
   imageProxy: `${API}/image/proxy`,
   precedents: `${API}/precedents`,
+  appUpdateConfig: `${API}/app-update/config`,
   baseUrl: API,
 };
 
