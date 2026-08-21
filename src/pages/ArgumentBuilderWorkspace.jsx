@@ -4,7 +4,7 @@ import {
   Gavel, Search, ArrowRight, ArrowLeft, Upload, Sparkles, 
   Copy, Download, Globe, ShieldAlert, CheckCircle2, ChevronDown, ChevronUp,
   MessageSquare, HelpCircle, Shield, AlertTriangle, Rocket, CheckSquare, Layers,
-  FileText, Briefcase, User, Building2, Calendar, Scale, FolderOpen, RefreshCw, X, Trash2, Check, Clock
+  FileText, Briefcase, User, Building2, Calendar, Scale, FolderOpen, RefreshCw, X, Trash2, Check, Clock, Menu
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -362,49 +362,50 @@ Language: ${outputLanguage}
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-slate-900 dark:text-white flex flex-col font-sans">
-      {/* APP WORKSPACE HEADER */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#111622]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 pl-14 pr-4 sm:px-8 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+      {/* APP WORKSPACE HEADER - 1 SINGLE ROW ON MOBILE & DESKTOP */}
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#111622]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 pl-14 pr-2.5 sm:px-8 py-2 sm:py-3.5 flex flex-row items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
           <button 
             onClick={() => navigate('/dashboard/tools')}
-            className="p-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer border border-slate-200 dark:border-slate-800"
+            className="p-1.5 sm:p-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer border border-slate-200 dark:border-slate-800 shrink-0"
             title="Back to AI Tools Suite"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
 
-          <div className="w-10 h-10 rounded-2xl bg-[#111111] border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D] shadow-md">
-            <Gavel className="w-5 h-5" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#111111] border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D] shadow-md shrink-0">
+            <Gavel className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
 
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <h1 className="text-xs sm:text-lg font-black tracking-tight text-slate-900 dark:text-white truncate">
                 Argument Builder
               </h1>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 uppercase">
+              <span className="text-[9px] sm:text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 uppercase shrink-0 hidden md:inline-block">
                 Courtroom Intelligence
               </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 hidden md:block">
               Build structured courtroom arguments, anticipate opposition, prepare judge responses & hearing strategy.
             </p>
           </div>
         </div>
 
         {/* Header Right Actions */}
-        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {currentStep !== 4 && (
             <>
               {/* Saved Briefs Button */}
               <button
                 onClick={() => setIsSavedModalOpen(true)}
-                className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:border-[#C8A34D] transition-all"
+                className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 text-[11px] sm:text-xs font-bold flex items-center gap-1 cursor-pointer hover:border-[#C8A34D] transition-all whitespace-nowrap"
               >
-                <FolderOpen className="w-4 h-4 text-[#C8A34D]" />
-                <span>Saved Briefs</span>
+                <FolderOpen className="w-3.5 h-3.5 text-[#C8A34D]" />
+                <span className="hidden xs:inline sm:inline">Saved Briefs</span>
+                <span className="xs:hidden">Briefs</span>
                 {savedBriefs.length > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full bg-[#C8A34D] text-[#111111] text-[10px] font-black">
+                  <span className="px-1.5 py-0.2 rounded-full bg-[#C8A34D] text-[#111111] text-[9px] sm:text-[10px] font-black">
                     {savedBriefs.length}
                   </span>
                 )}
@@ -415,7 +416,7 @@ Language: ${outputLanguage}
                 <select
                   value={outputLanguage}
                   onChange={(e) => setOutputLanguage(e.target.value)}
-                  className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold text-[#C8A34D] focus:outline-none focus:border-[#C8A34D] cursor-pointer"
+                  className="px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-[11px] sm:text-xs font-bold text-[#C8A34D] focus:outline-none focus:border-[#C8A34D] cursor-pointer"
                 >
                   {SUPPORTED_LANGUAGES.map(lang => (
                     <option key={lang} value={lang}>{lang}</option>
@@ -429,23 +430,23 @@ Language: ${outputLanguage}
             <>
               <button
                 onClick={handleCopyOralNotes}
-                className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:border-[#C8A34D]"
+                className="px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 text-[11px] sm:text-xs font-bold flex items-center gap-1 cursor-pointer hover:border-[#C8A34D]"
               >
-                <Copy className="w-4 h-4 text-[#C8A34D]" /> Copy Notes
+                <Copy className="w-3.5 h-3.5 text-[#C8A34D]" /> <span className="hidden xs:inline">Copy</span>
               </button>
 
               <button
                 onClick={handleSaveBrief}
-                className="px-3.5 py-2 rounded-xl bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/40 text-xs font-bold flex items-center gap-1.5 cursor-pointer hover:bg-[#C8A34D] hover:text-[#111111] transition-all"
+                className="px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/40 text-[11px] sm:text-xs font-bold flex items-center gap-1 cursor-pointer hover:bg-[#C8A34D] hover:text-[#111111] transition-all"
               >
-                Save Brief
+                Save
               </button>
 
               <button
                 onClick={handleDownloadPDF}
-                className="px-4 py-2 rounded-xl bg-[#C8A34D] text-[#111111] text-xs font-black flex items-center gap-1.5 cursor-pointer shadow-md shadow-[#C8A34D]/20 hover:bg-[#b8933d] transition-all"
+                className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-[#C8A34D] text-[#111111] text-[11px] sm:text-xs font-black flex items-center gap-1 cursor-pointer shadow-md shadow-[#C8A34D]/20 hover:bg-[#b8933d] transition-all"
               >
-                <Download className="w-4 h-4" /> Export PDF
+                <Download className="w-3.5 h-3.5" /> <span className="hidden xs:inline">Export</span> PDF
               </button>
             </>
           )}
@@ -453,27 +454,27 @@ Language: ${outputLanguage}
       </header>
 
       {/* STEP PROGRESS BAR */}
-      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800/80 px-4 sm:px-8 py-2.5 overflow-x-auto flex items-center justify-between text-xs font-semibold">
+      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800/80 px-3 sm:px-8 py-2 overflow-x-auto scrollbar-none flex items-center gap-1.5 sm:gap-2 text-xs font-semibold max-w-full select-none">
         {[
-          { num: 1, label: '1. Input Source' },
-          { num: 2, label: '2. Review Context' },
-          { num: 3, label: '3. AI Compilation' },
-          { num: 4, label: '4. Argument Builder Workspace' },
+          { num: 1, label: 'Input Source', short: 'Input' },
+          { num: 2, label: 'Review Context', short: 'Review' },
+          { num: 3, label: 'AI Compilation', short: 'Compile' },
+          { num: 4, label: 'Argument Workspace', short: 'Workspace' },
         ].map(step => (
           <button
             key={step.num}
             onClick={() => { if (step.num < currentStep) setCurrentStep(step.num); }}
             disabled={step.num > currentStep}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-xl transition-all ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
               currentStep === step.num
-                ? 'bg-[#C8A34D] text-[#111111] font-black shadow-sm'
+                ? 'bg-[#C8A34D] text-[#111111] font-black shadow-md shadow-[#C8A34D]/20'
                 : currentStep > step.num
-                ? 'text-[#C8A34D] cursor-pointer'
-                : 'text-slate-400 dark:text-slate-600 opacity-60'
+                ? 'bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 cursor-pointer hover:bg-[#C8A34D]/25'
+                : 'bg-slate-100 dark:bg-[#1E293B] text-slate-400 opacity-60 cursor-not-allowed'
             }`}
           >
-            <span>{step.label}</span>
-            {currentStep > step.num && <Check className="w-3.5 h-3.5" />}
+            <span>{step.num}. <span className="sm:hidden">{step.short}</span><span className="hidden sm:inline">{step.label}</span></span>
+            {currentStep > step.num && <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
           </button>
         ))}
       </div>
@@ -487,11 +488,11 @@ Language: ${outputLanguage}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6 max-w-4xl mx-auto"
           >
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+            <div className="text-center space-y-1.5 sm:space-y-2">
+              <h2 className="text-lg sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                 Step 1 — Choose Input Source
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-snug">
                 Select an existing case from your Advocate Workspace, upload a legal document, or manually enter case facts.
               </p>
             </div>
@@ -567,7 +568,9 @@ Language: ${outputLanguage}
                       const court = c.courtName || c.court || 'Court Jurisdiction';
                       const client = c.clientName || c.client || 'Client';
                       const caseType = c.caseType || c.category || c.type || 'Legal Case';
-                      const isCaseSelected = selectedCase?._id === c._id;
+                      const cId = c._id || c.id || c.name;
+                      const selId = selectedCase?._id || selectedCase?.id || selectedCase?.name;
+                      const isCaseSelected = Boolean(selectedCase && c && cId && selId && selId === cId);
                       return (
                         <div
                           key={c._id}

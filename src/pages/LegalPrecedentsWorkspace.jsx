@@ -4,7 +4,7 @@ import {
   ArrowLeft, Search, BookOpen, Scale, Gavel, FileText, Briefcase, 
   CheckCircle2, Copy, Download, Share2, Sparkles, Filter, ChevronRight,
   ExternalLink, Layers, AlertCircle, RefreshCw, Bookmark, Award, Shield, Building2,
-  FileCheck2, HelpCircle, ArrowRight, Check, MessageSquare
+  FileCheck2, HelpCircle, ArrowRight, Check, MessageSquare, Menu
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -638,38 +638,37 @@ export default function LegalPrecedentsWorkspace() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-slate-900 dark:text-white flex flex-col font-sans">
-      {/* WORKSPACE HEADER */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#111622]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 pl-14 pr-4 sm:px-8 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+      {/* APP WORKSPACE HEADER - 1 SINGLE ROW ON MOBILE & DESKTOP */}
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#111622]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 pl-14 pr-2.5 sm:px-8 py-2 sm:py-3.5 flex flex-row items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
           <button 
             onClick={() => {
               if (selectedPrecedent) {
                 setSelectedPrecedent(null);
-                setActiveAiOp(null);
               } else {
                 navigate('/dashboard/tools');
               }
             }}
-            className="p-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer border border-slate-200 dark:border-slate-800"
+            className="p-1.5 sm:p-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer border border-slate-200 dark:border-slate-800 shrink-0"
             title={selectedPrecedent ? "Back to Precedents Search Results" : "Back to AI Tools Suite"}
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
 
-          <div className="w-10 h-10 rounded-2xl bg-[#111111] border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D] shadow-md">
-            <BookOpen className="w-5 h-5" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#111111] border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D] shadow-md shrink-0">
+            <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
 
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <h1 className="text-xs sm:text-lg font-black tracking-tight text-slate-900 dark:text-white truncate">
                 Legal Precedents
               </h1>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 uppercase">
-                Supreme Court & High Courts
+              <span className="text-[9px] sm:text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 uppercase shrink-0 hidden md:inline-block">
+                SC & High Courts
               </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 hidden md:block">
               Research Supreme Court & High Court judgments with relevant citations, ratio decidendi and precedent analysis.
             </p>
           </div>
@@ -677,7 +676,7 @@ export default function LegalPrecedentsWorkspace() {
       </header>
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-8 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-8 py-4 sm:py-8 space-y-4 sm:space-y-6 min-w-0 overflow-x-hidden">
         
         {/* PRECEDENT DETAIL VIEW WORKSPACE */}
         {selectedPrecedent ? (
@@ -742,11 +741,11 @@ export default function LegalPrecedentsWorkspace() {
               </div>
 
               {/* PRECEDENT AI INTELLIGENCE SUITE */}
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2 pt-1 max-w-full">
                 <span className="text-[11px] font-bold text-[#C8A34D] uppercase tracking-wider block">
                   Precedent AI Intelligence Suite:
                 </span>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none max-w-full pb-1">
                   {[
                     { id: 'simple', label: 'Simple Words', icon: HelpCircle },
                     { id: 'summary', label: 'Full Summary', icon: FileText },
@@ -762,7 +761,7 @@ export default function LegalPrecedentsWorkspace() {
                       <button
                         key={op.id}
                         onClick={() => handleTriggerAiOp(op.id, selectedPrecedent)}
-                        className={`px-3 py-1.5 rounded-xl border text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer ${
+                        className={`px-2.5 sm:px-3 py-1.5 rounded-xl border text-[11px] sm:text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                           isActive
                             ? 'bg-[#C8A34D] text-[#111111] border-[#C8A34D] shadow-sm'
                             : 'bg-slate-50 dark:bg-[#1A2333] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-[#C8A34D]'
@@ -1087,57 +1086,57 @@ export default function LegalPrecedentsWorkspace() {
         </motion.div>
       ) : (
           /* MODE SELECTION & PRECEDENTS SEARCH WORKSPACE */
-          <div className="space-y-6 max-w-5xl mx-auto">
+          <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto w-full min-w-0">
             {/* RESEARCH MODE SELECTION TOGGLE */}
-            <div className="bg-white dark:bg-[#111622] p-2 rounded-2xl border border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2 shadow-sm">
+            <div className="bg-white dark:bg-[#111622] p-2 rounded-2xl border border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2 shadow-xs max-w-full overflow-hidden">
               <button
                 onClick={() => setResearchMode('CURRENT')}
-                className={`p-4 rounded-xl transition-all cursor-pointer text-left flex items-start gap-3 border ${
+                className={`p-3.5 sm:p-4 rounded-xl transition-all cursor-pointer text-left flex items-start gap-3 border min-w-0 ${
                   researchMode === 'CURRENT'
                     ? 'bg-[#C8A34D]/10 border-[#C8A34D] text-slate-900 dark:text-white shadow-sm ring-1 ring-[#C8A34D]/40'
                     : 'bg-white dark:bg-[#111622] border-slate-200 dark:border-slate-800 hover:border-[#C8A34D]/40 text-slate-600 dark:text-slate-400'
                 }`}
               >
-                <div className={`p-2.5 rounded-xl ${researchMode === 'CURRENT' ? 'bg-[#C8A34D] text-[#111111]' : 'bg-slate-100 dark:bg-[#1A2333] text-slate-500'}`}>
-                  <Briefcase className="w-5 h-5" />
+                <div className={`p-2 sm:p-2.5 rounded-xl shrink-0 ${researchMode === 'CURRENT' ? 'bg-[#C8A34D] text-[#111111]' : 'bg-slate-100 dark:bg-[#1A2333] text-slate-500'}`}>
+                  <Briefcase className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-extrabold">Current Case</h3>
-                    {researchMode === 'CURRENT' && <span className="w-2 h-2 rounded-full bg-[#C8A34D]" />}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-xs sm:text-sm font-extrabold truncate">Current Case</h3>
+                    {researchMode === 'CURRENT' && <span className="w-2 h-2 rounded-full bg-[#C8A34D] shrink-0" />}
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Research precedents relevant to the currently selected case context.</p>
+                  <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">Research precedents relevant to the currently selected case context.</p>
                 </div>
               </button>
 
               <button
                 onClick={() => setResearchMode('MANUAL')}
-                className={`p-4 rounded-xl transition-all cursor-pointer text-left flex items-start gap-3 border ${
+                className={`p-3.5 sm:p-4 rounded-xl transition-all cursor-pointer text-left flex items-start gap-3 border min-w-0 ${
                   researchMode === 'MANUAL'
                     ? 'bg-[#C8A34D]/10 border-[#C8A34D] text-slate-900 dark:text-white shadow-sm ring-1 ring-[#C8A34D]/40'
                     : 'bg-white dark:bg-[#111622] border-slate-200 dark:border-slate-800 hover:border-[#C8A34D]/40 text-slate-600 dark:text-slate-400'
                 }`}
               >
-                <div className={`p-2.5 rounded-xl ${researchMode === 'MANUAL' ? 'bg-[#C8A34D] text-[#111111]' : 'bg-slate-100 dark:bg-[#1A2333] text-slate-500'}`}>
-                  <Search className="w-5 h-5" />
+                <div className={`p-2 sm:p-2.5 rounded-xl shrink-0 ${researchMode === 'MANUAL' ? 'bg-[#C8A34D] text-[#111111]' : 'bg-slate-100 dark:bg-[#1A2333] text-slate-500'}`}>
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-extrabold">Manual Search</h3>
-                    {researchMode === 'MANUAL' && <span className="w-2 h-2 rounded-full bg-[#C8A34D]" />}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-xs sm:text-sm font-extrabold truncate">Manual Search</h3>
+                    {researchMode === 'MANUAL' && <span className="w-2 h-2 rounded-full bg-[#C8A34D] shrink-0" />}
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Search legal precedents using legal issue, section, case name or citation.</p>
+                  <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">Search legal precedents using legal issue, section, case name or citation.</p>
                 </div>
               </button>
             </div>
 
             {/* CURRENT CASE MODE CONTEXT BOX */}
             {researchMode === 'CURRENT' && (
-              <div className="bg-white dark:bg-[#111622] p-6 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+              <div className="bg-white dark:bg-[#111622] p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 space-y-3 sm:space-y-4 shadow-xs max-w-full overflow-hidden">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                    <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">Active Case Context</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Precedents will be customized for this authorized case file.</p>
+                    <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">Active Case Context</h3>
+                    <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">Precedents will be customized for this authorized case file.</p>
                   </div>
 
                   {advocateCases.length > 1 && (
@@ -1147,7 +1146,7 @@ export default function LegalPrecedentsWorkspace() {
                         const found = advocateCases.find(c => c._id === e.target.value);
                         setSelectedCase(found);
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#C8A34D]"
+                      className="w-full sm:w-auto px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#C8A34D]"
                     >
                       {advocateCases.map(c => (
                         <option key={c._id} value={c._id}>
@@ -1159,15 +1158,15 @@ export default function LegalPrecedentsWorkspace() {
                 </div>
 
                 {selectedCase ? (
-                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div className="space-y-1">
+                  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 max-w-full overflow-hidden">
+                    <div className="space-y-1 min-w-0 flex-1">
                       <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] uppercase">
                         {selectedCase.caseType || selectedCase.category || 'Active Matter'}
                       </span>
-                      <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                      <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate">
                         {selectedCase.name || selectedCase.caseName || selectedCase.title || 'State vs Raj Malhotra & Ors.'}
                       </h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
                         {selectedCase.courtName || selectedCase.court || 'Patiala House Courts, New Delhi'} • Client: {selectedCase.clientName || selectedCase.client || 'Raj Malhotra'}
                       </p>
                     </div>
@@ -1175,18 +1174,18 @@ export default function LegalPrecedentsWorkspace() {
                     <button
                       onClick={() => handlePerformSearch()}
                       disabled={isSearching}
-                      className="px-5 py-2.5 rounded-xl bg-[#C8A34D] text-[#111111] text-xs font-black flex items-center gap-2 cursor-pointer shadow-md hover:bg-[#b8933d] transition-all shrink-0"
+                      className="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-xl bg-[#C8A34D] text-[#111111] text-xs font-black flex items-center justify-center gap-2 cursor-pointer shadow-md hover:bg-[#b8933d] transition-all shrink-0"
                     >
                       {isSearching ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                       Find Relevant Precedents
                     </button>
                   </div>
                 ) : (
-                  <div className="p-6 text-center space-y-3 bg-slate-50 dark:bg-[#1A2333] rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
-                    <AlertCircle className="w-8 h-8 text-amber-500 mx-auto" />
+                  <div className="p-4 sm:p-6 text-center space-y-3 bg-slate-50 dark:bg-[#1A2333] rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+                    <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500 mx-auto" />
                     <div>
                       <h4 className="text-xs font-bold text-slate-900 dark:text-white">No active case available</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Open or select a case to research precedents using case context.</p>
+                      <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1">Open or select a case to research precedents using case context.</p>
                     </div>
                     <button
                       onClick={() => setResearchMode('MANUAL')}
@@ -1319,41 +1318,41 @@ export default function LegalPrecedentsWorkspace() {
                         <motion.div
                           key={precedent._id || precedent.case_name}
                           whileHover={{ y: -2 }}
-                          className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 hover:border-[#C8A34D]/60 transition-all shadow-sm space-y-3 cursor-pointer"
+                          className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 hover:border-[#C8A34D]/60 transition-all shadow-xs space-y-3 cursor-pointer"
                           onClick={() => setSelectedPrecedent(precedent)}
                         >
-                          <div className="flex items-start justify-between gap-4">
-                            <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[10px] font-mono font-bold uppercase">
+                          <div className="flex items-start justify-between gap-2.5 sm:gap-4">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-1 min-w-0 max-w-full">
+                                <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[9.5px] sm:text-[10px] font-mono font-bold uppercase whitespace-nowrap shrink-0">
                                   {court}
                                 </span>
-                                <span className="text-xs font-mono font-bold text-slate-400">
+                                <span className="text-[11px] sm:text-xs font-mono font-bold text-slate-400 truncate min-w-0">
                                   {year} • {citation}
                                 </span>
                               </div>
-                              <h4 className="text-base font-extrabold text-slate-900 dark:text-white hover:text-[#C8A34D] transition-colors">
+                              <h4 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white hover:text-[#C8A34D] transition-colors leading-snug">
                                 {caseName}
                               </h4>
                             </div>
 
-                            <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-bold shrink-0">
+                            <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] sm:text-xs font-bold shrink-0 whitespace-nowrap">
                               {precedent.relevance_score || 96}% Match
                             </span>
                           </div>
 
-                          <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                          <p className="text-[11px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 leading-snug">
                             Principle: {principle}
                           </p>
 
-                          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 font-serif line-clamp-2">
+                          <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 font-serif line-clamp-2">
                             "{ratio}"
                           </div>
 
-                          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                            <div className="flex flex-wrap items-center gap-2 flex-1">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 pt-1">
+                            <div className="flex items-center gap-1.5 flex-wrap min-w-0 max-w-full">
                               {(precedent.tags || ['NI Act', 'Sec 138']).map((tag, tIdx) => (
-                                <span key={tIdx} className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#1E293B] text-slate-500 whitespace-nowrap shrink-0">
+                                <span key={tIdx} className="text-[9.5px] sm:text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#1E293B] text-slate-600 dark:text-slate-300 whitespace-nowrap shrink-0">
                                   {tag}
                                 </span>
                               ))}
@@ -1364,10 +1363,10 @@ export default function LegalPrecedentsWorkspace() {
                                 e.stopPropagation();
                                 setSelectedPrecedent(precedent);
                               }}
-                              className="text-xs font-bold text-[#C8A34D] flex items-center gap-1 hover:underline cursor-pointer shrink-0"
+                              className="text-xs font-bold text-[#C8A34D] flex items-center gap-1 hover:underline cursor-pointer whitespace-nowrap shrink-0 self-end sm:self-auto"
                             >
                               <span>View Precedent</span>
-                              <ChevronRight className="w-4 h-4" />
+                              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                             </button>
                           </div>
                         </motion.div>

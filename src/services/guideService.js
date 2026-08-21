@@ -1,6 +1,7 @@
 /**
  * AI LEGAL™ – Web Product Guide Service
  * Handles feature lookup, step-by-step parsing, dynamic suggestions, and AI responses.
+ * Aligned 1:1 with Mobile App Guide Service architecture.
  */
 
 import axios from 'axios';
@@ -16,23 +17,26 @@ export const APP_CONTEXTS = [
   { id: 'Evidence Vault', label: '📎 Evidence Vault & Analyst' },
   { id: 'Draft Maker', label: '📝 Draft Maker' },
   { id: 'Contract Analyzer', label: '📄 Contract Analyzer' },
+  { id: 'Legal Precedents', label: '📚 Legal Precedents & Research' },
   { id: 'Timeline', label: '⏱ Case Timeline' },
-  { id: 'OCR Scanner', label: '🔤 OCR & Document Scanner' },
+  { id: 'Hearings', label: '🔔 Court Hearings & Reminders' },
+  { id: 'AI Mock Courtroom', label: '🏛️ AI Mock Courtroom' },
+  { id: 'AI Client Connect', label: '💬 AI Client Connect' },
   { id: 'Settings', label: '⚙ Settings & Preferences' }
 ];
 
 export const QUICK_ACTIONS = [
-  { label: 'Create New Case', icon: '🚀', query: 'How do I create a case in My Matters?' },
-  { label: 'Upload Evidence', icon: '📎', query: 'How do I upload evidence in Evidence Analyst?' },
-  { label: 'Generate Draft', icon: '📝', query: 'How do I use Draft Maker to generate legal notices?' },
-  { label: 'Analyze Contract', icon: '📄', query: 'How does Contract Analyzer identify legal risks?' },
-  { label: 'Research Case Law', icon: '📚', query: 'How do I research precedents in Legal Precedents?' },
-  { label: 'View Timeline', icon: '⏱', query: 'How does Case Timeline extract facts chronologically?' },
-  { label: 'Manage Hearings', icon: '🔔', query: 'How do I add court hearings and reminders?' },
-  { label: 'Open Settings', icon: '⚙', query: 'How do I manage my settings and language preferences?' }
+  { label: 'How do I create a case?', query: 'How do I create a case?' },
+  { label: 'How do I upload evidence?', query: 'How do I upload evidence?' },
+  { label: 'Where is Draft Maker?', query: 'Where is Draft Maker?' },
+  { label: 'How do reminders work?', query: 'How do reminders work?' },
+  { label: 'How do I analyze a contract?', query: 'How do I analyze a contract?' },
+  { label: 'How do I search legal precedents?', query: 'How do I search legal precedents?' },
+  { label: 'How does AI Mock Courtroom work?', query: 'How does AI Mock Courtroom work?' },
+  { label: 'How do I connect with clients?', query: 'How do I connect with clients?' }
 ];
 
-const WEB_ROUTES_MAP = {
+export const WEB_ROUTES_MAP = {
   'My Matters': '/dashboard/cases',
   'Case Creation': '/dashboard/cases',
   'Draft Maker': '/dashboard/tools/draft-maker',
@@ -49,13 +53,13 @@ const WEB_ROUTES_MAP = {
   'Dashboard': '/dashboard'
 };
 
-const KNOWLEDGE_BASE = [
+export const KNOWLEDGE_BASE = [
   {
     id: 'case_creation',
     topic: 'Case Creation',
     keywords: ['case', 'create', 'new case', 'folder', 'matter', 'bana', 'banae'],
     patterns: [/create.*case/i, /new.*case/i, /case.*creation/i, /add.*case/i],
-    reply: `You can initialize case dossiers in My Matters to keep all pleadings, evidence, and hearings organized.
+    reply: `You can create case folders in My Matters to organize your case dossiers.
 ↓
 Step 1
 Open My Matters from the left sidebar navigation menu.
@@ -230,17 +234,97 @@ Tip
     navRoute: '/dashboard/cases',
     navLabel: 'Open My Matters →',
     suggestions: ['How do I create a case?', 'Where is Timeline?', 'Open Settings']
+  },
+  {
+    id: 'mock_courtroom',
+    topic: 'AI Mock Courtroom',
+    keywords: ['mock', 'courtroom', 'judge', 'bench', 'argument', 'trial', 'simulation', 'oral'],
+    patterns: [/mock.*court/i, /courtroom/i, /trial.*simulation/i],
+    reply: `AI Mock Courtroom lets you rehearse oral arguments against an AI Judge bench before your court hearing.
+↓
+Step 1
+Navigate to AI Tools -> AI Mock Courtroom.
+↓
+Step 2
+Select your Bench Type (Single Judge, Division Bench, Arbitrator) and Judicial Style (Strict, Analytical, Inquisitive).
+↓
+Step 3
+Present your oral submissions or type written arguments.
+↓
+Step 4
+Receive real-time judicial counter-questions, BSA admissibility objections, and scoring feedback.
+↓
+Tip
+• Use AI Mock Courtroom to test argument vulnerability before filing petitions.`,
+    navRoute: '/dashboard/tools/mock-courtroom',
+    navLabel: 'Open AI Mock Courtroom →',
+    suggestions: ['Where is Argument Builder?', 'How do I research precedents?', 'Explain Strategy Engine']
+  },
+  {
+    id: 'client_connect',
+    topic: 'AI Client Connect',
+    keywords: ['client', 'connect', 'communication', 'portal', 'update', 'whatsapp', 'client update'],
+    patterns: [/client.*connect/i, /client.*update/i, /communication/i],
+    reply: `AI Client Connect automates plain-language case updates and consultation briefs for your clients.
+↓
+Step 1
+Open AI Tools -> AI Client Connect.
+↓
+Step 2
+Select the target Case dossier and latest court order or hearing log.
+↓
+Step 3
+AI transforms complex legalese into clear, empathetic client update letters in English, Hindi, or regional languages.
+↓
+Step 4
+Review draft update and dispatch via WhatsApp, Email, or Client Portal.
+↓
+Tip
+• Client updates maintain attorney-client privilege while saving hours of routine client queries.`,
+    navRoute: '/dashboard/tools/client-connect',
+    navLabel: 'Open AI Client Connect →',
+    suggestions: ['How do I create a case?', 'Where is Draft Maker?', 'How do reminders work?']
   }
 ];
 
 export class GuideService {
+  /**
+   * Helper method to parse step-by-step responses containing '↓'
+   */
+  static parseStepFlow(text) {
+    if (!text || typeof text !== 'string') return { intro: '', steps: [], tips: [] };
+    if (!text.includes('↓')) {
+      return { intro: text, steps: [], tips: [] };
+    }
+
+    const rawParts = text.split(/↓\n|↓/);
+    const steps = [];
+    const tips = [];
+    let intro = '';
+
+    rawParts.forEach((part, idx) => {
+      const trimmed = part.trim();
+      if (!trimmed) return;
+
+      if (idx === 0 && !trimmed.toLowerCase().includes('step') && !trimmed.toLowerCase().includes('tip')) {
+        intro = trimmed;
+      } else if (trimmed.toLowerCase().includes('tip') || trimmed.startsWith('•')) {
+        tips.push(trimmed.replace(/^tip\s*/i, '').replace(/^•\s*/, '').trim());
+      } else {
+        steps.push(trimmed);
+      }
+    });
+
+    return { intro, steps, tips };
+  }
+
   /**
    * Main response generator for Product Guide
    */
   static async getResponse(query, currentContext = 'General', conversationHistory = []) {
     const cleanQuery = (query || '').trim().toLowerCase();
 
-    // 1. Check for off-scope non-app legal queries (e.g., criminal advice, emergency filing)
+    // 1. Check for off-scope non-app legal queries
     const isOffScope = /(how to murder|bail advice|divorce lawyer fees|sue my neighbor|real crime|police emergency)/i.test(cleanQuery);
     if (isOffScope) {
       return {
@@ -268,8 +352,43 @@ export class GuideService {
       };
     }
 
-    // 3. Dynamic AI Fallback via Gemini Chat API
+    // 3. Dynamic RAG query via backend (/api/knowledge/query-guide or /api/knowledge/chat)
     try {
+      const token = getUserData()?.token || localStorage.getItem('token');
+      const headers = { 'X-Device-Fingerprint': getDeviceFingerprint() };
+      if (token && token !== 'undefined' && token !== 'null') {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      // First try backend RAG endpoint
+      const res = await axios.post(`${apis.chatAgent.replace('/ai/chat-agent', '')}/knowledge/query-guide`, {
+        query: cleanQuery,
+        context: currentContext
+      }, { headers, timeout: 12000 }).catch(() => null);
+
+      if (res && res.data && res.data.success && res.data.answer) {
+        let navRoute = null;
+        let navLabel = null;
+        for (const [name, route] of Object.entries(WEB_ROUTES_MAP)) {
+          if (cleanQuery.includes(name.toLowerCase()) || res.data.answer.toLowerCase().includes(name.toLowerCase())) {
+            navRoute = route;
+            navLabel = `Open ${name} →`;
+            break;
+          }
+        }
+        return {
+          reply: res.data.answer,
+          navRoute,
+          navLabel,
+          suggestions: res.data.suggestions || [
+            'How do I create a case?',
+            'Where is Draft Maker?',
+            'How do I upload evidence?'
+          ]
+        };
+      }
+
+      // Fallback to chatAgent with system prompt
       const systemInstruction = `You are AI LEGAL™ Product Guide, an interactive AI coach for advocates using the AI LEGAL™ web application.
 Your ONLY job is to explain how to use the AI LEGAL™ platform features, screens, and navigation.
 
@@ -295,26 +414,9 @@ STRICT OUTPUT RULES:
 1. If question is NOT about using AI LEGAL™, start response with:
 "[GUIDE_LIMITATION] AI LEGAL™ Product Guide explains how to use the application. It does not provide external legal advice."
 2. FORMAT: Format explanations with visual step cards using '↓' divider between steps.
-Example:
-"To use this feature:
-↓
-Step 1
-Open target module from sidebar.
-↓
-Step 2
-Select your inputs.
-↓
-Tip
-• Keep details clear for best results."
-3. Keep answers concise (100-200 words max). Do NOT invent non-existent features.`;
+3. Keep answers concise (100-200 words max).`;
 
-      const token = getUserData()?.token;
-      const headers = { 'X-Device-Fingerprint': getDeviceFingerprint() };
-      if (token && token !== 'undefined' && token !== 'null') {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
-      const res = await axios.post(apis.chatAgent, {
+      const chatRes = await axios.post(apis.chatAgent, {
         content: `[CONTEXT: ${currentContext}] ${query}`,
         history: conversationHistory.slice(-4).map(m => ({
           role: m.sender === 'user' ? 'user' : 'model',
@@ -325,9 +427,8 @@ Tip
         skipSession: true
       }, { headers, withCredentials: true, timeout: 15000 });
 
-      const aiReply = res.data?.response || res.data?.message || `I can help you navigate AI LEGAL™! Open the sidebar to access My Matters, AI Legal Assistant, or AI Tools.`;
+      const aiReply = chatRes.data?.response || chatRes.data?.message || `I can help you navigate AI LEGAL™! Open the sidebar to access My Matters, AI Legal Assistant, or AI Tools.`;
 
-      // Extract matching route if mentioned in response
       let navRoute = null;
       let navLabel = null;
       for (const [name, route] of Object.entries(WEB_ROUTES_MAP)) {
@@ -372,3 +473,4 @@ Tip
     }
   }
 }
+

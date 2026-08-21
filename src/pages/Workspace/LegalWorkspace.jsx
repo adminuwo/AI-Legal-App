@@ -10385,50 +10385,50 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                            className="flex-1 flex flex-col items-center justify-center text-center py-12 px-4 sm:px-6 w-full max-w-2xl mx-auto space-y-8 select-text min-h-[60vh]"
+                            className="flex-1 flex flex-col items-center justify-center text-center py-6 sm:py-12 px-3 sm:px-6 w-full max-w-2xl mx-auto space-y-5 sm:space-y-8 select-text min-h-[60vh]"
                           >
                             {/* Hero Section */}
-                            <div className="flex flex-col items-center space-y-4">
+                            <div className="flex flex-col items-center space-y-3 sm:space-y-4">
                               {isGeneralCopilot ? (
                                 <motion.div
                                   whileHover={{ scale: 1.05 }}
                                   className="flex items-center justify-center -mb-2"
                                 >
-                                  <img src="/logo/logo_transparent.png" className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-sm" alt="AI Legal Logo" />
+                                  <img src="/logo/logo_transparent.png" className="w-20 h-20 sm:w-28 sm:h-28 object-contain drop-shadow-sm" alt="AI Legal Logo" />
                                 </motion.div>
                               ) : (
                                 <motion.div
                                   whileHover={{ scale: 1.05, rotate: 2 }}
-                                  className="w-16 h-16 bg-white dark:bg-zinc-800 rounded-2xl flex items-center justify-center border border-slate-200/90 dark:border-zinc-700 shadow-sm relative overflow-hidden p-2"
+                                  className="w-14 h-14 sm:w-16 sm:h-16 bg-white dark:bg-zinc-800 rounded-2xl flex items-center justify-center border border-slate-200/90 dark:border-zinc-700 shadow-sm relative overflow-hidden p-2"
                                 >
-                                  <IconComponent className="w-10 h-10 text-[#C8A34D] relative z-10" strokeWidth={2.2} />
+                                  <IconComponent className="w-8 h-8 sm:w-10 sm:h-10 text-[#C8A34D] relative z-10" strokeWidth={2.2} />
                                 </motion.div>
                               )}
 
-                              <div className="text-center space-y-2 select-text">
+                              <div className="text-center space-y-1.5 sm:space-y-2 select-text">
                                 <div className="flex items-center justify-center gap-3">
-                                  <h1 className="text-3xl sm:text-4xl font-extrabold text-[#111827] dark:text-zinc-100 tracking-tight">
+                                  <h1 className="text-2xl sm:text-4xl font-extrabold text-[#111827] dark:text-zinc-100 tracking-tight">
                                     {details.title}
                                   </h1>
                                 </div>
-                                <p className="text-sm text-[#6B7280] dark:text-zinc-400 font-medium max-w-md mx-auto leading-relaxed">
+                                <p className="text-xs sm:text-sm text-[#6B7280] dark:text-zinc-400 font-medium max-w-md mx-auto leading-relaxed px-2">
                                   {details.desc}
                                 </p>
                               </div>
                             </div>
 
-                            {/* Centered Chat Input Card */}
-                            <div className="w-full pointer-events-auto">
+                            {/* Centered Chat Input Card - Shifted slightly down for better mobile ergonomics */}
+                            <div className="w-full pointer-events-auto mt-3 sm:mt-5">
                               {renderInputForm()}
                             </div>
 
-                            {/* Intelligent Suggestion Chips */}
+                            {/* Intelligent Suggestion Chips - Clean Mobile Responsive UI */}
                             {activeToolId !== 'legal_precedents' && quickSuggestions.length > 0 && (
                               <motion.div
                                 variants={chipsContainerVariants}
                                 initial="hidden"
                                 animate="visible"
-                                className="w-full flex flex-wrap gap-2.5 justify-center items-center mt-3 select-none pointer-events-auto max-w-2xl px-4"
+                                className="w-full flex flex-wrap gap-2 sm:gap-2.5 justify-center items-center mt-2.5 sm:mt-4 select-none pointer-events-auto max-w-2xl px-2 sm:px-4"
                               >
                                 {(() => {
                                   const visibleChips = isSuggestionsExpanded
@@ -10440,7 +10440,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                       {visibleChips.map((action, idx) => {
                                         const isSurprise = action.prompt === "SURPRISE_ME";
                                         return (
-                                          <motion.div key={idx} variants={chipItemVariants}>
+                                          <motion.div key={idx} variants={chipItemVariants} className="max-w-full">
                                             <motion.button
                                               type="button"
                                               whileHover={{ scale: 1.03, y: -0.5 }}
@@ -10452,12 +10452,12 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                                   handleSuggestionClick(action.prompt);
                                                 }
                                               }}
-                                              className={`h-[34px] px-3.5 rounded-full text-[12px] sm:text-[13px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs cursor-pointer select-none border ${isSurprise
-                                                  ? "bg-[#C8A34D]/15 text-[#C8A34D] border-[#C8A34D]/30 hover:bg-[#C8A34D]/25 font-bold"
-                                                  : "bg-white dark:bg-zinc-800/40 text-slate-700 dark:text-zinc-300 border-slate-200/60 hover:border-[#C8A34D]/50 hover:text-[#C8A34D] hover:bg-[#C8A34D]/5"
+                                              className={`min-h-[34px] sm:h-[34px] py-1.5 px-3.5 rounded-full text-[11px] sm:text-[13px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs cursor-pointer select-none border max-w-full text-center leading-tight ${isSurprise
+                                                  ? "bg-[#C8A34D]/15 text-[#C8A34D] border-[#C8A34D]/40 hover:bg-[#C8A34D]/25 font-bold"
+                                                  : "bg-white dark:bg-zinc-800/50 text-slate-700 dark:text-zinc-200 border-slate-200/80 dark:border-zinc-700 hover:border-[#C8A34D]/50 hover:text-[#C8A34D] hover:bg-[#C8A34D]/5"
                                                 }`}
                                             >
-                                              {action.label}
+                                              <span className="truncate max-w-full">{action.label}</span>
                                             </motion.button>
                                           </motion.div>
                                         );
@@ -10470,7 +10470,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                             whileHover={{ scale: 1.03, y: -0.5 }}
                                             whileTap={{ scale: 0.97 }}
                                             onClick={() => setIsSuggestionsExpanded(!isSuggestionsExpanded)}
-                                            className="h-[34px] px-3.5 rounded-full text-[12px] sm:text-[13px] font-bold shadow-2xs hover:shadow-xs cursor-pointer select-none border border-[#C8A34D]/30 bg-[#C8A34D]/15 text-[#C8A34D] hover:bg-[#C8A34D]/25 transition-all duration-200 flex items-center justify-center"
+                                            className="min-h-[34px] sm:h-[34px] py-1.5 px-3.5 rounded-full text-[11px] sm:text-[13px] font-bold shadow-2xs hover:shadow-xs cursor-pointer select-none border border-[#C8A34D]/40 bg-[#C8A34D]/15 text-[#C8A34D] hover:bg-[#C8A34D]/25 transition-all duration-200 flex items-center justify-center"
                                           >
                                             {isSuggestionsExpanded ? "Less -" : "More +"}
                                           </motion.button>

@@ -137,92 +137,9 @@ const MobileNotificationBell = ({ onClick }) => {
   );
 };
 
-// ─── SCROLL SHOW/HIDE LOGIC (FIXED VERSION 🔥) ───
+// ─── SCROLL SHOW/HIDE LOGIC (PERMANENTLY VISIBLE HEADER) ───
 const useScrollNavbar = () => {
-  const [visible, setVisible] = useState(true);
-  const lastScrollY = useRef(new Map());
-  const ticking = useRef(false);
-  const isLocked = useRef(false);
-  const lockTimeout = useRef(null);
-  // Use a ref to mirror `visible` so the scroll handler never becomes stale
-  // without needing `visible` in the effect dependency array.
-  const visibleRef = useRef(true);
-  const scrollThreshold = 15;
-
-  useEffect(() => {
-    const handleScroll = (e) => {
-      if (isLocked.current) return;
-
-      const target = e.target;
-
-      // In DashboardLayout, the document itself does not scroll (fixed inset-0).
-      // Any document scroll events are bogus (mobile browser UI shifts, etc) and cause flickering.
-      if (target === document || target === document.documentElement || target === window) {
-        return;
-      }
-
-      const isChat = target.classList && target.classList.contains('chatgpt-container');
-      const isMain = target.tagName === 'MAIN';
-
-      // Only track scroll events from our known scrollable containers
-      if (!isChat && !isMain) return;
-
-      if (!ticking.current) {
-        window.requestAnimationFrame(() => {
-          const targetKey = isChat ? 'chat' : 'main';
-          const currentScrollY = target.scrollTop ?? 0;
-          const prevScrollY = lastScrollY.current.get(targetKey) || 0;
-
-          // Always show at top (with a small buffer for bounce)
-          if (currentScrollY <= 10) {
-            if (!visibleRef.current) {
-              visibleRef.current = true;
-              setVisible(true);
-              isLocked.current = true;
-              clearTimeout(lockTimeout.current);
-              lockTimeout.current = setTimeout(() => { isLocked.current = false; }, 300);
-            }
-            lastScrollY.current.set(targetKey, currentScrollY);
-            ticking.current = false;
-            return;
-          }
-
-          const diff = currentScrollY - prevScrollY;
-          if (Math.abs(diff) > scrollThreshold) {
-            if (currentScrollY > prevScrollY) {
-              // scroll down
-              if (visibleRef.current) {
-                visibleRef.current = false;
-                setVisible(false);
-                isLocked.current = true;
-                clearTimeout(lockTimeout.current);
-                lockTimeout.current = setTimeout(() => { isLocked.current = false; }, 300);
-              }
-            } else {
-              // scroll up
-              if (!visibleRef.current) {
-                visibleRef.current = true;
-                setVisible(true);
-                isLocked.current = true;
-                clearTimeout(lockTimeout.current);
-                lockTimeout.current = setTimeout(() => { isLocked.current = false; }, 300);
-              }
-            }
-            lastScrollY.current.set(targetKey, currentScrollY);
-          }
-          ticking.current = false;
-        });
-        ticking.current = true;
-      }
-    };
-
-    // Use capture: true to catch scroll events from child containers like #chat-container
-    // NOTE: No `visible` in deps — visibleRef keeps the handler fresh without re-registration
-    window.addEventListener("scroll", handleScroll, { capture: true, passive: true });
-    return () => window.removeEventListener("scroll", handleScroll, { capture: true, passive: true });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  return visible;
+  return true;
 };
 
 const DashboardLayout = () => {
@@ -271,6 +188,18 @@ const DashboardLayout = () => {
     }
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Listen for sidebar toggle events from workspace sub-components
+  useEffect(() => {
+    const handleToggle = () => setIsSidebarOpen(prev => !prev);
+    const handleOpen = () => setIsSidebarOpen(true);
+    window.addEventListener('open_sidebar', handleOpen);
+    window.addEventListener('toggle_sidebar', handleToggle);
+    return () => {
+      window.removeEventListener('open_sidebar', handleOpen);
+      window.removeEventListener('toggle_sidebar', handleToggle);
+    };
+  }, []);
 
   // Sync CSS variable for child pages top-padding
   useEffect(() => {
@@ -325,19 +254,22 @@ const DashboardLayout = () => {
         {/* ─── FINAL RENDER (Navbar) ─── */}
         {allowNavbar && !isFullScreen && !isSidebarOpen && !tglState.focusMode && (
           <div
-            className={`navbar fixed top-0 left-0 right-0 z-[1001] transition-transform duration-300 lg:left-[280px]
-              ${showOnScroll ? "translate-y-0" : "-translate-y-full"}`}
+            className="navbar fixed top-0 left-0 right-0 z-[1001] bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800 lg:border-none lg:bg-transparent lg:backdrop-blur-none translate-y-0"
           >
-            <div className="flex items-center justify-between lg:justify-end px-6 py-3 bg-transparent shrink-0">
+            <div className="flex items-center justify-between px-4 py-2.5 lg:justify-end shrink-0">
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setIsSidebarOpen(true)}
-                className="lg:hidden w-10 h-10 flex items-center justify-center bg-transparent rounded-xl border border-transparent text-primary"
+                className="lg:hidden w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-[#C8A34D] cursor-pointer shadow-2xs"
+                aria-label="Open Navigation Menu"
               >
-                <Menu className="w-6 h-6 stroke-[2.5]" />
+                <Menu className="w-5 h-5 stroke-[2.5]" />
               </motion.button>
 
-
+              <div className="lg:hidden flex items-center gap-2">
+                <img src="/logo/logo_transparent.png" alt="AI LEGAL" className="w-5 h-5 object-contain" />
+                <span className="font-black text-xs tracking-tight text-[#111111] dark:text-white">AI LEGAL<span className="text-[#C8A34D]">.</span></span>
+              </div>
             </div>
           </div>
         )}
@@ -346,8 +278,7 @@ const DashboardLayout = () => {
         {/* Outlet for pages */}
         <main
           ref={mainRef}
-          className={`flex-1 ${(location.pathname.includes('/chat') || (location.pathname.includes('/case') && !location.pathname.includes('case-predictor'))) ? 'overflow-hidden' : 'overflow-y-auto'} relative w-full scroll-smooth p-0 scrollbar-hide transition-all duration-300 ease-in-out`}
-          style={{ paddingTop: '0px' }}
+          className={`flex-1 ${(location.pathname.includes('/chat') || (location.pathname.includes('/case') && !location.pathname.includes('case-predictor'))) ? 'overflow-hidden' : 'overflow-y-auto'} relative w-full scroll-smooth p-0 scrollbar-hide transition-all duration-300 ease-in-out ${allowNavbar ? 'pt-14 lg:pt-0' : ''}`}
         >
           <Suspense fallback={
             <div className="flex h-full w-full items-center justify-center bg-transparent">

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Plus, Edit2, Trash2, Archive, ChevronRight, ArrowLeft, Search, LayoutGrid, List,
+  Plus, Edit2, Trash2, Archive, ChevronRight, ArrowLeft, Menu, Search, LayoutGrid, List,
   Calendar, FileText, ShieldCheck, Gavel, CheckSquare, Sparkles, FolderOpen, MoreVertical, AlertTriangle,
   UserPlus, Building2, Users, CreditCard, X
 } from 'lucide-react';
@@ -326,21 +326,28 @@ const LegalDashboard = ({
 
   return (
     <div className="flex-1 flex flex-col w-full min-h-0 overflow-hidden bg-[#FFFFFF] dark:bg-[#0F172A] relative font-sans text-[#111827] dark:text-white">
-      {/* 1. Main Header Area */}
-      <div className="w-full px-6 sm:px-10 pt-7 pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#1E293B]">
+      {/* 1. Header — Title & Create Button */}
+      <div className="w-full px-4 sm:px-10 pt-5 sm:pt-7 pb-4 sm:pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#1E293B]">
         <div className="flex items-center gap-3">
-          {onBack && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onBack}
-              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors cursor-pointer"
-            >
-              <ArrowLeft size={18} className="text-slate-600 dark:text-slate-300" />
-            </motion.button>
-          )}
+          {/* Hamburger button on mobile phone view; Back button on desktop if onBack is passed */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              if (window.innerWidth < 1024) {
+                window.dispatchEvent(new CustomEvent('open_sidebar'));
+              } else if (onBack) {
+                onBack();
+              }
+            }}
+            className={`p-2 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors cursor-pointer text-[#C8A34D] ${!onBack ? 'lg:hidden' : ''}`}
+            title="Navigation Menu"
+          >
+            <Menu className="w-5 h-5 stroke-[2.5] lg:hidden text-[#C8A34D]" />
+            {onBack && <ArrowLeft size={18} className="hidden lg:block text-slate-600 dark:text-slate-300" />}
+          </motion.button>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white flex flex-wrap items-center gap-3">
+            <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white flex flex-wrap items-center gap-2 sm:gap-3">
               <span>
                 {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm'
                   ? 'FIRM WORKSPACE'
@@ -363,7 +370,7 @@ const LegalDashboard = ({
         <div className="flex items-center gap-3">
           <button
             onClick={handleCreateCaseClick}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 whitespace-nowrap cursor-pointer"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 whitespace-nowrap cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>+ Create</span>
@@ -372,23 +379,23 @@ const LegalDashboard = ({
       </div>
 
       {/* 2. Control Bar — Search, Filters & Sorting */}
-      <div className="w-full px-6 sm:px-10 py-4 border-b border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0F172A] flex flex-col lg:flex-row gap-3 justify-between items-stretch lg:items-center shrink-0">
+      <div className="w-full px-4 sm:px-10 py-3 sm:py-4 border-b border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0F172A] flex flex-col lg:flex-row gap-3 justify-between items-stretch lg:items-center shrink-0">
         {/* Search Input */}
         <div className="relative flex-1 max-w-2xl">
           <Search className="w-4 h-4 text-[#C8A34D] absolute left-3.5 top-3" />
           <input
             type="text"
-            placeholder="Search by case name, client, opponent, court, case number, FIR number or case type..."
+            placeholder="Search by case name, client, opponent, court, case number..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs font-semibold placeholder-slate-400 focus:outline-none focus:border-[#C8A34D] focus:ring-1 focus:ring-[#C8A34D] bg-white dark:bg-[#1E293B] text-[#111111] dark:text-white transition-all shadow-xs"
           />
         </div>
 
-        {/* Filters and Controls */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        {/* Filters and Controls Strip (Scrollable on mobile) */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 lg:pb-0 shrink-0">
           {/* Status Filter */}
-          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status:</span>
             <select
               value={statusFilter}
@@ -404,7 +411,7 @@ const LegalDashboard = ({
           </div>
 
           {/* Priority Filter */}
-          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Priority:</span>
             <select
               value={priorityFilter}
@@ -420,12 +427,12 @@ const LegalDashboard = ({
           </div>
 
           {/* Court Filter */}
-          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Court:</span>
             <select
               value={courtFilter}
               onChange={(e) => setCourtFilter(e.target.value)}
-              className="bg-transparent border-none outline-none font-bold text-[#111111] dark:text-white text-xs cursor-pointer max-w-[140px] truncate"
+              className="bg-transparent border-none outline-none font-bold text-[#111111] dark:text-white text-xs cursor-pointer max-w-[130px] truncate"
             >
               <option value="All">All Courts</option>
               {courts.map(court => (
@@ -435,12 +442,12 @@ const LegalDashboard = ({
           </div>
 
           {/* Case Type Filter */}
-          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Type:</span>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="bg-transparent border-none outline-none font-bold text-[#111111] dark:text-white text-xs cursor-pointer max-w-[140px] truncate"
+              className="bg-transparent border-none outline-none font-bold text-[#111111] dark:text-white text-xs cursor-pointer max-w-[130px] truncate"
             >
               <option value="All">All Types</option>
               {caseTypes.map(ct => (
@@ -450,7 +457,7 @@ const LegalDashboard = ({
           </div>
 
           {/* Sorting Option */}
-          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sort:</span>
             <select
               value={sortOption}
@@ -464,7 +471,7 @@ const LegalDashboard = ({
           </div>
 
           {/* Grid/List Toggle */}
-          <div className="flex items-center border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#1E293B] rounded-xl p-1 shadow-xs gap-0.5">
+          <div className="flex items-center border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#1E293B] rounded-xl p-1 shadow-xs gap-0.5 shrink-0">
             <button
               onClick={() => setViewMode('grid')}
               className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#111111] dark:bg-[#333333] text-[#C8A34D]' : 'text-slate-400 hover:text-slate-600'}`}
@@ -484,7 +491,7 @@ const LegalDashboard = ({
       </div>
 
       {/* 3. Case Listing Container */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar px-6 sm:px-10 py-6 bg-slate-50/30 dark:bg-[#0F172A]">
+      <div className="flex-1 overflow-y-auto custom-scrollbar px-4 sm:px-10 py-4 sm:py-6 bg-slate-50/30 dark:bg-[#0F172A]">
         {sortedCases.length > 0 ? (
           viewMode === 'grid' ? (
             /* 3A. Premium Grid View — Rich Case Dossier Cards */
@@ -618,8 +625,8 @@ const LegalDashboard = ({
           ) : (
             /* 3B. Professional Table — List View */
             <div className="w-full bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-left text-xs">
+              <div className="overflow-x-auto custom-scrollbar">
+                <table className="min-w-[850px] w-full border-collapse text-left text-xs whitespace-nowrap">
                   <thead className="bg-slate-50 dark:bg-[#0F172A] text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-200/80 dark:border-slate-800">
                     <tr>
                       <th className="px-4 py-3">Case Name</th>

@@ -7,7 +7,7 @@ import {
   ChevronRight, Calendar, AlertCircle, Sparkles, Pin, PinOff, X, 
   ChevronDown, Clock, Building, MapPin, User, Filter, Printer, 
   ExternalLink, Mail, FileCheck, Layers, Phone, Mic, Lock,
-  RotateCw, ShieldAlert, CheckCircle2
+  RotateCw, ShieldAlert, CheckCircle2, Menu
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { apiService } from '../../services/apiService';
@@ -451,23 +451,23 @@ export const CaseWorkspace = ({
       <div className="space-y-6 max-w-7xl mx-auto">
         {/* Incomplete / Empty Case Banner */}
         {isEmptyCase && (
-          <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-amber-500/15 text-amber-600 dark:text-amber-400 rounded-xl border border-amber-300 dark:border-amber-800">
-                <AlertTriangle size={20} />
+          <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 rounded-2xl p-4 sm:p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3.5">
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 sm:p-3 bg-amber-500/15 text-amber-600 dark:text-amber-400 rounded-xl border border-amber-300 dark:border-amber-800 shrink-0">
+                <AlertTriangle size={18} />
               </div>
               <div>
-                <h3 className="text-sm font-black text-amber-900 dark:text-amber-200 uppercase tracking-wider">Case Information Incomplete</h3>
-                <p className="text-xs text-amber-700 dark:text-amber-300 font-medium mt-0.5">
+                <h3 className="text-xs sm:text-sm font-black text-amber-900 dark:text-amber-200 uppercase tracking-wider">Case Information Incomplete</h3>
+                <p className="text-[11px] sm:text-xs text-amber-700 dark:text-amber-300 font-medium mt-0.5 leading-relaxed">
                   Add case facts, pleadings, evidence or schedule hearings to build your case intelligence dashboard.
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <button onClick={() => setActiveTab('settings')} className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer">
+            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              <button onClick={() => setActiveTab('settings')} className="flex-1 md:flex-none px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer text-center whitespace-nowrap">
                 + Add Case Details
               </button>
-              <button onClick={() => setActiveTab('documents')} className="px-3 py-1.5 bg-white dark:bg-slate-800 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700 hover:bg-amber-100 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer">
+              <button onClick={() => setActiveTab('documents')} className="flex-1 md:flex-none px-3 py-1.5 bg-white dark:bg-slate-800 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700 hover:bg-amber-100 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer text-center whitespace-nowrap">
                 + Upload Document
               </button>
             </div>
@@ -479,8 +479,8 @@ export const CaseWorkspace = ({
           {/* Main Column */}
           <div className="md:col-span-2 space-y-6">
             {/* Executive Summary Card */}
-            <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <h3 className="text-xs font-black text-[#0F172A] dark:text-white uppercase tracking-widest flex items-center gap-2">
                   <FileText size={14} className="text-[#C8A34D]" />
                   <span>Executive Case Summary</span>
@@ -488,7 +488,7 @@ export const CaseWorkspace = ({
                 <button 
                   onClick={handleRunAiAnalysis}
                   disabled={isLoadingAnalysis}
-                  className="px-3 py-1.5 bg-[#C8A34D]/15 hover:bg-[#C8A34D]/25 text-[#C8A34D] border border-[#C8A34D]/30 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="px-3 py-1.5 bg-[#C8A34D]/15 hover:bg-[#C8A34D]/25 text-[#C8A34D] border border-[#C8A34D]/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 whitespace-nowrap shrink-0 self-start sm:self-auto"
                 >
                   <Sparkles size={13} />
                   <span>{isLoadingAnalysis ? "Generating Brief..." : "Generate AI Brief"}</span>
@@ -10418,33 +10418,35 @@ Through Counsel
   return (
     <div className="flex-1 flex flex-col h-full bg-[#F8FAFC] dark:bg-[#0F172A] overflow-hidden select-text">
       {/* ─── Case Workspace Header ─── */}
-      <header className="border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0F172A] shrink-0 px-5 py-2.5 shadow-xs">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={handleBackToDashboard}
-              className="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1 cursor-pointer text-[11px] font-bold shrink-0"
-              title="Back to My Matters"
-            >
-              <ArrowLeft size={13} />
-              <span>Back to My Matters</span>
-            </button>
-            
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-black text-[#0F172A] dark:text-white tracking-tight leading-none flex items-center gap-1.5">
-                  <span className="text-sm">📁</span>
-                  <span>{caseData.name || 'Unspecified Case'}</span>
+      <header className="border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0F172A] shrink-0 px-3 sm:px-6 py-2.5 sm:py-3 shadow-xs">
+        <div className="flex flex-col gap-2">
+          {/* Top Row: Navigation + Title + Badges (and Desktop Actions) */}
+          <div className="flex items-center justify-between gap-2 min-w-0 w-full">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+              <button 
+                onClick={handleBackToDashboard}
+                className="px-2 py-1.5 sm:px-2.5 sm:py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1 cursor-pointer text-[10px] sm:text-[11px] font-bold shrink-0 whitespace-nowrap"
+                title="Back to My Matters"
+              >
+                <ArrowLeft size={12} />
+                <span className="hidden sm:inline">Back to My Matters</span>
+                <span className="sm:hidden">Back</span>
+              </button>
+              
+              <div className="min-w-0 flex-1 flex items-center gap-1.5 overflow-hidden">
+                <h2 className="text-xs sm:text-sm font-black text-[#0F172A] dark:text-white tracking-tight leading-none flex items-center gap-1 truncate shrink min-w-0">
+                  <span className="text-xs sm:text-sm shrink-0">📁</span>
+                  <span className="truncate">{caseData.name || 'Unspecified Case'}</span>
                 </h2>
-                <div className="flex items-center gap-1">
-                  <span className={`px-2 py-0.5 rounded-full text-[8px] font-mono font-bold uppercase tracking-wider border ${
+                <div className="flex items-center gap-1 shrink-0">
+                  <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold uppercase tracking-wider border shrink-0 ${
                     caseData.status === 'Active' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/40' :
                     caseData.status === 'Closed' ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700' :
                     'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/40'
                   }`}>
                     {caseData.status || 'Active'}
                   </span>
-                  <span className={`px-2 py-0.5 rounded-full text-[8px] font-mono font-bold uppercase tracking-wider border ${
+                  <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-mono font-bold uppercase tracking-wider border shrink-0 ${
                     caseData.priority === 'Urgent' || caseData.priority === 'Critical' || caseData.priority === 'High' ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/40' :
                     'bg-[#C8A34D]/10 text-[#C8A34D] border-[#C8A34D]/30'
                   }`}>
@@ -10452,48 +10454,84 @@ Through Counsel
                   </span>
                 </div>
               </div>
+            </div>
 
-              <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium flex flex-wrap items-center gap-1.5">
-                <span>Client: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.clientName || 'Client Profile'}</strong></span>
-                <span className="text-slate-300 dark:text-slate-700">•</span>
-                <span>Opponent: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.opponentName || caseData.accused || 'Opposite Party'}</strong></span>
-                <span className="text-slate-300 dark:text-slate-700">•</span>
-                <span>Court: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.courtName || 'District Court'}</strong></span>
-                <span className="text-slate-300 dark:text-slate-700">•</span>
-                <span>Case No: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.caseNumber || caseData.number || caseData.firNumber || 'Pending Filing'}</strong></span>
-              </p>
+            {/* Desktop Action Buttons */}
+            <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+              {aiPanel && (
+                <button 
+                  onClick={() => setIsAiPanelExpanded(!isAiPanelExpanded)}
+                  className={`px-3 py-1.5 rounded-lg text-[11px] font-black transition-all border shadow-2xs flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0 ${
+                    isAiPanelExpanded 
+                      ? 'bg-[#C8A34D] border-[#C8A34D] text-[#111111] hover:bg-[#b08d3b]' 
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-[#C8A34D] bg-[#C8A34D]/10 border-[#C8A34D]/30'
+                  }`}
+                >
+                  <Sparkles size={12} className={isAiPanelExpanded ? 'text-[#111111]' : 'text-[#C8A34D]'} />
+                  {isAiPanelExpanded ? 'Hide AI' : 'Show AI'}
+                </button>
+              )}
+              <button 
+                onClick={handleExportSummary}
+                className="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-[11px] font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
+              >
+                <Download size={12} /> Export
+              </button>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success("Secure sharing link copied to clipboard!");
+                }}
+                className="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-[11px] font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
+              >
+                <Share2 size={12} /> Share
+              </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
-            {aiPanel && (
+          {/* Row 2: Metadata & Mobile Action Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800/60">
+            <div className="w-full text-[10px] sm:text-[10.5px] text-slate-500 dark:text-slate-400 font-medium flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <span>Client: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.clientName || 'Client Profile'}</strong></span>
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+              <span>Opponent: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.opponentName || caseData.accused || 'Opposite Party'}</strong></span>
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+              <span>Court: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.courtName || 'District Court'}</strong></span>
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+              <span>Case No: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.caseNumber || caseData.number || caseData.firNumber || 'Pending Filing'}</strong></span>
+            </div>
+
+            {/* Mobile Action Controls Strip */}
+            <div className="flex sm:hidden items-center gap-1.5 shrink-0 pt-0.5">
+              {aiPanel && (
+                <button 
+                  onClick={() => setIsAiPanelExpanded(!isAiPanelExpanded)}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-black transition-all border shadow-2xs flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0 ${
+                    isAiPanelExpanded 
+                      ? 'bg-[#C8A34D] border-[#C8A34D] text-[#111111] hover:bg-[#b08d3b]' 
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-[#C8A34D] bg-[#C8A34D]/10 border-[#C8A34D]/30'
+                  }`}
+                >
+                  <Sparkles size={11} className={isAiPanelExpanded ? 'text-[#111111]' : 'text-[#C8A34D]'} />
+                  {isAiPanelExpanded ? 'Hide AI' : 'Show AI'}
+                </button>
+              )}
               <button 
-                onClick={() => setIsAiPanelExpanded(!isAiPanelExpanded)}
-                className={`px-3 py-1.5 rounded-lg text-[11px] font-black transition-all border shadow-2xs flex items-center gap-1 cursor-pointer ${
-                  isAiPanelExpanded 
-                    ? 'bg-[#C8A34D] border-[#C8A34D] text-[#111111] hover:bg-[#b08d3b]' 
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-[#C8A34D] bg-[#C8A34D]/10 border-[#C8A34D]/30'
-                }`}
+                onClick={handleExportSummary}
+                className="px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
               >
-                <Sparkles size={12} className={isAiPanelExpanded ? 'text-[#111111]' : 'text-[#C8A34D]'} />
-                {isAiPanelExpanded ? 'Hide AI' : 'Show AI'}
+                <Download size={11} /> Export
               </button>
-            )}
-            <button 
-              onClick={handleExportSummary}
-              className="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-[11px] font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1 cursor-pointer"
-            >
-              <Download size={12} /> Export
-            </button>
-            <button 
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                toast.success("Secure sharing link copied to clipboard!");
-              }}
-              className="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-[11px] font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1 cursor-pointer"
-            >
-              <Share2 size={12} /> Share
-            </button>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success("Secure sharing link copied to clipboard!");
+                }}
+                className="px-2 py-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-[10px] font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
+              >
+                <Share2 size={11} /> Share
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -10505,8 +10543,7 @@ Through Counsel
             e.currentTarget.scrollLeft += e.deltaY;
           }
         }}
-        className="shrink-0 border-b border-slate-200 dark:border-slate-800 bg-[#F8FAFC] dark:bg-[#0F172A] px-4 sm:px-6 py-2.5 overflow-x-auto custom-scrollbar flex items-center gap-1.5 select-none scroll-smooth w-full min-w-0"
-        style={{ scrollbarWidth: 'thin' }}
+        className="shrink-0 border-b border-slate-200 dark:border-slate-800 bg-[#F8FAFC] dark:bg-[#0F172A] px-2.5 sm:px-6 py-2 overflow-x-auto no-scrollbar flex items-center gap-1.5 select-none scroll-smooth w-full min-w-0"
       >
         {tabs.map((t) => {
           const isActive = activeTab === t.id;
@@ -10514,7 +10551,7 @@ Through Counsel
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id)}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black transition-all duration-200 shrink-0 select-none cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-black transition-all duration-200 shrink-0 select-none cursor-pointer whitespace-nowrap ${
                 isActive 
                   ? 'bg-[#C8A34D] text-[#111111] border border-[#C8A34D] shadow-xs' 
                   : 'text-slate-600 dark:text-slate-400 hover:text-[#C8A34D] dark:hover:text-[#C8A34D] hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -10529,7 +10566,7 @@ Through Counsel
 
       {/* ─── Active Content Panel and Side AI Panel ─── */}
       <div className="flex-1 flex overflow-hidden min-h-0 relative w-full">
-        <main className="flex-1 p-4 sm:p-6 bg-[#F8FAFC] dark:bg-[#0F172A] overflow-y-auto custom-scrollbar min-w-0">
+        <main className="flex-1 p-3 sm:p-6 bg-[#F8FAFC] dark:bg-[#0F172A] overflow-y-auto custom-scrollbar min-w-0">
           {activeTab === 'overview' && renderOverview()}
           {activeTab === 'prediction' && renderPrediction()}
           {activeTab === 'timeline' && renderTimeline()}

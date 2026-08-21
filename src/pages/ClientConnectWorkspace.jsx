@@ -4,7 +4,7 @@ import {
   MessageSquare, Mail, Sparkles, Send, Copy, RefreshCw, Edit3, CheckCircle2,
   AlertCircle, ArrowLeft, ArrowRight, User, Calendar, Clock, ShieldCheck, Search, Filter,
   FileText, Check, ChevronRight, X, ExternalLink, HelpCircle, UserCheck, Scale, Plus,
-  Users, Building2, UserPlus, FolderOpen, Briefcase, Phone, PhoneCall, Trash2, Lock, ShieldAlert
+  Users, Building2, UserPlus, FolderOpen, Briefcase, Phone, PhoneCall, Trash2, Lock, ShieldAlert, Menu
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
@@ -618,25 +618,25 @@ ${advocateSignature}`;
       ========================================================================= */}
       {stage === 'ENTRY' && (
         <div className="max-w-5xl mx-auto space-y-6 py-4">
-          {/* TOP HEADER & ACTION BAR */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-            <div className="flex items-center gap-3">
+          {/* TOP HEADER & ACTION BAR — 1 SINGLE ROW ON MOBILE & DESKTOP */}
+          <div className="flex flex-row items-center justify-between gap-2 pb-3.5 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
               <button
                 onClick={() => navigate('/dashboard/tools')}
-                className="p-2.5 rounded-xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition-all cursor-pointer shadow-sm"
+                className="p-1.5 sm:p-2.5 rounded-xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition-all cursor-pointer shadow-xs shrink-0"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
               </button>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <h1 className="text-xs sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white truncate">
                     {activeRole === 'law_firm' ? 'AI Team Communication' : 'AI Client Connect'}
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-md bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-[10px] font-black uppercase tracking-wider whitespace-nowrap shrink-0">
+                  <span className="px-2 sm:px-2.5 py-0.5 rounded-md bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-[9px] sm:text-[10px] font-black uppercase tracking-wider shrink-0 hidden md:inline-block">
                     {activeRole === 'law_firm' ? 'Firm Communication Suite' : 'Client Communication Suite'}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium hidden md:block mt-0.5">
                   {activeRole === 'law_firm'
                     ? 'Select a firm matter or client to start AI WhatsApp, Email & Call communication.'
                     : 'Select a case or register a new client for AI WhatsApp & Email communication.'}
@@ -646,9 +646,9 @@ ${advocateSignature}`;
 
             <button
               onClick={() => setStage('CONNECT_NEW')}
-              className="px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 shrink-0"
+              className="px-2.5 sm:px-5 py-1.5 sm:py-2.5 rounded-xl sm:rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-[10.5px] sm:text-xs transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap"
             >
-              <UserPlus className="w-4 h-4" />
+              <UserPlus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span>+ Connect New Client</span>
             </button>
           </div>
@@ -667,11 +667,11 @@ ${advocateSignature}`;
 
           {/* REGISTERED MATTERS DIRECT LIST / GRID */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xs font-black uppercase tracking-wider text-slate-400">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 sm:gap-2">
+              <h2 className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-400 min-w-0">
                 Registered Firm Matters & Case Folders ({cases.filter(c => !searchQuery.trim() || c.name?.toLowerCase().includes(searchQuery.toLowerCase()) || c.clientName?.toLowerCase().includes(searchQuery.toLowerCase())).length})
               </h2>
-              <span className="text-[11px] text-slate-400 font-medium">
+              <span className="text-[10px] sm:text-[11px] text-slate-400 font-medium min-w-0">
                 Click any case to launch AI Communication Workspace
               </span>
             </div>
@@ -703,36 +703,36 @@ ${advocateSignature}`;
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-4">
                 {cases.filter(c => !searchQuery.trim() || c.name?.toLowerCase().includes(searchQuery.toLowerCase()) || c.clientName?.toLowerCase().includes(searchQuery.toLowerCase())).map((c) => (
                   <div
                     key={c._id || c.id}
                     onClick={() => handleSelectMatter(c)}
-                    className="p-5 rounded-3xl bg-white dark:bg-[#111622] border-2 border-slate-200 dark:border-slate-800 hover:border-[#C8A34D] transition-all cursor-pointer shadow-xs hover:shadow-lg space-y-3 group"
+                    className="p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border-2 border-slate-200 dark:border-slate-800 hover:border-[#C8A34D] transition-all cursor-pointer shadow-xs hover:shadow-md space-y-2 group"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 flex items-center justify-center font-black group-hover:scale-105 transition-transform">
-                          <FolderOpen className="w-5 h-5" />
+                    <div className="flex items-center justify-between gap-2.5">
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 flex items-center justify-center font-black group-hover:scale-105 transition-transform shrink-0">
+                          <FolderOpen className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                         </div>
-                        <div>
-                          <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#C8A34D] transition-colors line-clamp-1">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white group-hover:text-[#C8A34D] transition-colors truncate">
                             {c.name}
                           </h3>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                          <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
                             Forum: {c.courtName || c.caseType || 'District Court'}
                           </p>
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0 mt-1" />
+                      <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform shrink-0" />
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
-                      <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                        <User className="w-3.5 h-3.5 text-[#C8A34D]" />
-                        <span className="font-bold">{c.clientName || 'Primary Client'}</span>
+                    <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 dark:border-slate-800/80 text-[10.5px] sm:text-xs">
+                      <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 min-w-0">
+                        <User className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C8A34D] shrink-0" />
+                        <span className="font-bold truncate">{c.clientName || 'Primary Client'}</span>
                       </div>
-                      <span className="text-[11px] font-extrabold text-[#C8A34D] group-hover:underline flex items-center gap-1">
+                      <span className="text-[10px] sm:text-[11px] font-extrabold text-[#C8A34D] group-hover:underline flex items-center gap-1 shrink-0">
                         <span>Launch Workspace</span>
                         <ArrowRight className="w-3 h-3" />
                       </span>
@@ -904,31 +904,31 @@ ${advocateSignature}`;
           STAGE 4: CONNECT NEW CLIENT FORM
       ========================================================================= */}
       {stage === 'CONNECT_NEW' && (
-        <div className="max-w-2xl mx-auto space-y-6 py-4">
-          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
-            <div className="flex items-center gap-3">
+        <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6 py-2 sm:py-4">
+          <div className="flex flex-row items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
               <button
                 onClick={() => setStage('ENTRY')}
-                className="p-2 rounded-xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 cursor-pointer"
+                className="p-1.5 sm:p-2 rounded-xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 cursor-pointer shrink-0"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
-              <div>
-                <h2 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider">
+              <div className="min-w-0 flex-1">
+                <h2 className="text-xs sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider truncate">
                   Connect New Client
                 </h2>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate mt-0.5">
                   Enter client details to establish communication context.
                 </p>
               </div>
             </div>
           </div>
 
-          <form onSubmit={handleConnectNewClientSubmit} className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
+          <form onSubmit={handleConnectNewClientSubmit} className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-xs space-y-3.5 sm:space-y-4">
             
             {/* Client Name */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase text-slate-400 block">
+            <div className="space-y-1">
+              <label className="text-[11px] sm:text-xs font-black uppercase text-slate-400 block">
                 Client Full Name <span className="text-rose-500">*</span>
               </label>
               <input
@@ -937,14 +937,14 @@ ${advocateSignature}`;
                 value={newClientName}
                 onChange={(e) => setNewClientName(e.target.value)}
                 placeholder="e.g. Suresh Kumar"
-                className="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none"
+                className="w-full p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none"
               />
             </div>
 
             {/* Mobile & WhatsApp Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase text-slate-400 block">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1">
+                <label className="text-[11px] sm:text-xs font-black uppercase text-slate-400 block">
                   Mobile Number
                 </label>
                 <input
@@ -952,12 +952,12 @@ ${advocateSignature}`;
                   value={newClientMobile}
                   onChange={(e) => setNewClientMobile(e.target.value)}
                   placeholder="e.g. +91 98765 43210"
-                  className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none"
+                  className="w-full p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase text-slate-400 block">
+              <div className="space-y-1">
+                <label className="text-[11px] sm:text-xs font-black uppercase text-slate-400 block">
                   WhatsApp Number
                 </label>
                 <input
@@ -965,15 +965,15 @@ ${advocateSignature}`;
                   value={newClientWhatsApp}
                   onChange={(e) => setNewClientWhatsApp(e.target.value)}
                   placeholder="Leave empty if same as Mobile"
-                  className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none"
+                  className="w-full p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none"
                 />
               </div>
             </div>
 
             {/* Email & Language Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase text-slate-400 block">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1">
+                <label className="text-[11px] sm:text-xs font-black uppercase text-slate-400 block">
                   Email Address
                 </label>
                 <input
@@ -981,18 +981,18 @@ ${advocateSignature}`;
                   value={newClientEmail}
                   onChange={(e) => setNewClientEmail(e.target.value)}
                   placeholder="e.g. client@example.com"
-                  className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none"
+                  className="w-full p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase text-slate-400 block">
+              <div className="space-y-1">
+                <label className="text-[11px] sm:text-xs font-black uppercase text-slate-400 block">
                   Preferred Language
                 </label>
                 <select
                   value={newClientLanguage}
                   onChange={(e) => setNewClientLanguage(e.target.value)}
-                  className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none cursor-pointer"
+                  className="w-full p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none cursor-pointer"
                 >
                   {LANGUAGES.map(l => (
                     <option key={l} value={l}>{l}</option>
@@ -1002,15 +1002,15 @@ ${advocateSignature}`;
             </div>
 
             {/* Client Role & Matter Association */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase text-slate-400 block">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1">
+                <label className="text-[11px] sm:text-xs font-black uppercase text-slate-400 block">
                   Client Type / Role
                 </label>
                 <select
                   value={newClientRole}
                   onChange={(e) => setNewClientRole(e.target.value)}
-                  className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none cursor-pointer"
+                  className="w-full p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none cursor-pointer"
                 >
                   {CLIENT_ROLES.map(r => (
                     <option key={r} value={r}>{r}</option>
@@ -1018,14 +1018,14 @@ ${advocateSignature}`;
                 </select>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase text-slate-400 block">
+              <div className="space-y-1">
+                <label className="text-[11px] sm:text-xs font-black uppercase text-slate-400 block">
                   Associate Existing Matter (Optional)
                 </label>
                 <select
                   value={newClientAssociatedCaseId}
                   onChange={(e) => setNewClientAssociatedCaseId(e.target.value)}
-                  className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none cursor-pointer"
+                  className="w-full p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold focus:border-[#C8A34D] focus:outline-none cursor-pointer"
                 >
                   <option value="">-- Independent Legal Consultation --</option>
                   {cases.map(c => (
@@ -1035,19 +1035,19 @@ ${advocateSignature}`;
               </div>
             </div>
 
-            <div className="pt-4 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
+            <div className="pt-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setStage('ENTRY')}
-                className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-xs font-bold hover:bg-slate-200 cursor-pointer"
+                className="px-4 sm:px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-xs font-bold hover:bg-slate-200 cursor-pointer flex items-center justify-center whitespace-nowrap shrink-0"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-8 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs transition-all cursor-pointer shadow-md flex items-center gap-2"
+                className="px-5 sm:px-8 py-3 rounded-xl sm:rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs transition-all cursor-pointer shadow-xs flex items-center justify-center gap-2 whitespace-nowrap shrink-0"
               >
-                <UserCheck className="w-4 h-4" />
+                <UserCheck className="w-4 h-4 shrink-0" />
                 <span>Connect Client & Launch Workspace</span>
               </button>
             </div>
@@ -1062,26 +1062,26 @@ ${advocateSignature}`;
       {stage === 'WORKSPACE' && activeClient && (
         <div className="space-y-6">
 
-          {/* WORKSPACE HEADER BAR */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-            <div className="flex items-center gap-3">
+          {/* WORKSPACE HEADER BAR — 1 SINGLE ROW ON MOBILE & DESKTOP */}
+          <div className="flex flex-row items-center justify-between gap-2 pb-3.5 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
               <button
                 onClick={handleSwitchClientMatter}
-                className="p-2.5 rounded-xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition-all cursor-pointer shadow-sm flex items-center gap-1.5 text-xs font-bold"
+                className="p-1.5 sm:p-2.5 rounded-xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 transition-all cursor-pointer shadow-xs flex items-center gap-1.5 text-xs font-bold shrink-0"
                 title="Switch Client or Matter"
               >
-                <ArrowLeft className="w-4 h-4" /> Switch Client
+                <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> <span className="hidden md:inline">Switch Client</span>
               </button>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <h1 className="text-xs sm:text-xl font-black tracking-tight text-slate-900 dark:text-white truncate">
                     {activeRole === 'law_firm' ? 'AI Team Communication Workspace' : 'AI Client Connect Workspace'}
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-md bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-[10px] font-black uppercase tracking-wider">
+                  <span className="px-2 sm:px-2.5 py-0.5 rounded-md bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-[9px] sm:text-[10px] font-black uppercase tracking-wider shrink-0 hidden md:inline-block">
                     Connected Session
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium hidden md:block mt-0.5">
                   Active Client: <strong className="text-slate-900 dark:text-white">{activeClient.name}</strong> • Matter: <strong className="text-[#C8A34D]">{activeMatter?.name}</strong>
                 </p>
               </div>
@@ -1089,63 +1089,63 @@ ${advocateSignature}`;
 
             <button
               onClick={handleSwitchClientMatter}
-              className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-xs font-extrabold hover:bg-slate-200 transition-all cursor-pointer flex items-center gap-1.5"
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-[10.5px] sm:text-xs font-extrabold hover:bg-slate-200 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap"
             >
-              <Users className="w-4 h-4 text-[#C8A34D]" /> Change Client / Matter
+              <Users className="w-3.5 h-3.5 text-[#C8A34D]" /> <span className="hidden sm:inline">Change Client / Matter</span><span className="sm:hidden">Change</span>
             </button>
           </div>
 
           {/* CLIENT PROFILE RECORD CARD */}
-          <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-sm space-y-5">
-            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#C8A34D]/15 border border-[#C8A34D]/30 flex items-center justify-center font-black text-lg text-[#C8A34D]">
+          <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 shadow-xs space-y-4 sm:space-y-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3.5">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#C8A34D]/15 border border-[#C8A34D]/30 flex items-center justify-center font-black text-base sm:text-lg text-[#C8A34D] shrink-0">
                   {activeClient.name.charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-                    <span>{activeClient.name}</span>
-                    <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-[#1A2333] text-slate-500 dark:text-slate-400 text-[10px] font-bold">
+                <div className="min-w-0">
+                  <h2 className="text-xs sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+                    <span className="truncate">{activeClient.name}</span>
+                    <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-[#1A2333] text-slate-500 dark:text-slate-400 text-[9.5px] sm:text-[10px] font-bold whitespace-nowrap shrink-0">
                       {activeClient.role || 'Connected Client'}
                     </span>
                   </h2>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
                     Matter: <strong className="text-[#C8A34D]">{activeMatter?.name}</strong> • Forum: {activeMatter?.courtName || 'Advocate Office'}
                   </p>
                 </div>
               </div>
 
               {/* Quick Communication Actions (WhatsApp, Email & Phone Call) */}
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap w-full sm:w-auto">
                 <button
                   onClick={() => handleOpenChannelBuilder('WhatsApp')}
-                  className={`px-4 py-2.5 rounded-xl font-extrabold text-xs transition-all cursor-pointer shadow-sm flex items-center gap-1.5 ${
+                  className={`flex-1 sm:flex-none px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-extrabold text-[11px] sm:text-xs transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5 whitespace-nowrap ${
                     activeChannel === 'WhatsApp'
                       ? 'bg-[#25D366] text-white shadow-md'
                       : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-[#25D366] hover:text-white'
                   }`}
                 >
-                  <MessageSquare className="w-4 h-4" /> WhatsApp Message
+                  <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> WhatsApp Message
                 </button>
                 <button
                   onClick={() => handleOpenChannelBuilder('Email')}
-                  className={`px-4 py-2.5 rounded-xl font-extrabold text-xs transition-all cursor-pointer shadow-sm flex items-center gap-1.5 ${
+                  className={`flex-1 sm:flex-none px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-extrabold text-[11px] sm:text-xs transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5 whitespace-nowrap ${
                     activeChannel === 'Email'
                       ? 'bg-sky-500 text-white shadow-md'
                       : 'bg-sky-500/10 text-sky-500 border border-sky-500/20 hover:bg-sky-500 hover:text-white'
                   }`}
                 >
-                  <Mail className="w-4 h-4" /> Email Communication
+                  <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> Email Communication
                 </button>
                 <button
                   onClick={() => handleOpenChannelBuilder('Phone Call')}
-                  className={`px-4 py-2.5 rounded-xl font-extrabold text-xs transition-all cursor-pointer shadow-sm flex items-center gap-1.5 ${
+                  className={`flex-1 sm:flex-none px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-extrabold text-[11px] sm:text-xs transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5 whitespace-nowrap ${
                     activeChannel === 'Phone Call'
                       ? 'bg-amber-500 text-white shadow-md'
                       : 'bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500 hover:text-white'
                   }`}
                 >
-                  <PhoneCall className="w-4 h-4" /> Direct Phone Call
+                  <PhoneCall className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" /> Direct Phone Call
                 </button>
               </div>
             </div>
@@ -1415,33 +1415,33 @@ ${advocateSignature}`;
                       />
                     </div>
 
-                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                      <div className="flex items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 pt-3 border-t border-slate-100 dark:border-slate-800 min-w-0">
+                      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap min-w-0">
                         <button
                           onClick={() => setBuilderStep('BUILDER')}
-                          className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-xs font-bold hover:bg-slate-200 cursor-pointer"
+                          className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-[11px] sm:text-xs font-bold hover:bg-slate-200 cursor-pointer whitespace-nowrap shrink-0"
                         >
                           Back to Setup
                         </button>
                         <button
                           onClick={handleCopyDraft}
-                          className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-xs font-bold hover:bg-slate-200 cursor-pointer flex items-center gap-1"
+                          className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-[11px] sm:text-xs font-bold hover:bg-slate-200 cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
                         >
-                          <Copy className="w-3.5 h-3.5" /> Copy
+                          <Copy className="w-3.5 h-3.5 shrink-0" /> Copy
                         </button>
                         <button
                           onClick={handleGenerateAiDraft}
-                          className="px-3.5 py-2 rounded-xl bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-xs font-extrabold hover:bg-[#C8A34D] hover:text-[#111] cursor-pointer flex items-center gap-1"
+                          className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-[11px] sm:text-xs font-extrabold hover:bg-[#C8A34D] hover:text-[#111] cursor-pointer flex items-center gap-1 whitespace-nowrap shrink-0"
                         >
-                          <RefreshCw className="w-3.5 h-3.5" /> Regenerate
+                          <RefreshCw className="w-3.5 h-3.5 shrink-0" /> Regenerate
                         </button>
                       </div>
 
                       <button
                         onClick={handleApproveAndLaunch}
-                        className="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs transition-all cursor-pointer shadow-md flex items-center gap-2"
+                        className="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs transition-all cursor-pointer shadow-xs flex items-center justify-center gap-2 whitespace-nowrap shrink-0"
                       >
-                        <Send className="w-4 h-4" /> Approve & Launch {activeChannel}
+                        <Send className="w-4 h-4 shrink-0" /> Approve & Launch {activeChannel}
                       </button>
                     </div>
 
