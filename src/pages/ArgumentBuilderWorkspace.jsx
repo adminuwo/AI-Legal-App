@@ -363,7 +363,7 @@ Language: ${outputLanguage}
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-slate-900 dark:text-white flex flex-col font-sans">
       {/* APP WORKSPACE HEADER */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#111622]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 px-4 sm:px-8 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#111622]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 pl-14 pr-4 sm:px-8 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => navigate('/dashboard/tools')}

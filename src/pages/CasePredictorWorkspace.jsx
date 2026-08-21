@@ -10,6 +10,23 @@ import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
 import { useSubscription } from '../context/SubscriptionContext';
 
+const CASE_TYPES = [
+  'Cheque Bounce (Sec 138 NI Act)', 
+  'Consumer Complaint (COPRA 2019)', 
+  'Commercial Rent Default (TP Act)', 
+  'Bail Application (Sec 439 CrPC / Sec 483 BNS)',
+  'Arbitration Breach (Sec 9 / 11)', 
+  'Civil Suit for Recovery'
+];
+
+const COURT_LEVELS = [
+  'District Court',
+  'High Court',
+  'Supreme Court',
+  'Tribunal',
+  'Consumer Forum'
+];
+
 export default function CasePredictorWorkspace() {
   const navigate = useNavigate();
   const { deductToolUsage } = useSubscription();
@@ -402,7 +419,7 @@ export default function CasePredictorWorkspace() {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 font-sans pb-16">
       
       {/* HEADER BAR */}
-      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 px-6 py-4 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 pl-14 pr-4 sm:px-6 py-4 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
@@ -417,11 +434,11 @@ export default function CasePredictorWorkspace() {
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
                   Case Predictor
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[10px] font-extrabold uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[10px] font-extrabold uppercase tracking-wider whitespace-nowrap shrink-0">
                   Outcome Probability Engine
                 </span>
               </div>

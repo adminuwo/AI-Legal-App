@@ -96,7 +96,7 @@ const LegalDashboard = ({
 
     if (plan === 'ENTERPRISE' || plan === 'SUPER_ADMIN' || limit === -1) {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40 shadow-2xs">
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40 shadow-2xs whitespace-nowrap shrink-0">
           <span>∞ Unlimited</span>
         </span>
       );
@@ -104,7 +104,7 @@ const LegalDashboard = ({
 
     const isReached = limit > 0 && used >= limit;
     return (
-      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold shadow-2xs border ${
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-extrabold shadow-2xs border whitespace-nowrap shrink-0 ${
         isReached 
           ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-900/40' 
           : 'bg-[#C8A34D]/15 text-[#C8A34D] border-[#C8A34D]/30'
@@ -340,7 +340,7 @@ const LegalDashboard = ({
             </motion.button>
           )}
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white flex flex-wrap items-center gap-3">
               <span>
                 {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm'
                   ? 'FIRM WORKSPACE'

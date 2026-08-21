@@ -476,8 +476,8 @@ THROUGH ADVOCATE`;
   return (
     <div className="min-h-screen bg-[#F5F5F5] dark:bg-[#111111] text-slate-900 dark:text-white font-sans flex flex-col">
       {/* HEADER BAR */}
-      <header className="sticky top-0 z-30 w-full bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-3.5 flex items-center justify-between shadow-sm shrink-0">
-        <div className="flex items-center gap-4">
+      <header className="sticky top-0 z-30 w-full bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 pl-14 pr-4 sm:px-6 py-3.5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-sm shrink-0 overflow-hidden">
+        <div className="flex items-center gap-3 sm:gap-4 shrink-0 w-full lg:w-auto">
           <button 
             onClick={() => navigate('/dashboard/tools')}
             className="p-2 rounded-xl bg-slate-100 dark:bg-[#1E293B] hover:bg-[#C8A34D]/20 text-slate-700 dark:text-slate-200 hover:text-[#C8A34D] transition-colors flex items-center gap-2 text-xs font-bold cursor-pointer"
@@ -489,9 +489,9 @@ THROUGH ADVOCATE`;
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
 
           <div>
-            <h1 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <h1 className="text-base font-black text-slate-900 dark:text-white flex flex-wrap items-center gap-2">
               <span>Draft Maker</span>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 uppercase">
+              <span className="text-[9px] sm:text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 uppercase shrink-0">
                 Advocate Production Suite
               </span>
             </h1>
@@ -502,7 +502,7 @@ THROUGH ADVOCATE`;
         </div>
 
         {/* Step Numbers Indicator */}
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide w-full lg:w-auto pb-1 lg:pb-0">
           {[
             { num: 1, label: 'Template' },
             { num: 2, label: 'Input Source' },

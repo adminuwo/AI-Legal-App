@@ -628,11 +628,11 @@ ${advocateSignature}`;
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                     {activeRole === 'law_firm' ? 'AI Team Communication' : 'AI Client Connect'}
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-md bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-[10px] font-black uppercase tracking-wider">
+                  <span className="px-2.5 py-0.5 rounded-md bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 text-[10px] font-black uppercase tracking-wider whitespace-nowrap shrink-0">
                     {activeRole === 'law_firm' ? 'Firm Communication Suite' : 'Client Communication Suite'}
                   </span>
                 </div>

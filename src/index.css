@@ -1254,6 +1254,7 @@ html.lenis body {
 .user-row .chatgpt-text ul,
 .user-row .chatgpt-text ol {
   text-align: left;
+  margin-bottom: 0 !important;
   /* Normal left alignment inside the user bubble */
 }
 
@@ -2126,7 +2127,6 @@ body.modal-open-hide-navbar {
    Scoped to #aisa-app-root to avoid breaking public page main containers */
 @media (max-width: 1023px) {
   #aisa-app-root main {
-    overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
     min-height: 0 !important;

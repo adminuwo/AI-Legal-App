@@ -475,7 +475,7 @@ export default function ContractAnalyzerWorkspace() {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 font-sans pb-16">
       
       {/* HEADER BAR */}
-      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 px-6 py-4 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 pl-14 pr-4 sm:px-6 py-4 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button

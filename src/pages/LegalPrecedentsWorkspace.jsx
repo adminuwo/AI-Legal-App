@@ -639,7 +639,7 @@ export default function LegalPrecedentsWorkspace() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-slate-900 dark:text-white flex flex-col font-sans">
       {/* WORKSPACE HEADER */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#111622]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 px-4 sm:px-8 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#111622]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 pl-14 pr-4 sm:px-8 py-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => {
@@ -1061,7 +1061,7 @@ export default function LegalPrecedentsWorkspace() {
                   </h3>
                   <div className="flex flex-wrap gap-1.5">
                     {(selectedPrecedent.tags || ['Sec 138 NI Act', 'Sec 139 NI Act', 'Evidence Act']).map((tag, idx) => (
-                      <span key={idx} className="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-700 dark:text-slate-300">
+                      <span key={idx} className="px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap shrink-0">
                         {tag}
                       </span>
                     ))}
@@ -1350,10 +1350,10 @@ export default function LegalPrecedentsWorkspace() {
                             "{ratio}"
                           </div>
 
-                          <div className="flex items-center justify-between pt-1">
-                            <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                            <div className="flex flex-wrap items-center gap-2 flex-1">
                               {(precedent.tags || ['NI Act', 'Sec 138']).map((tag, tIdx) => (
-                                <span key={tIdx} className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#1E293B] text-slate-500">
+                                <span key={tIdx} className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#1E293B] text-slate-500 whitespace-nowrap shrink-0">
                                   {tag}
                                 </span>
                               ))}
@@ -1364,7 +1364,7 @@ export default function LegalPrecedentsWorkspace() {
                                 e.stopPropagation();
                                 setSelectedPrecedent(precedent);
                               }}
-                              className="text-xs font-bold text-[#C8A34D] flex items-center gap-1 hover:underline cursor-pointer"
+                              className="text-xs font-bold text-[#C8A34D] flex items-center gap-1 hover:underline cursor-pointer shrink-0"
                             >
                               <span>View Precedent</span>
                               <ChevronRight className="w-4 h-4" />

@@ -215,16 +215,16 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
     <div className="space-y-6 text-slate-900 dark:text-slate-100 transition-colors">
       
       {/* 1. Header & Enterprise Banner */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-sm text-slate-900 dark:text-white transition-colors">
-        <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C8A34D]/15 border border-[#C8A34D]/30 text-[#C8A34D] text-xs font-extrabold uppercase tracking-wider">
-            <Building2 className="w-3.5 h-3.5" />
-            <span>Law Firm Enterprise Workspace</span>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 sm:p-6 lg:p-7 rounded-3xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-sm text-slate-900 dark:text-white transition-colors">
+        <div className="space-y-2 w-full md:w-auto">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-[#C8A34D]/15 border border-[#C8A34D]/30 text-[#C8A34D] text-[10px] sm:text-xs font-extrabold uppercase tracking-wider whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+            <Building2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+            <span className="truncate">Law Firm Enterprise Workspace</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white flex items-center gap-2 sm:gap-3 flex-wrap">
             <span>{activeWsName}</span>
             {activeWorkspaceObj?.badge && (
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#C8A34D]/20 text-[#C8A34D] font-bold border border-[#C8A34D]/30">
+              <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-[#C8A34D]/20 text-[#C8A34D] font-bold border border-[#C8A34D]/30 whitespace-nowrap">
                 {activeWorkspaceObj.badge}
               </span>
             )}
@@ -234,17 +234,17 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 shrink-0 w-full md:w-auto mt-2 md:mt-0">
           <button
             onClick={() => setIsInviteModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-xl bg-[#C8A34D] hover:bg-[#b59240] text-slate-950 font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer"
+            className="inline-flex justify-center items-center gap-2 px-4 py-2.5 sm:px-4.5 rounded-xl bg-[#C8A34D] hover:bg-[#b59240] text-slate-950 font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer w-full sm:w-auto"
           >
             <UserPlus className="w-4 h-4" />
             <span>Invite Team Member</span>
           </button>
           <button
             onClick={() => navigate('/dashboard/subscription')}
-            className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs sm:text-sm transition-all cursor-pointer"
+            className="inline-flex justify-center items-center gap-2 px-4 py-2.5 sm:px-4.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs sm:text-sm transition-all cursor-pointer w-full sm:w-auto"
           >
             <CreditCard className="w-4 h-4 text-[#C8A34D]" />
             <span>Manage Seats</span>
@@ -255,7 +255,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
       {/* 2. Firm KPI Overview (4 Grid Cards matching Mobile App) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Active Firm Cases */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-900 dark:text-white">Active Firm Cases</span>
             <div className="p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
@@ -269,7 +269,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
         </div>
 
         {/* Card 2: Today's Hearings */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-900 dark:text-white">Today's Hearings</span>
             <div className="p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
@@ -283,7 +283,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
         </div>
 
         {/* Card 3: Pending Reviews */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-900 dark:text-white">Pending Reviews</span>
             <div className="p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
@@ -297,7 +297,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
         </div>
 
         {/* Card 4: Team Members */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-900 dark:text-white">Team Members</span>
             <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
@@ -312,7 +312,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
       </div>
 
       {/* 3. Daily AI Firm Executive Brief */}
-      <div className="p-5 rounded-2xl bg-amber-50/60 dark:bg-[#1E2538] border-2 border-[#C8A34D]/80 shadow-sm space-y-2.5 transition-colors">
+      <div className="p-4 sm:p-5 rounded-2xl bg-amber-50/60 dark:bg-[#1E2538] border-2 border-[#C8A34D]/80 shadow-sm space-y-2.5 transition-colors">
         <div className="flex items-center gap-2 text-[#C8A34D] font-extrabold text-sm uppercase tracking-wider">
           <Sparkles className="w-4.5 h-4.5" />
           <span>Daily AI Firm Executive Brief</span>
@@ -331,7 +331,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
       </div>
 
       {/* 4. AI Legal Knowledge Hub Card (Mobile Parity) */}
-      <div className="p-6 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 transition-colors">
+      <div className="p-4 sm:p-6 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 transition-colors">
         <div className="flex items-start gap-3">
           <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-[#C8A34D] border border-slate-200 dark:border-slate-700">
             <Database className="w-5 h-5" />
@@ -385,7 +385,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
       </div>
 
       {/* 5. New to AI LEGAL™ Product Guide Banner */}
-      <div className="p-6 rounded-2xl bg-indigo-50/50 dark:bg-[#1E1B4B]/40 border border-indigo-200 dark:border-indigo-900/60 shadow-sm space-y-4 transition-colors">
+      <div className="p-4 sm:p-6 rounded-2xl bg-indigo-50/50 dark:bg-[#1E1B4B]/40 border border-indigo-200 dark:border-indigo-900/60 shadow-sm space-y-4 transition-colors">
         <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-200 font-extrabold text-sm">
           <Sparkles className="w-4.5 h-4.5 text-[#C8A34D]" />
           <span>New to AI LEGAL™?</span>
@@ -405,7 +405,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
       </div>
 
       {/* 4. Firm Team Members Roster Table */}
-      <div className="p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 transition-colors">
+      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4 transition-colors">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div>
             <h3 className="text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
@@ -425,15 +425,15 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
             <p>No team members yet. Invite your first advocate to start building your firm workspace.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+          <div className="overflow-x-auto scrollbar-hide pb-2">
+            <table className="w-full min-w-[600px] text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px] font-bold">
-                  <th className="py-3 px-4">Member Name</th>
-                  <th className="py-3 px-4">Role / Designation</th>
-                  <th className="py-3 px-4">Active Matters</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-4 whitespace-nowrap">Member Name</th>
+                  <th className="py-3 px-4 whitespace-nowrap">Role / Designation</th>
+                  <th className="py-3 px-4 whitespace-nowrap">Active Matters</th>
+                  <th className="py-3 px-4 whitespace-nowrap">Status</th>
+                  <th className="py-3 px-4 text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -441,7 +441,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
                   const casesCount = getMemberCaseCount(member);
                   return (
                     <tr key={member.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
-                      <td className="py-3 px-4 font-semibold text-slate-900 dark:text-white">
+                      <td className="py-3 px-4 font-semibold text-slate-900 dark:text-white whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-[#C8A34D]/20 border border-[#C8A34D]/40 flex items-center justify-center font-bold text-[#C8A34D] text-xs shrink-0">
                             {member.name.charAt(0).toUpperCase()}
@@ -457,15 +457,15 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
                           </div>
                         </div>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-4 whitespace-nowrap">
                         <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
                           {member.role}
                         </span>
                       </td>
-                      <td className="py-3 px-4 font-bold text-slate-700 dark:text-slate-200">
+                      <td className="py-3 px-4 font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap">
                         {casesCount} Cases
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-4 whitespace-nowrap">
                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
                           member.status === 'Active' 
                             ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' 
@@ -474,7 +474,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
                           {member.status}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right relative">
+                      <td className="py-3 px-4 text-right relative whitespace-nowrap">
                         {!member.isOwner && (
                           <div className="inline-block relative">
                             <button

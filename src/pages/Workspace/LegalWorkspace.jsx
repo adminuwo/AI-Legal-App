@@ -9918,7 +9918,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                         )}
                                         {/* Render Actions and Timestamp INSIDE the bubble */}
                                         {msg.role === 'user' ? (
-                                          <div className="mt-3 pt-2 border-t border-slate-200/30 flex items-center justify-end gap-3 w-full">
+                                          <div className="mt-1 pt-1 flex items-center justify-end gap-3 w-full">
                                             <div className="flex items-center gap-3">
                                               <div className="flex items-center gap-1">
                                                 <button
@@ -10368,7 +10368,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                       return (
                         <>
                           {messages.length === 0 && !isHistoryOpen && !activeCaseId && (
-                            <div className="absolute top-4 left-4 z-30 select-none">
+                            <div className="absolute top-4 left-16 md:left-20 lg:left-4 z-30 select-none">
                               <button
                                 type="button"
                                 onClick={() => setIsHistoryOpen(true)}
@@ -10528,7 +10528,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                   const details = getToolDetails(activeToolId, selectedRole);
                   return (
                     <div className="w-full border-b border-slate-200/60 dark:border-zinc-800/60 bg-white dark:bg-[#0d0e16] shrink-0 select-none z-30 shadow-2xs">
-                      <div className="flex items-center justify-between px-4 sm:px-6 py-3 w-full gap-3">
+                      <div className="flex items-center justify-between pl-16 lg:pl-6 pr-4 lg:pr-6 py-3 w-full gap-3">
                         
                         {/* LEFT: Assistant Title & History */}
                         <div className="flex items-center gap-2 sm:gap-3">
