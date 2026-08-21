@@ -1,22 +1,60 @@
-# Use Node.js 20 LTS lightweight alpine image
+# =========================================================================
+# Stage 1: Build the React SPA Frontend (Vite)
+# =========================================================================
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /webapp
+
+# Copy frontend dependency manifests and install dependencies
+COPY AI-Legal_App_Webapp/package*.json ./
+RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+
+# Copy frontend source code
+COPY AI-Legal_App_Webapp/ ./
+
+# Accept build-time environment arguments (optional)
+ARG VITE_GOOGLE_CLIENT_ID
+ARG VITE_APPLE_PAY_MERCHANT_ID
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+ENV VITE_APPLE_PAY_MERCHANT_ID=$VITE_APPLE_PAY_MERCHANT_ID
+
+# Build production static assets (outputs to /webapp/dist)
+RUN npm run build
+
+# =========================================================================
+# Stage 2: Production Server (Node.js Express Backend & Static Host)
+# =========================================================================
 FROM node:20-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy backend package files and install dependencies
+# Install native dependencies required by canvas, pdf-parse, sharp, etc.
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    cairo-dev \
+    pango-dev \
+    jpeg-dev \
+    giflib-dev \
+    librsvg-dev
+
+# Copy backend dependency manifests and install production dependencies
 COPY AI-Legal_App_BAckend/package*.json ./
-RUN npm install --production
+RUN npm install --production --legacy-peer-deps
 
 # Copy backend source code
 COPY AI-Legal_App_BAckend/ ./
 
-# Expose port 8080 for GCP Cloud Run
-EXPOSE 8080
+# Copy compiled frontend assets from Stage 1 into backend's public directory
+COPY --from=frontend-builder /webapp/dist/ ./public/
 
-# Set default environment variables
+# Configure Cloud Run environment variables
 ENV PORT=8080
 ENV NODE_ENV=production
 
-# Start backend server
+# Expose port for GCP Cloud Run
+EXPOSE 8080
+
+# Start backend server (serves API, WebSockets, and SPA frontend)
 CMD ["node", "server.js"]

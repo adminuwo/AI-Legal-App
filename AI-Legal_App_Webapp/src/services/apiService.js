@@ -73,14 +73,7 @@ apiClient.interceptors.request.use(
     const activeRole = localStorage.getItem('user_selected_role') || 'advocate';
     const activeWsId = activeRole === 'law_firm' ? (localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID') || 'personal_practice') : 'personal_practice';
 
-    const getBaseUrl = () => {
-      if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-        return 'http://localhost:8080/api';
-      }
-      return API;
-    };
-
-    config.baseURL = getBaseUrl();
+    config.baseURL = API;
 
     const deviceId = localStorage.getItem('aisa_device_id') || 'web_client';
     config.headers['X-User-Role'] = activeRole;
