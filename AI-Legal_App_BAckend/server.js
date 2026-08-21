@@ -139,7 +139,8 @@ const STATIC_CORS_ORIGINS = [
   'http://localhost:19006',
   'http://localhost:8081',
   'http://127.0.0.1:8080',
-  'http://127.0.0.1:3000'
+  'http://127.0.0.1:3000',
+  'https://ailegal.aisa24.com'
 ];
 
 const ALLOWED_DOMAIN_PATTERNS = [
