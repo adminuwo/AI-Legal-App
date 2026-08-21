@@ -1,0 +1,124 @@
+{
+  "expo": {
+    "name": "AI LEGAL™",
+    "slug": "ai-legal",
+    "version": "1.0.3",
+    "orientation": "portrait",
+    "icon": "./assets/icons/adaptive-icon.png",
+    "scheme": [
+      "ailegal",
+      "ailegalmobile",
+      "com.googleusercontent.apps.743928421487-8nuhql6qpu3c3vd4tum9g5a4c0qkcgdj"
+    ],
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "icon": "./assets/icons/adaptive-icon.png",
+      "bundleIdentifier": "com.uwo.ailegal",
+      "buildNumber": "15",
+      "supportsTablet": true,
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "NSCameraUsageDescription": "AI Legal requires camera access to scan and upload legal documents.",
+        "NSPhotoLibraryUsageDescription": "AI Legal requires photo library access to select and upload legal documents.",
+        "NSMicrophoneUsageDescription": "AI Legal requires microphone access for voice transcription and audio legal search.",
+        "NSLocationWhenInUseUsageDescription": "AI Legal requires location access to find nearby advocates and legal services.",
+        "NSFaceIDUsageDescription": "AI Legal requires Face ID for quick and secure biometric login.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.uwo.ailegal",
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 510,
+      "permissions": [],
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/icons/adaptive-icon.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "softwareKeyboardLayoutMode": "resize",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "ailegal"
+            },
+            {
+              "scheme": "ailegalmobile"
+            },
+            {
+              "scheme": "https",
+              "host": "aisa.uwo24.com",
+              "pathPrefix": "/app"
+            },
+            {
+              "scheme": "https",
+              "host": "uwo24.com",
+              "pathPrefix": "/app"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/icons/inapplogo.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#FFFFFF",
+          "image": "./assets/icons/new one spalsh screen.png",
+          "resizeMode": "contain",
+          "android": {
+            "image": "./assets/icons/new one spalsh screen.png",
+            "imageWidth": 180,
+            "resizeMode": "contain"
+          }
+        }
+      ],
+      "expo-font",
+      "expo-secure-store",
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icons/adaptive-icon.png",
+          "color": "#6D5DFC"
+        }
+      ],
+      "@react-native-google-signin/google-signin",
+      "expo-apple-authentication",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "2.1.20"
+          },
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "da420927-c698-45b3-8916-e3cfd231b37b"
+      }
+    },
+    "owner": "abha0518"
+  }
+}
