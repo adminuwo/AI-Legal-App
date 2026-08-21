@@ -5,11 +5,11 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy backend package files and install dependencies
-COPY package*.json ./
+COPY AI-Legal_App_BAckend/package*.json ./
 RUN npm install --production
 
 # Copy backend source code
-COPY . .
+COPY AI-Legal_App_BAckend/ ./
 
 # Expose port 8080 for GCP Cloud Run
 EXPOSE 8080
