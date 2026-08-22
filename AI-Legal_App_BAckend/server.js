@@ -192,11 +192,11 @@ app.use((req, res, next) => {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
 
-  const origin = req.headers.origin;
-  if (origin && isAllowedOrigin(origin)) {
+  const origin = req.headers.origin || req.headers.Origin;
+  if (origin) {
     res.setHeader('Access-Control-Allow-Origin', origin);
-  } else if (!origin) {
-    res.setHeader('Access-Control-Allow-Origin', 'https://uwo24.com');
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*');
   }
   res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
