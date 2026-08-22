@@ -4,7 +4,7 @@
 # ==============================================================================
 
 param (
-    [string]$ServiceName = "ai-legal-app",
+    [string]$ServiceName = "ai-legal-app-backend",
     [string]$Region = "asia-south1",
     [string]$Memory = "2Gi",
     [string]$Cpu = "2",

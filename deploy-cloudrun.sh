@@ -7,7 +7,7 @@
 set -e
 
 # Default Configurations
-SERVICE_NAME=${SERVICE_NAME:-"ai-legal-app"}
+SERVICE_NAME=${SERVICE_NAME:-"ai-legal-app-backend"}
 REGION=${REGION:-"asia-south1"}
 MEMORY=${MEMORY:-"2Gi"}
 CPU=${CPU:-"2"}
