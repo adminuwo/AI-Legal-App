@@ -43,6 +43,7 @@ export default function AdminDashboard() {
       user.role === 'admin' ||
       user.role === 'SUPER_ADMIN' ||
       email === 'aditi@uwo24.com' ||
+      email === 'aditilakhera0@gmail.com' ||
       email === 'admin@uwo24.com' ||
       isSuperAdmin(user)
     );
@@ -200,10 +201,18 @@ export default function AdminDashboard() {
 
     try {
       const token = user?.token || localStorage.getItem('token');
-      const authHeader = { headers: { Authorization: `Bearer ${token}` } };
+      const tStamp = Date.now();
+      const authHeader = { 
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        } 
+      };
+      const noCacheAuthHeader = authHeader;
 
       const [statsRes, usersRes, billingRes, plansRes, couponsRes, featuresRes, bugsRes, settingsRes, complaintsRes, crashesRes] = await Promise.all([
-        axios.get(`${API}/admin/stats`, authHeader).catch(() => ({ data: { success: false } })),
+        axios.get(`${API}/admin/stats?_t=${tStamp}`, noCacheAuthHeader).catch((err) => ({ data: { success: false, code: err.response?.data?.code } })),
         axios.get(`${API}/admin/users?limit=200`, authHeader).catch(() => ({ data: { list: [] } })),
         axios.get(`${API}/admin/billing?limit=200`, authHeader).catch(() => ({ data: { list: [] } })),
         axios.get(`${API}/admin/plans`, authHeader).catch(() => ({ data: { plans: [] } })),
@@ -215,8 +224,19 @@ export default function AdminDashboard() {
         axios.get(`${API}/admin/crashes?limit=200`, authHeader).catch(() => ({ data: { crashes: [], stats: null } }))
       ]);
 
-      if (statsRes.data?.success && statsRes.data.stats) {
-        setStats(prev => ({ ...prev, ...statsRes.data.stats }));
+      if (statsRes.data?.code === 'SESSION_REVOKED') {
+        toast.error('Session expired or logged in from another device. Please log in again.');
+        setStats(prev => ({ ...prev, revenueMonth: 0, revenueToday: 0, revenueLifetime: 0 }));
+      } else if (statsRes.data?.success && statsRes.data.stats) {
+        setStats(prev => ({ 
+          ...prev, 
+          ...statsRes.data.stats,
+          revenueToday: Number(statsRes.data.stats.revenueToday || 0),
+          revenueMonth: Number(statsRes.data.stats.revenueMonth || 0),
+          revenueLifetime: Number(statsRes.data.stats.revenueLifetime || 0)
+        }));
+      } else {
+        setStats(prev => ({ ...prev, revenueMonth: 0, revenueToday: 0, revenueLifetime: 0 }));
       }
       if (Array.isArray(usersRes.data?.list)) setUsersList(usersRes.data.list);
       if (Array.isArray(billingRes.data?.list)) setPaymentsList(billingRes.data.list);
@@ -276,10 +296,12 @@ export default function AdminDashboard() {
     let failedCount = 0;
 
     paymentsList.forEach(p => {
+      const gw = String(p.gateway || '').toLowerCase();
+      const isRazorpay = gw.includes('razorpay');
       const st = String(p.status || 'success').toLowerCase();
       const amt = Number(p.amount || 0);
 
-      if (st === 'success' || st === 'paid') {
+      if (isRazorpay && (st === 'success' || st === 'paid')) {
         totalRevenue += amt;
         successCount += 1;
       } else if (st === 'pending') {
@@ -1164,12 +1186,12 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-                    ₹{(stats.revenueMonth || 0).toLocaleString('en-IN')}
+                    ₹{(stats.revenueMonth || liveBillingStats.totalRevenue || 0).toLocaleString('en-IN')}
                   </h3>
                   <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 dark:border-zinc-800/80 text-[11px] font-semibold text-slate-500 dark:text-zinc-400 truncate">
                     <span>Today: <strong className="text-slate-900 dark:text-white font-black">₹{(stats.revenueToday || 0).toLocaleString('en-IN')}</strong></span>
                     <span className="text-slate-300 dark:text-zinc-700">•</span>
-                    <span>Life: <strong className="text-slate-900 dark:text-white font-black">₹{(stats.revenueLifetime || 0).toLocaleString('en-IN')}</strong></span>
+                    <span>Life: <strong className="text-slate-900 dark:text-white font-black">₹{(stats.revenueLifetime || liveBillingStats.totalRevenue || 0).toLocaleString('en-IN')}</strong></span>
                   </div>
                 </div>
               </div>

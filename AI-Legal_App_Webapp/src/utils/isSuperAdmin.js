@@ -7,6 +7,6 @@
 export const isSuperAdmin = (user) => {
     if (!user || !user.email) return false;
     const emailLower = (user.email || '').toLowerCase().trim();
-    return emailLower === 'aditi@uwo24.com';
+    return emailLower === 'aditi@uwo24.com' || emailLower === 'aditilakhera0@gmail.com' || user.role === 'SUPER_ADMIN';
 };
 
