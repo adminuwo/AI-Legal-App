@@ -4,7 +4,7 @@ import {
   ArrowLeft, Search, Sparkles, Trophy, BookOpen, Clock, ShieldAlert,
   CheckCircle2, XCircle, ChevronRight, Bookmark, RefreshCw, BarChart2,
   Brain, Zap, GraduationCap, Flame, HelpCircle, AlertCircle, Share2,
-  FileText, Award, Scale, CheckSquare, Layers, Globe
+  FileText, Award, Scale, CheckSquare, Layers, Globe, Menu
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { generateChatResponse } from '../services/geminiService';

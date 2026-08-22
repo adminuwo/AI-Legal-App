@@ -6,7 +6,7 @@ import {
   ShieldAlert, Cloud, FileText, Check, AlertTriangle, 
   ChevronRight, Volume2, Globe, Calendar, Clock, Laptop, Eye, Heart, Download,
   Bug, MessageSquare, BookOpen, Star, Send, Paperclip, CheckCircle2, MessageCircle,
-  Award, ShieldCheck, ChevronDown, RefreshCw, Smartphone, Lock, Mail
+  Award, ShieldCheck, ChevronDown, RefreshCw, Smartphone, Lock, Mail, Menu
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePersonalization } from '../context/PersonalizationContext';
@@ -310,11 +310,11 @@ const SettingsPage = () => {
       {/* Settings Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800 shrink-0">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/30 flex items-center justify-center text-[#C8A34D]">
+          <div className="flex items-center gap-2 font-black">
+            <div className="w-8 h-8 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/30 flex items-center justify-center text-[#C8A34D] shrink-0">
               <Settings2 size={18} />
             </div>
-            <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">AI LEGAL System Settings</h1>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate">AI LEGAL System Settings</h1>
           </div>
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Configure workspace parameters, app guide, security, and appearance settings.</p>
         </div>

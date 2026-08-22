@@ -564,7 +564,7 @@ export default function KnowledgeHubWorkspace() {
     <div className="flex flex-col h-screen w-full bg-slate-50 dark:bg-[#0B0F17] text-slate-900 dark:text-zinc-100 overflow-hidden font-sans select-none">
       
       {/* ─── TOP HEADER ─── */}
-      <header className="w-full bg-white dark:bg-[#0d0e16] border-b border-slate-200/80 dark:border-zinc-800/80 px-4 sm:px-6 py-3 flex items-center justify-between shrink-0 shadow-2xs z-20">
+      <header className="w-full bg-white dark:bg-[#0d0e16] border-b border-slate-200/80 dark:border-zinc-800/80 pl-14 pr-4 sm:px-6 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shrink-0 shadow-2xs z-20 overflow-hidden">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -579,12 +579,12 @@ export default function KnowledgeHubWorkspace() {
             <ArrowLeft size={18} />
           </button>
 
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/30 flex items-center justify-center text-[#C8A34D]">
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/30 flex items-center justify-center text-[#C8A34D] shrink-0">
               <BookOpen size={18} />
             </div>
             <div>
-              <h1 className="text-sm sm:text-base font-black text-slate-900 dark:text-zinc-100 tracking-tight">
+              <h1 className="text-sm sm:text-base font-black text-slate-900 dark:text-zinc-100 tracking-tight whitespace-nowrap">
                 AI Legal Knowledge Hub
               </h1>
               <p className="text-[11px] font-semibold text-slate-500 dark:text-zinc-400 hidden sm:block">
@@ -840,7 +840,7 @@ export default function KnowledgeHubWorkspace() {
                 </div>
 
                 {/* Reader Theme & Font Customization */}
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   {/* Theme Selector */}
                   <div className="flex items-center bg-slate-100 dark:bg-zinc-800 p-1 rounded-xl gap-1">
                     <button 
@@ -867,9 +867,9 @@ export default function KnowledgeHubWorkspace() {
                   </div>
 
                   {/* Font Size */}
-                  <div className="flex items-center bg-slate-100 dark:bg-zinc-800 px-2 py-1 rounded-xl text-xs font-bold gap-2">
+                  <div className="flex items-center bg-slate-100 dark:bg-zinc-800 px-2 py-1 rounded-xl text-xs font-bold gap-2 shrink-0">
                     <button onClick={() => setFontSize(f => Math.max(12, f - 1))} className="hover:text-[#C8A34D]">-</button>
-                    <span>{fontSize}px</span>
+                    <span className="whitespace-nowrap shrink-0">{fontSize}px</span>
                     <button onClick={() => setFontSize(f => Math.min(22, f + 1))} className="hover:text-[#C8A34D]">+</button>
                   </div>
 

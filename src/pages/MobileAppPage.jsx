@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   Smartphone, UserCheck, Briefcase, CreditCard, RefreshCw, 
-  CheckCircle2, QrCode, ShieldCheck, ArrowUpRight 
+  CheckCircle2, QrCode, ShieldCheck, ArrowUpRight, Menu
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { apis } from '../types';
@@ -60,13 +60,12 @@ const DownloadQRCode = ({ value, label = "Scan with Camera", platform = "univers
   const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(value)}&color=000000&bgcolor=ffffff&margin=1`;
 
   return (
-    <div className="p-3 bg-white rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center shrink-0 space-y-2 group transition-all duration-200 hover:border-[#C8A34D]/50 hover:shadow-md">
-      <div className="p-2 bg-white rounded-xl border border-slate-100 flex items-center justify-center">
+    <div className="p-2 sm:p-3 bg-white rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center shrink-0 space-y-1.5 sm:space-y-2 group transition-all duration-200 hover:border-[#C8A34D]/50 hover:shadow-md max-w-[145px] sm:max-w-none">
+      <div className="p-1.5 sm:p-2 bg-white rounded-xl border border-slate-100 flex items-center justify-center">
         <img
           src={qrApiUrl}
           alt={`Scan to Download AI LEGAL Mobile App (${label})`}
-          className="rounded-md object-contain"
-          style={{ width: size, height: size }}
+          className="rounded-md object-contain w-[82px] h-[82px] sm:w-[110px] sm:h-[110px]"
           loading="lazy"
           onError={(e) => {
             e.currentTarget.onerror = null;
@@ -74,10 +73,10 @@ const DownloadQRCode = ({ value, label = "Scan with Camera", platform = "univers
           }}
         />
       </div>
-      <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5 pt-0.5">
-        {platform === 'ios' && <AppleStoreIcon className="w-3.5 h-3.5 text-[#C8A34D]" />}
-        {platform === 'android' && <GooglePlayIcon className="w-3.5 h-3.5 text-[#C8A34D]" />}
-        {label}
+      <span className="text-[9px] sm:text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 pt-0.5 whitespace-nowrap">
+        {platform === 'ios' && <AppleStoreIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C8A34D] shrink-0" />}
+        {platform === 'android' && <GooglePlayIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C8A34D] shrink-0" />}
+        <span>{label}</span>
       </span>
     </div>
   );
@@ -191,8 +190,8 @@ export default function MobileAppPage() {
           </p>
         </div>
 
-        {/* Authentic Store Badges */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-2">
+        {/* Authentic Store Badges - 1 Row on Mobile & Desktop */}
+        <div className="flex flex-row items-center justify-center gap-2 sm:gap-5 pt-2 max-w-full">
           {/* App Store Badge */}
           <a
             href={isRealStoreUrl(storeConfig.appStoreUrl) ? storeConfig.appStoreUrl : '#'}
@@ -202,7 +201,7 @@ export default function MobileAppPage() {
             aria-label="Download AI LEGAL™ on the Apple App Store"
             className="inline-block transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shrink-0"
           >
-            <OfficialAppStoreBadge className="h-14 w-[190px] md:w-[205px] object-contain drop-shadow-xs" />
+            <OfficialAppStoreBadge className="h-10 sm:h-14 w-[135px] sm:w-[205px] object-contain drop-shadow-xs" />
           </a>
 
           {/* Google Play Badge */}
@@ -213,7 +212,7 @@ export default function MobileAppPage() {
             aria-label="Get AI LEGAL™ on Google Play"
             className="inline-block transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer shrink-0"
           >
-            <OfficialGooglePlayBadge className="h-14 w-[190px] md:w-[205px] object-contain drop-shadow-xs" />
+            <OfficialGooglePlayBadge className="h-10 sm:h-14 w-[135px] sm:w-[205px] object-contain drop-shadow-xs" />
           </a>
         </div>
 
@@ -282,20 +281,20 @@ export default function MobileAppPage() {
           </p>
         </div>
 
-        <div className="flex flex-row items-center gap-4 shrink-0 flex-wrap justify-center">
+        <div className="flex flex-row items-center gap-2 sm:gap-4 shrink-0 justify-center max-w-full">
           {/* iOS App Store QR */}
           <DownloadQRCode 
             value={storeConfig.appStoreUrl} 
             label="iOS App Store" 
             platform="ios" 
-            size={110} 
+            size={90} 
           />
           {/* Android Google Play QR */}
           <DownloadQRCode 
             value={storeConfig.googlePlayUrl} 
             label="Google Play" 
             platform="android" 
-            size={110} 
+            size={90} 
           />
         </div>
       </section>

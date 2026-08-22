@@ -6,7 +6,7 @@ import {
   Zap, FileText, Scale, Binary, FileCheck, 
   Brain, Gavel, GraduationCap, Building2, MessageSquare, 
   BookOpen, Award, ArrowRight, ShieldAlert, CheckCircle2,
-  Mic, Users, BookMarked, HelpCircle, FileCheck2, ShieldCheck
+  Mic, Users, BookMarked, HelpCircle, FileCheck2, ShieldCheck, Menu
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../context/SubscriptionContext';
@@ -381,15 +381,15 @@ export default function AiToolsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] dark:bg-[#111111] pt-4 md:pt-6 pb-12 px-4 md:px-12 max-w-7xl mx-auto text-[#111111] dark:text-white font-sans space-y-6">
+    <div className="min-h-screen bg-[#F5F5F5] dark:bg-[#111111] pt-3 sm:pt-4 md:pt-6 pb-12 px-3 sm:px-6 md:px-12 w-full max-w-7xl mx-auto text-[#111111] dark:text-white font-sans space-y-4 sm:space-y-6 overflow-x-hidden min-w-0">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 p-5 md:p-6 rounded-xl bg-white dark:bg-[#1E293B] border border-[#C8A34D]/30 shadow-sm">
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#C8A34D]/10 border border-[#C8A34D]/30 text-[#C8A34D] text-[11px] font-semibold">
-            <Zap className="w-3.5 h-3.5 text-[#C8A34D]" />
-            <span>{selectedRole === 'student' ? 'Student AI Learning Suite • Rolex Minimalist Theme' : 'Advocate Enterprise AI Suite • Rolex Minimalist Theme'}</span>
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 p-3.5 sm:p-6 rounded-xl bg-white dark:bg-[#1E293B] border border-[#C8A34D]/30 shadow-sm w-full min-w-0 overflow-hidden">
+        <div className="space-y-1 min-w-0 flex-1">
+          <div className="inline-flex max-w-full min-w-0 items-center gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-[#C8A34D]/10 border border-[#C8A34D]/30 text-[#C8A34D] text-[9.5px] sm:text-[11px] font-semibold">
+            <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#C8A34D] shrink-0" />
+            <span className="truncate min-w-0">{selectedRole === 'student' ? 'Student AI Learning Suite • Rolex Minimalist Theme' : 'Advocate Enterprise AI Suite • Rolex Minimalist Theme'}</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight text-[#0F172A] dark:text-white">
+          <h1 className="text-lg sm:text-3xl font-black tracking-tight text-[#0F172A] dark:text-white truncate min-w-0">
             {selectedRole === 'student' ? 'Student AI Tools Suite ⚡' : 'Advocate AI Tools Suite ⚡'}
           </h1>
           <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-snug">
@@ -401,7 +401,7 @@ export default function AiToolsPage() {
       </div>
 
       {/* Tools Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 w-full min-w-0">
         {activeCatalog.map((t) => {
           const IconComp = t.icon;
           const usage = getToolUsageStatus(t.id);
@@ -410,18 +410,18 @@ export default function AiToolsPage() {
               key={t.id}
               whileHover={{ y: -3 }}
               onClick={() => handleLaunchTool(t)}
-              className="group p-4 sm:p-5 rounded-xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 hover:border-[#C8A34D]/60 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between"
+              className="group p-3.5 sm:p-5 rounded-xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 hover:border-[#C8A34D]/60 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between w-full min-w-0 overflow-hidden"
             >
-              <div>
-                <div className="flex items-start justify-between gap-2 mb-2.5">
-                  <div className="p-2.5 rounded-lg bg-[#C8A34D]/10 border border-[#C8A34D]/25 text-[#C8A34D]">
-                    <IconComp className="w-5 h-5 text-[#C8A34D]" />
+              <div className="min-w-0">
+                <div className="flex items-start justify-between gap-2 mb-2.5 min-w-0">
+                  <div className="p-2 sm:p-2.5 rounded-lg bg-[#C8A34D]/10 border border-[#C8A34D]/25 text-[#C8A34D] shrink-0">
+                    <IconComp className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#C8A34D]" />
                   </div>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${usage.badgeClass}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider border shrink-0 ${usage.badgeClass}`}>
                     {usage.text}
                   </span>
                 </div>
-                <h3 className="text-base font-bold text-[#111111] dark:text-white group-hover:text-[#C8A34D] transition-colors leading-tight">
+                <h3 className="text-sm sm:text-base font-bold text-[#111111] dark:text-white group-hover:text-[#C8A34D] transition-colors leading-tight truncate">
                   {t.title}
                 </h3>
                 <p className="mt-1.5 text-xs text-slate-600 dark:text-slate-400 leading-snug line-clamp-2">
@@ -430,9 +430,9 @@ export default function AiToolsPage() {
 
                 {/* Spec Highlights */}
                 {t.highlights && (
-                  <div className="flex flex-wrap gap-1 mt-3">
+                  <div className="flex flex-wrap gap-1 mt-2.5 sm:mt-3 min-w-0">
                     {t.highlights.map((h, i) => (
-                      <span key={i} className="text-[9px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#111111] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800">
+                      <span key={i} className="text-[9px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#111111] text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 max-w-full truncate">
                         • {h}
                       </span>
                     ))}
@@ -440,9 +440,9 @@ export default function AiToolsPage() {
                 )}
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-[#C8A34D]">
+              <div className="mt-3.5 sm:mt-4 pt-2.5 sm:pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-[#C8A34D]">
                 <span>Start</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform" />
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1.5 transition-transform shrink-0" />
               </div>
             </motion.div>
           );

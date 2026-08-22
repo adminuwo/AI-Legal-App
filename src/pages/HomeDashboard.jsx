@@ -5,7 +5,7 @@ import {
   Clock, AlertTriangle, CheckCircle2, RefreshCw, Edit2, 
   Trash2, Archive, ChevronRight, X, ArrowUpRight, TrendingUp,
   Sparkles, Info, Users, ShieldCheck, BookOpen, User, MoreVertical, Activity,
-  Binary, Scale, Bell
+  Binary, Scale, Bell, Menu
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -498,37 +498,37 @@ export default function HomeDashboard() {
       {isLoading ? renderLoadingSkeletons() : (
         <>
           {/* 1. Header Greeting & Primary Action */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-6 border-b border-slate-200 dark:border-slate-800">
-            <div>
+          <div className="flex items-start justify-between gap-3 sm:gap-4 mb-5 sm:mb-6 pb-4 sm:pb-5 border-b border-slate-200 dark:border-slate-800">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white">
+                <h1 className="text-base sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white truncate">
                   Welcome, Advocate {userName}
                 </h1>
                 {isSyncing && (
-                  <RefreshCw size={14} className="text-[#C8A34D] animate-spin" />
+                  <RefreshCw size={14} className="text-[#C8A34D] animate-spin shrink-0" />
                 )}
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-2 mt-1.5">
-                <Calendar className="w-4 h-4 text-[#C8A34D]" />
-                {formatDate(currentTime)}
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1.5 mt-1">
+                <Calendar className="w-3.5 h-3.5 text-[#C8A34D] shrink-0" />
+                <span>{formatDate(currentTime)}</span>
               </p>
             </div>
             
-            <div className="flex items-center gap-3 self-start md:self-auto shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setIsNotifOpen(true)}
-                className="relative flex items-center gap-2 px-4 py-2.5 bg-[#C8A34D]/15 hover:bg-[#C8A34D]/25 border border-[#C8A34D]/40 text-[#B48A35] dark:text-[#C8A34D] font-black rounded-xl text-xs sm:text-sm shadow-xs transition-all active:scale-95 cursor-pointer"
+                className="relative flex items-center gap-2 p-2 sm:px-4 sm:py-2.5 bg-[#C8A34D]/15 hover:bg-[#C8A34D]/25 border border-[#C8A34D]/40 text-[#B48A35] dark:text-[#C8A34D] font-black rounded-xl text-xs sm:text-sm shadow-xs transition-all active:scale-95 cursor-pointer"
                 title="View Updates & System Notifications"
               >
                 <div className="relative">
-                  <Bell className="w-4.5 h-4.5 text-[#C8A34D]" />
+                  <Bell className="w-4.5 h-4.5 sm:w-4.5 sm:h-4.5 text-[#C8A34D]" />
                   {unreadNotifCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-white dark:ring-[#0F172A] animate-pulse" />
                   )}
                 </div>
-                <span>Updates & Notifications</span>
+                <span className="hidden sm:inline">Updates & Notifications</span>
                 {unreadNotifCount > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black ml-1">
+                  <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black">
                     {unreadNotifCount > 99 ? '99+' : unreadNotifCount}
                   </span>
                 )}
@@ -582,23 +582,23 @@ export default function HomeDashboard() {
           {/* 2. Today's Overview Statistics Ribbon */}
           <div className="mb-8">
             <h2 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4">Today&apos;s Overview</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {[
                 { label: "Active Cases", value: totalActiveCases, icon: Briefcase, status: "Active", color: "text-[#C8A34D] bg-[#C8A34D]/10 border border-[#C8A34D]/25" },
                 { label: "Today's Hearings", value: totalTodaysHearingsCount, icon: Gavel, status: totalTodaysHearingsCount > 0 ? "TODAY" : "0 Today", color: totalTodaysHearingsCount > 0 ? "text-rose-500 bg-rose-50 border border-rose-200" : "text-slate-400 bg-slate-100 dark:bg-slate-800" },
                 { label: "Pending Drafts", value: totalPendingDrafts, icon: FileText, status: "Pending", color: "text-amber-500 bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-900/40" },
                 { label: "Pending Research", value: totalPendingResearch, icon: Search, status: "Up to Date", color: "text-emerald-500 bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-900/40" }
               ].map((stat, i) => (
-                <div key={i} className="p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] shadow-xs hover:border-[#C8A34D] hover:shadow-md transition-all flex flex-col justify-between">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{stat.label}</span>
-                    <div className={`p-2 rounded-xl ${stat.color}`}>
-                      <stat.icon className="w-4.5 h-4.5" />
+                <div key={i} className="p-3.5 sm:p-6 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] shadow-xs hover:border-[#C8A34D] hover:shadow-md transition-all flex flex-col justify-between">
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider sm:tracking-widest truncate">{stat.label}</span>
+                    <div className={`p-1.5 sm:p-2 rounded-xl ${stat.color} shrink-0`}>
+                      <stat.icon className="w-3.5 h-3.5 sm:w-4.5 sm:h-4.5" />
                     </div>
                   </div>
-                  <div className="flex items-baseline justify-between mt-2">
-                    <span className="text-3xl font-black text-[#111111] dark:text-white">{stat.value}</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  <div className="flex items-baseline justify-between mt-1 sm:mt-2">
+                    <span className="text-2xl sm:text-3xl font-black text-[#111111] dark:text-white">{stat.value}</span>
+                    <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
                       {stat.status}
                     </span>
                   </div>
@@ -612,59 +612,59 @@ export default function HomeDashboard() {
 
               {/* Continue Working Card */}
               {continueWorkingCase && (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <h2 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Continue Working</h2>
                   <div 
                     onClick={() => handleOpenWorkspace(continueWorkingCase._id)}
-                    className="p-6 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] hover:border-[#C8A34D] transition-all shadow-xs cursor-pointer relative group overflow-hidden"
+                    className="p-3.5 sm:p-5 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] hover:border-[#C8A34D] transition-all shadow-xs cursor-pointer relative group overflow-hidden"
                   >
-                    <div className="absolute right-6 top-6 text-slate-400 group-hover:text-[#C8A34D] transition-colors">
-                      <ArrowUpRight size={18} />
+                    <div className="absolute right-4 top-4 text-slate-400 group-hover:text-[#C8A34D] transition-colors">
+                      <ArrowUpRight size={16} />
                     </div>
-                    <span className="px-2.5 py-1 bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25 text-[9px] font-mono font-bold uppercase tracking-wider rounded-full">Last Updated Case</span>
-                    <h3 className="text-xl font-black text-[#111111] dark:text-white mt-3 group-hover:text-[#C8A34D] transition-colors">{continueWorkingCase.name}</h3>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-1 max-w-md truncate">{continueWorkingCase.summary || 'No summary configured yet.'}</p>
+                    <span className="px-2.5 py-0.5 bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25 text-[9px] font-mono font-bold uppercase tracking-wider rounded-full">Last Updated Case</span>
+                    <h3 className="text-base sm:text-xl font-black text-[#111111] dark:text-white mt-1.5 group-hover:text-[#C8A34D] transition-colors truncate">{continueWorkingCase.name}</h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5 max-w-md truncate">{continueWorkingCase.summary || 'No summary configured yet.'}</p>
                     
-                    <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-500 font-semibold">
-                      <span>Hearings: <strong className="text-[#111111] dark:text-white">{continueWorkingCase.hearings?.length || 0}</strong></span>
-                      <span>Evidence: <strong className="text-[#111111] dark:text-white">{continueWorkingCase.evidence?.length || 0}</strong></span>
-                      <span>Contracts: <strong className="text-[#111111] dark:text-white">{continueWorkingCase.contracts?.length || 0}</strong></span>
+                    <div className="flex items-center gap-3 mt-2.5 pt-2.5 border-t border-slate-100 dark:border-slate-800 text-[10px] text-slate-500 font-semibold overflow-x-auto no-scrollbar">
+                      <span className="shrink-0">Hearings: <strong className="text-[#111111] dark:text-white">{continueWorkingCase.hearings?.length || 0}</strong></span>
+                      <span className="shrink-0">Evidence: <strong className="text-[#111111] dark:text-white">{continueWorkingCase.evidence?.length || 0}</strong></span>
+                      <span className="shrink-0">Contracts: <strong className="text-[#111111] dark:text-white">{continueWorkingCase.contracts?.length || 0}</strong></span>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Subscription Entitlements & Usage Summary */}
-              <div className="p-5 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] shadow-xs space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Subscription & Workspace Quotas</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30">{badge}</span>
+              <div className="p-3.5 sm:p-5 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] shadow-xs space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">Subscription Quotas</span>
+                    <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 shrink-0">{badge}</span>
                   </div>
                   <button
                     onClick={() => triggerUpgradeModal({ title: 'Manage Subscription', message: 'Upgrade your plan to unlock higher limits.' })}
-                    className="text-xs font-bold text-[#C8A34D] hover:underline cursor-pointer"
+                    className="text-[11px] sm:text-xs font-bold text-[#C8A34D] hover:underline cursor-pointer shrink-0"
                   >
-                    Upgrade Plan →
+                    Upgrade →
                   </button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-                  <div>
-                    <p className="text-slate-400 font-semibold">Active Matters</p>
-                    <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
-                      {subCases?.used || 0} / {subCases?.limit === -1 ? 'Unlimited' : (subCases?.limit || 3)}
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-4 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+                  <div className="min-w-0">
+                    <p className="text-[9px] sm:text-xs text-slate-400 font-semibold truncate">Active Matters</p>
+                    <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mt-0.5 truncate">
+                      {subCases?.used || 0} / {subCases?.limit === -1 ? '∞' : (subCases?.limit || 3)}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-slate-400 font-semibold">Cloud Storage</p>
-                    <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
-                      {storage?.usedGB || 0} GB / {storage?.limitGB === -1 ? 'Unlimited' : `${storage?.limitGB || 1} GB`}
+                  <div className="min-w-0">
+                    <p className="text-[9px] sm:text-xs text-slate-400 font-semibold truncate">Cloud Storage</p>
+                    <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mt-0.5 truncate">
+                      {storage?.usedGB || 0} GB / {storage?.limitGB === -1 ? '∞' : `${storage?.limitGB || 1} GB`}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-slate-400 font-semibold">AI Assistant Queries</p>
-                    <p className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
-                      {features?.ai_chat ? `${features.ai_chat.used} / ${features.ai_chat.limit === -1 ? 'Unlimited' : features.ai_chat.limit}` : '0 / 50'}
+                  <div className="min-w-0">
+                    <p className="text-[9px] sm:text-xs text-slate-400 font-semibold truncate">AI Queries</p>
+                    <p className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white mt-0.5 truncate">
+                      {features?.ai_chat ? `${features.ai_chat.used} / ${features.ai_chat.limit === -1 ? '∞' : features.ai_chat.limit}` : '0 / 50'}
                     </p>
                   </div>
                 </div>
@@ -706,14 +706,14 @@ export default function HomeDashboard() {
               </div>
 
               {/* 4. AI Legal Knowledge Hub Card */}
-              <div className="p-6 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] shadow-xs space-y-4">
+              <div className="p-4 sm:p-6 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white dark:bg-[#1E293B] shadow-xs space-y-3.5">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25 shrink-0">
-                    <BookOpen className="w-5 h-5" />
+                  <div className="p-2 sm:p-2.5 rounded-xl bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25 shrink-0">
+                    <BookOpen className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                   </div>
                   <div>
                     <h3 className="text-base font-extrabold text-[#111111] dark:text-white">AI Legal Knowledge Hub</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Search Indian laws, sections, judgments, legal procedures and get AI-powered legal answers.</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Search Indian laws, sections, judgments & legal procedures.</p>
                   </div>
                 </div>
 
@@ -731,14 +731,14 @@ export default function HomeDashboard() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Trending Searches:</span>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 shrink-0 whitespace-nowrap">
                     {['IPC 420', 'BNS', 'Divorce', 'GST', 'Consumer Rights', 'Labour Law', 'Property', 'RTI', 'Motor Accident'].map((chip, idx) => (
                       <button 
                         key={idx}
                         onClick={() => navigate(`/dashboard/tools/knowledge-hub?q=${encodeURIComponent(chip)}`)}
-                        className="px-3 py-1 bg-slate-50 dark:bg-[#0F172A] hover:bg-[#111111] dark:hover:bg-[#333333] border border-slate-200/80 dark:border-slate-800 hover:border-[#C8A34D] text-[#111111] dark:text-white hover:text-[#C8A34D] rounded-lg text-xs font-bold transition-all cursor-pointer"
+                        className="px-2.5 py-1 bg-slate-50 dark:bg-[#0F172A] hover:bg-[#111111] dark:hover:bg-[#333333] border border-slate-200/80 dark:border-slate-800 hover:border-[#C8A34D] text-[#111111] dark:text-white hover:text-[#C8A34D] rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap"
                       >
                         {chip}
                       </button>
