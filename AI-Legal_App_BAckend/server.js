@@ -1,4 +1,5 @@
 import express, { urlencoded } from "express";
+import cors from "cors";
 import 'dotenv/config';
 import fs from 'fs';
 
@@ -183,6 +184,18 @@ const isAllowedOrigin = (origin) => {
   return false;
 };
 
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (isAllowedOrigin(origin)) return callback(null, true);
+    return callback(null, true); // Allow all web app origins
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: '*',
+  optionsSuccessStatus: 200
+}));
+
 app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -205,7 +218,7 @@ app.use((req, res, next) => {
   if (requestHeaders) {
     res.setHeader('Access-Control-Allow-Headers', requestHeaders);
   } else {
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, content-type, Authorization, authorization, Accept, accept, X-Requested-With, x-requested-with, x-device-fingerprint, X-Device-Fingerprint, x-device-id, X-Device-Id, x-device-name, X-Device-Name, x-device-platform, X-Device-Platform, x-app-version, X-App-Version, Origin, origin, X-App-Language, x-app-language, X-App-Locale, x-app-locale, x-active-workspace-id, X-Active-Workspace-Id, x-user-role, X-User-Role, x-workspace-type, X-Workspace-Type, x-workspace-id, X-Workspace-Id, X-Client-Version, x-client-version, X-Platform, x-platform, *');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, content-type, Authorization, authorization, Accept, accept, X-Requested-With, x-requested-with, x-device-fingerprint, X-Device-Fingerprint, x-device-id, X-Device-Id, x-device-name, X-Device-Name, x-device-platform, X-Device-Platform, x-app-version, X-App-Version, Origin, origin, X-App-Language, x-app-language, X-App-Locale, x-app-locale, x-active-workspace-id, X-Active-Workspace-Id, x-user-role, X-User-Role, x-workspace-type, X-Workspace-Type, x-workspace-id, X-Workspace-Id, X-Client-Version, x-client-version, X-Platform, *');
   }
   
   if (req.method === 'OPTIONS') {
