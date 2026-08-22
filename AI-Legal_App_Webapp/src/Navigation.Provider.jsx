@@ -409,7 +409,6 @@ const NavigateProvider = () => {
           }}
         />
         <CreditUpsellPopup />
-        <CookieConsentBanner />
         <Routes>
         {/* Public Routes */}
         <Route path={AppRoute.LANDING} element={<HomeRedirect />} />
