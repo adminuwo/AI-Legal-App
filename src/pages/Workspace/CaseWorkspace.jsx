@@ -2624,85 +2624,91 @@ export const CaseWorkspace = ({
     };
 
     return (
-      <div className="space-y-6 max-w-7xl mx-auto pb-16 animate-in fade-in duration-250">
+      <div className="space-y-4 sm:space-y-6 max-w-7xl mx-auto pb-16 animate-in fade-in duration-250 w-full min-w-0">
         
         {/* ─── Top Header Banner ─── */}
-        <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-[#C8A34D]/15 text-[#C8A34D] rounded-xl border border-[#C8A34D]/30">
-              <Users size={22} />
+        <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 sm:p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 w-full min-w-0">
+          <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0 w-full md:flex-1">
+            <div className="p-2 sm:p-3 bg-[#C8A34D]/15 text-[#C8A34D] rounded-xl border border-[#C8A34D]/30 shrink-0 aspect-square">
+              <Users size={18} className="sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h2 className="text-xl font-black text-[#0F172A] dark:text-white flex items-center gap-2">
-                <span>Parties & Case Roster</span>
-                <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-md text-[10px] font-mono font-bold">Directory</span>
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-base sm:text-xl font-black text-[#0F172A] dark:text-white tracking-tight">
+                  Parties & Case Roster
+                </h2>
+                <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-md text-[10px] font-mono font-bold shrink-0 whitespace-nowrap">
+                  Directory
+                </span>
+              </div>
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 break-words">
                 Manage litigants, advocates, witnesses and court details for this case.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            <button
-              onClick={() => {
-                setPersonForm({
-                  id: '',
-                  name: '',
-                  role: 'Plaintiff / Petitioner',
-                  contact: '',
-                  email: '',
-                  notes: '',
-                  witnessType: 'Eye Witness',
-                  depositionStatus: 'Pending',
-                  counselType: 'Lead Counsel',
-                  representationSide: 'Petitioner'
-                });
-                setIsAddPersonModalOpen(true);
-              }}
-              className="px-4 py-2.5 bg-[#0F172A] dark:bg-white text-white dark:text-[#0F172A] hover:bg-slate-800 dark:hover:bg-slate-100 text-xs font-black rounded-xl transition-all flex items-center gap-2 shadow-xs cursor-pointer"
-            >
-              <Plus size={14} />
-              <span>+ Add Person</span>
-            </button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto shrink-0">
+            <div className="grid grid-cols-2 gap-2 w-full sm:w-auto">
+              <button
+                onClick={() => {
+                  setPersonForm({
+                    id: '',
+                    name: '',
+                    role: 'Plaintiff / Petitioner',
+                    contact: '',
+                    email: '',
+                    notes: '',
+                    witnessType: 'Eye Witness',
+                    depositionStatus: 'Pending',
+                    counselType: 'Lead Counsel',
+                    representationSide: 'Petitioner'
+                  });
+                  setIsAddPersonModalOpen(true);
+                }}
+                className="px-3 py-2 bg-[#0F172A] dark:bg-white text-white dark:text-[#0F172A] hover:bg-slate-800 dark:hover:bg-slate-100 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer truncate"
+              >
+                <Plus size={14} className="shrink-0" />
+                <span className="truncate">Add Person</span>
+              </button>
 
-            <button
-              onClick={() => {
-                setRosterForm({
-                  clientName: caseData.clientName || '',
-                  clientPhone: caseData.clientPhone || '',
-                  clientEmail: caseData.clientEmail || '',
-                  opponentName: caseData.opponentName || caseData.accused || '',
-                  opponentPhone: caseData.opponentPhone || '',
-                  opponentEmail: caseData.opponentEmail || '',
-                  opposingLawyer: caseData.opposingLawyer || '',
-                  courtName: caseData.courtName || '',
-                  judgeName: caseData.judgeName || caseData.judge || '',
-                  courtroom: caseData.courtroom || '',
-                  bench: caseData.bench || '',
-                  jurisdiction: caseData.jurisdiction || ''
-                });
-                setIsEditRosterModalOpen(true);
-              }}
-              className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all flex items-center gap-2 shadow-xs cursor-pointer"
-            >
-              <Edit2 size={13} />
-              <span>Edit Case Roster</span>
-            </button>
+              <button
+                onClick={() => {
+                  setRosterForm({
+                    clientName: caseData.clientName || '',
+                    clientPhone: caseData.clientPhone || '',
+                    clientEmail: caseData.clientEmail || '',
+                    opponentName: caseData.opponentName || caseData.accused || '',
+                    opponentPhone: caseData.opponentPhone || '',
+                    opponentEmail: caseData.opponentEmail || '',
+                    opposingLawyer: caseData.opposingLawyer || '',
+                    courtName: caseData.courtName || '',
+                    judgeName: caseData.judgeName || caseData.judge || '',
+                    courtroom: caseData.courtroom || '',
+                    bench: caseData.bench || '',
+                    jurisdiction: caseData.jurisdiction || ''
+                  });
+                  setIsEditRosterModalOpen(true);
+                }}
+                className="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer truncate"
+              >
+                <Edit2 size={13} className="shrink-0" />
+                <span className="truncate">Edit Roster</span>
+              </button>
+            </div>
 
             <button
               onClick={() => runPartiesDocExtraction(mockDocsList[0] || "plaint_recovery_suit.pdf")}
-              className="px-4 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-2 shadow-xs cursor-pointer"
+              className="w-full sm:w-auto px-3.5 py-2 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer shrink-0"
             >
-              <Sparkles size={14} />
+              <Sparkles size={14} className="shrink-0" />
               <span>AI Auto-Extract</span>
             </button>
           </div>
         </div>
 
         {/* ─── Search & Filter Bar ─── */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 w-full md:w-auto shrink-0">
             {[
               { id: 'ALL', label: 'All Members' },
               { id: 'LITIGANTS', label: 'Litigants' },
@@ -2713,7 +2719,7 @@ export const CaseWorkspace = ({
               <button
                 key={chip.id}
                 onClick={() => setActivePartiesFilter(chip.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                   activePartiesFilter === chip.id
                     ? 'bg-[#0F172A] dark:bg-white text-white dark:text-[#0F172A] shadow-xs'
                     : 'bg-white dark:bg-[#1E293B] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-[#C8A34D]'
@@ -2724,7 +2730,7 @@ export const CaseWorkspace = ({
             ))}
           </div>
 
-          <div className="relative w-full md:w-72">
+          <div className="relative w-full md:w-72 shrink-0">
             <Search size={14} className="text-slate-400 absolute left-3 top-2.5" />
             <input
               type="text"
@@ -9606,25 +9612,25 @@ Through Counsel
     };
 
     return (
-      <div className="space-y-6 max-w-7xl mx-auto">
+      <div className="space-y-4 sm:space-y-6 max-w-7xl mx-auto pb-16 w-full min-w-0">
         
         {/* A. PAGE HEADER & ACTIONS BAR */}
-        <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-black text-[#0F172A] dark:text-white uppercase tracking-wider">
+        <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-base sm:text-lg font-black text-[#0F172A] dark:text-white tracking-tight">
                 COURT ORDERS & JUDGMENTS
               </h2>
-              <span className="px-2.5 py-0.5 bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 rounded-full text-[9px] font-mono font-bold">
+              <span className="px-2.5 py-0.5 bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 rounded-full text-[9px] font-mono font-bold shrink-0 whitespace-nowrap">
                 Decree & Directive Repository
               </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium break-words">
               Track judicial decrees, interim orders, stay orders, judgments, directions, deadlines and compliance requirements.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto shrink-0">
             <button
               onClick={() => {
                 setOrderFormState({
@@ -9646,13 +9652,13 @@ Through Counsel
                 });
                 setIsAddOrderModalOpen(true);
               }}
-              className="px-3.5 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 sm:py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
-              <Plus size={14} /> Log Court Order
+              <Plus size={14} /> <span>Log Court Order</span>
             </button>
 
-            <label className="px-3.5 py-2.5 bg-[#0F172A] dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-[#0F172A] rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer">
-              <Upload size={14} className="text-[#C8A34D]" /> Upload Order PDF
+            <label className="px-3.5 py-2 sm:py-2.5 bg-[#0F172A] dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-[#0F172A] rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap">
+              <Upload size={14} className="text-[#C8A34D]" /> <span>Upload Order PDF</span>
               <input
                 type="file"
                 accept=".pdf,.png,.jpg,.jpeg,.docx"
@@ -9664,53 +9670,53 @@ Through Counsel
         </div>
 
         {/* B. TOP METRICS CARDS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl p-4 flex items-center gap-3.5 shadow-xs">
-            <div className="w-10 h-10 rounded-lg bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 flex items-center justify-center font-black text-sm shrink-0">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3.5 shadow-xs">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 flex items-center justify-center font-black text-xs sm:text-sm shrink-0">
               {totalOrdersCount}
             </div>
-            <div>
-              <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">TOTAL ORDERS</span>
-              <span className="text-xs font-black text-[#0F172A] dark:text-white">Logged Decrees</span>
+            <div className="min-w-0">
+              <span className="text-[8px] sm:text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block truncate">TOTAL ORDERS</span>
+              <span className="text-[11px] sm:text-xs font-black text-[#0F172A] dark:text-white truncate block">Logged Decrees</span>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl p-4 flex items-center gap-3.5 shadow-xs">
-            <div className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40 flex items-center justify-center font-black text-sm shrink-0">
+          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3.5 shadow-xs">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40 flex items-center justify-center font-black text-xs sm:text-sm shrink-0">
               {interimOrdersCount}
             </div>
-            <div>
-              <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">INTERIM ORDERS</span>
-              <span className="text-xs font-black text-[#0F172A] dark:text-white">Stay / Interim Decrees</span>
+            <div className="min-w-0">
+              <span className="text-[8px] sm:text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block truncate">INTERIM ORDERS</span>
+              <span className="text-[11px] sm:text-xs font-black text-[#0F172A] dark:text-white truncate block">Stay / Interim</span>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl p-4 flex items-center gap-3.5 shadow-xs">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/40 flex items-center justify-center font-black text-xs shrink-0">
-              <Calendar size={18} />
+          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3.5 shadow-xs">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900/40 flex items-center justify-center font-black text-xs shrink-0">
+              <Calendar size={16} />
             </div>
-            <div>
-              <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">LATEST ORDER</span>
-              <span className="text-xs font-black text-[#0F172A] dark:text-white">{latestOrderDate}</span>
+            <div className="min-w-0">
+              <span className="text-[8px] sm:text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block truncate">LATEST ORDER</span>
+              <span className="text-[11px] sm:text-xs font-black text-[#0F172A] dark:text-white truncate block">{latestOrderDate}</span>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl p-4 flex items-center gap-3.5 shadow-xs">
-            <div className="w-10 h-10 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40 flex items-center justify-center font-black text-sm shrink-0">
+          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3.5 shadow-xs">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40 flex items-center justify-center font-black text-xs sm:text-sm shrink-0">
               {totalPendingComplianceCount}
             </div>
-            <div>
-              <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">PENDING COMPLIANCE</span>
-              <span className="text-xs font-black text-[#0F172A] dark:text-white">Active Directives</span>
+            <div className="min-w-0">
+              <span className="text-[8px] sm:text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block truncate">COMPLIANCE</span>
+              <span className="text-[11px] sm:text-xs font-black text-[#0F172A] dark:text-white truncate block">Active Directives</span>
             </div>
           </div>
         </div>
 
         {/* C. SEARCH & MULTI-FILTER TOOLBAR */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+        <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 sm:p-4 shadow-xs">
           
           {/* Filter Chips */}
-          <div className="flex flex-wrap gap-1 bg-slate-100 dark:bg-[#0F172A] p-1.5 rounded-xl border border-slate-200/60 dark:border-slate-800">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 w-full md:w-auto shrink-0">
             {[
               'All',
               'Interim',
@@ -9723,10 +9729,10 @@ Through Counsel
               <button
                 key={chip}
                 onClick={() => setOrderFilterChip(chip)}
-                className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                   orderFilterChip === chip
                     ? 'bg-[#C8A34D] text-[#111111] shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-[#C8A34D]'
+                    : 'bg-slate-100 dark:bg-[#0F172A] text-slate-600 dark:text-slate-400 hover:text-[#C8A34D] border border-slate-200 dark:border-slate-800'
                 }`}
               >
                 {chip}
@@ -9735,8 +9741,8 @@ Through Counsel
           </div>
 
           {/* Search & Sort Controls */}
-          <div className="flex items-center gap-2 w-full md:w-auto">
-            <div className="relative w-full md:w-64">
+          <div className="flex items-center gap-2 w-full md:w-auto shrink-0">
+            <div className="relative flex-1 md:w-64">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
@@ -9759,12 +9765,12 @@ Through Counsel
         </div>
 
         {/* D. JUDICIAL ORDERS REPOSITORY GRID */}
-        <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between gap-2 flex-wrap pb-3 border-b border-slate-100 dark:border-slate-800">
             <h3 className="text-xs font-black text-[#0F172A] dark:text-white uppercase tracking-widest flex items-center gap-1.5">
               <FileCheck size={14} className="text-[#C8A34D]" /> JUDICIAL ORDERS REPOSITORY ({filteredOrders.length})
             </h3>
-            <span className="text-[10px] font-mono text-slate-400 font-bold">
+            <span className="text-[10px] font-mono text-slate-400 font-bold shrink-0 whitespace-nowrap">
               Official Case Decrees
             </span>
           </div>
@@ -9800,10 +9806,10 @@ Through Counsel
                   >
                     <div className="space-y-2">
                       <div className="flex justify-between items-start gap-2">
-                        <span className="px-2.5 py-0.5 bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 rounded-full text-[9px] font-mono font-bold uppercase">
+                        <span className="px-2.5 py-0.5 bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 rounded-full text-[9px] font-mono font-bold uppercase shrink-0 whitespace-nowrap">
                           {ord.metadata?.orderType || 'Interim Order'}
                         </span>
-                        <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
+                        <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-400 shrink-0 whitespace-nowrap">
                           <Clock size={11} />
                           <span>{ord.metadata?.orderDate || 'Recent'}</span>
                         </div>
@@ -9814,10 +9820,10 @@ Through Counsel
                         className="cursor-pointer space-y-1"
                       >
                         <h4 className="text-xs font-black text-[#0F172A] dark:text-white group-hover:text-[#C8A34D] transition-colors flex items-center justify-between">
-                          <span>{ord.name || ord.metadata?.orderType || 'Court Order'}</span>
-                          <ChevronRight size={14} className="text-slate-400 group-hover:text-[#C8A34D] group-hover:translate-x-0.5 transition-transform shrink-0" />
+                          <span className="line-clamp-1">{ord.name || ord.metadata?.orderType || 'Court Order'}</span>
+                          <ChevronRight size={14} className="text-slate-400 group-hover:text-[#C8A34D] group-hover:translate-x-0.5 transition-transform shrink-0 ml-1" />
                         </h4>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1.5">
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold flex items-center gap-1.5 flex-wrap">
                           <Building size={11} className="text-[#C8A34D] shrink-0" />
                           <span>{ord.metadata?.courtName || 'District Court'}</span>
                           {ord.metadata?.judgeName && (
@@ -9834,27 +9840,29 @@ Through Counsel
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between text-[10px]">
-                      <div className="flex items-center gap-2">
+                    <div className="pt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[11px]">
+                      {/* Badges */}
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         {pendingComp > 0 ? (
-                          <span className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40 rounded font-mono font-bold">
+                          <span className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40 rounded-lg font-mono font-bold text-[10px] whitespace-nowrap shrink-0">
                             ⚠️ {pendingComp} Pending Compliance
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40 rounded font-mono font-bold flex items-center gap-1">
+                          <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/40 rounded-lg font-mono font-bold text-[10px] flex items-center gap-1 whitespace-nowrap shrink-0">
                             <CheckCircle2 size={10} /> Compliance Clean
                           </span>
                         )}
 
-                        <span className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/40 rounded font-mono font-bold flex items-center gap-1">
-                          <Sparkles size={9} /> AI ANALYZED
+                        <span className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-900/40 rounded-lg font-mono font-bold text-[10px] flex items-center gap-1 whitespace-nowrap shrink-0">
+                          <Sparkles size={10} /> AI ANALYZED
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1">
+                      {/* Actions */}
+                      <div className="flex items-center gap-1.5 justify-end shrink-0">
                         <button
                           onClick={() => setSelectedCourtOrder(ord)}
-                          className="px-2.5 py-1 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-lg text-[10px] font-black uppercase cursor-pointer"
+                          className="flex-1 sm:flex-none px-3 py-1.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer whitespace-nowrap text-center shadow-xs"
                         >
                           View Order
                         </button>
@@ -10418,82 +10426,97 @@ Through Counsel
   return (
     <div className="flex-1 flex flex-col h-full bg-[#F8FAFC] dark:bg-[#0F172A] overflow-hidden select-text">
       {/* ─── Case Workspace Header ─── */}
-      <header className="border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#0F172A] shrink-0 px-5 py-2.5 shadow-xs">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
+      <header className="border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#111622] shrink-0 px-4 sm:px-6 py-3.5 sm:py-4 shadow-xs">
+        <div className="flex flex-col gap-3">
+          {/* Row 1: Back Button + Title + Badges */}
+          <div className="flex items-start gap-3 min-w-0">
             <button 
               onClick={handleBackToDashboard}
-              className="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1 cursor-pointer text-[11px] font-bold shrink-0"
+              className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-[#1A2333] hover:bg-[#C8A34D] hover:text-[#111111] text-slate-600 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-800 flex items-center justify-center cursor-pointer shrink-0 shadow-2xs mt-0.5"
               title="Back to My Matters"
             >
-              <ArrowLeft size={13} />
-              <span>Back to My Matters</span>
+              <ArrowLeft size={16} />
             </button>
             
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-black text-[#0F172A] dark:text-white tracking-tight leading-none flex items-center gap-1.5">
-                  <span className="text-sm">📁</span>
-                  <span>{caseData.name || 'Unspecified Case'}</span>
-                </h2>
-                <div className="flex items-center gap-1">
-                  <span className={`px-2 py-0.5 rounded-full text-[8px] font-mono font-bold uppercase tracking-wider border ${
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight leading-snug">
+                  {caseData.name || 'Unspecified Case'}
+                </h1>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border shrink-0 ${
                     caseData.status === 'Active' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/40' :
                     caseData.status === 'Closed' ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700' :
                     'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-900/40'
                   }`}>
                     {caseData.status || 'Active'}
                   </span>
-                  <span className={`px-2 py-0.5 rounded-full text-[8px] font-mono font-bold uppercase tracking-wider border ${
+                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border shrink-0 ${
                     caseData.priority === 'Urgent' || caseData.priority === 'Critical' || caseData.priority === 'High' ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-900/40' :
-                    'bg-[#C8A34D]/10 text-[#C8A34D] border-[#C8A34D]/30'
+                    'bg-[#C8A34D]/15 text-[#C8A34D] border-[#C8A34D]/30'
                   }`}>
                     {caseData.priority || 'Medium'}
                   </span>
                 </div>
               </div>
 
-              <p className="text-[10.5px] text-slate-500 dark:text-slate-400 font-medium flex flex-wrap items-center gap-1.5">
-                <span>Client: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.clientName || 'Client Profile'}</strong></span>
-                <span className="text-slate-300 dark:text-slate-700">•</span>
-                <span>Opponent: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.opponentName || caseData.accused || 'Opposite Party'}</strong></span>
-                <span className="text-slate-300 dark:text-slate-700">•</span>
-                <span>Court: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.courtName || 'District Court'}</strong></span>
-                <span className="text-slate-300 dark:text-slate-700">•</span>
-                <span>Case No: <strong className="text-[#0F172A] dark:text-white font-bold">{caseData.caseNumber || caseData.number || caseData.firNumber || 'Pending Filing'}</strong></span>
-              </p>
+              {/* Clean structured metadata pills */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="text-slate-400 text-[10px] font-bold uppercase">Client:</span>
+                  <span className="font-extrabold text-slate-800 dark:text-slate-200 truncate">{caseData.clientName || 'Not set'}</span>
+                </div>
+                <span className="text-slate-300 dark:text-slate-700 hidden xs:inline">•</span>
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="text-slate-400 text-[10px] font-bold uppercase">Opponent:</span>
+                  <span className="font-extrabold text-slate-800 dark:text-slate-200 truncate">{caseData.opponentName || caseData.accused || 'Not set'}</span>
+                </div>
+                <span className="text-slate-300 dark:text-slate-700 hidden xs:inline">•</span>
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="text-slate-400 text-[10px] font-bold uppercase">Court:</span>
+                  <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">{caseData.courtName || 'District Court'}</span>
+                </div>
+                <span className="text-slate-300 dark:text-slate-700 hidden xs:inline">•</span>
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="text-slate-400 text-[10px] font-bold uppercase">Case No:</span>
+                  <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">{caseData.caseNumber || caseData.number || caseData.firNumber || 'Pending Filing'}</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
+          {/* Row 2: Action Buttons */}
+          <div className="flex items-center justify-between sm:justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80 overflow-x-auto no-scrollbar">
             {aiPanel && (
               <button 
                 onClick={() => setIsAiPanelExpanded(!isAiPanelExpanded)}
-                className={`px-3 py-1.5 rounded-lg text-[11px] font-black transition-all border shadow-2xs flex items-center gap-1 cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all border shadow-2xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                   isAiPanelExpanded 
                     ? 'bg-[#C8A34D] border-[#C8A34D] text-[#111111] hover:bg-[#b08d3b]' 
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-[#C8A34D] bg-[#C8A34D]/10 border-[#C8A34D]/30'
+                    : 'hover:bg-[#C8A34D]/20 text-[#C8A34D] bg-[#C8A34D]/10 border-[#C8A34D]/30'
                 }`}
               >
-                <Sparkles size={12} className={isAiPanelExpanded ? 'text-[#111111]' : 'text-[#C8A34D]'} />
-                {isAiPanelExpanded ? 'Hide AI' : 'Show AI'}
+                <Sparkles size={13} className={isAiPanelExpanded ? 'text-[#111111]' : 'text-[#C8A34D]'} />
+                <span>{isAiPanelExpanded ? 'Hide AI Panel' : 'Show AI Assistant'}</span>
               </button>
             )}
-            <button 
-              onClick={handleExportSummary}
-              className="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-[11px] font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1 cursor-pointer"
-            >
-              <Download size={12} /> Export
-            </button>
-            <button 
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                toast.success("Secure sharing link copied to clipboard!");
-              }}
-              className="px-2.5 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-[11px] font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1 cursor-pointer"
-            >
-              <Share2 size={12} /> Share
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={handleExportSummary}
+                className="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              >
+                <Download size={13} /> <span>Export</span>
+              </button>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success("Secure sharing link copied to clipboard!");
+                }}
+                className="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-800 shadow-2xs flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              >
+                <Share2 size={13} /> <span>Share</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -10505,8 +10528,7 @@ Through Counsel
             e.currentTarget.scrollLeft += e.deltaY;
           }
         }}
-        className="shrink-0 border-b border-slate-200 dark:border-slate-800 bg-[#F8FAFC] dark:bg-[#0F172A] px-4 sm:px-6 py-2.5 overflow-x-auto custom-scrollbar flex items-center gap-1.5 select-none scroll-smooth w-full min-w-0"
-        style={{ scrollbarWidth: 'thin' }}
+        className="shrink-0 border-b border-slate-200 dark:border-slate-800 bg-[#F8FAFC] dark:bg-[#0F172A] px-4 sm:px-6 py-2.5 overflow-x-auto no-scrollbar scrollbar-hide flex items-center gap-1.5 select-none scroll-smooth w-full min-w-0"
       >
         {tabs.map((t) => {
           const isActive = activeTab === t.id;
@@ -10529,7 +10551,7 @@ Through Counsel
 
       {/* ─── Active Content Panel and Side AI Panel ─── */}
       <div className="flex-1 flex overflow-hidden min-h-0 relative w-full">
-        <main className="flex-1 p-4 sm:p-6 bg-[#F8FAFC] dark:bg-[#0F172A] overflow-y-auto custom-scrollbar min-w-0">
+        <main className="flex-1 p-3 sm:p-6 bg-[#F8FAFC] dark:bg-[#0F172A] overflow-y-auto no-scrollbar scrollbar-hide min-w-0 w-full max-w-full">
           {activeTab === 'overview' && renderOverview()}
           {activeTab === 'prediction' && renderPrediction()}
           {activeTab === 'timeline' && renderTimeline()}

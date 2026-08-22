@@ -350,7 +350,7 @@ export default function ProductGuideWorkspace() {
           <div className="h-5 w-[1px] bg-slate-200 dark:bg-zinc-700" />
 
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#C8A34D]/10 flex items-center justify-center border border-[#C8A34D]/30">
+            <div className="w-10 h-10 rounded-xl bg-[#C8A34D]/10 flex items-center justify-center border border-[#C8A34D]/30 shrink-0 aspect-square">
               <BookOpen className="w-5 h-5 text-[#C8A34D]" />
             </div>
             <div>

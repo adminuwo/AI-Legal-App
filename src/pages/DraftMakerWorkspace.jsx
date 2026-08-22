@@ -37,6 +37,7 @@ export default function DraftMakerWorkspace() {
 
   const handleSelectTemplate = (tmpl) => {
     setSelectedTemplate(tmpl);
+    toast.success(`Selected "${tmpl.title}" — Continue with Input Source`, { id: 'select-tmpl', duration: 2000 });
     setCurrentStep(2);
   };
 
@@ -476,33 +477,36 @@ THROUGH ADVOCATE`;
   return (
     <div className="min-h-screen bg-[#F5F5F5] dark:bg-[#111111] text-slate-900 dark:text-white font-sans flex flex-col">
       {/* HEADER BAR */}
-      <header className="sticky top-0 z-30 w-full bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-3.5 flex items-center justify-between shadow-sm shrink-0">
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => navigate('/dashboard/tools')}
-            className="p-2 rounded-xl bg-slate-100 dark:bg-[#1E293B] hover:bg-[#C8A34D]/20 text-slate-700 dark:text-slate-200 hover:text-[#C8A34D] transition-colors flex items-center gap-2 text-xs font-bold cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>AI Tools</span>
-          </button>
+      <header className="sticky top-0 z-30 w-full bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3 sm:py-3.5 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-sm shrink-0">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0 w-full md:w-auto justify-between md:justify-start">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <button 
+              onClick={() => navigate('/dashboard/tools')}
+              className="p-2 rounded-xl bg-slate-100 dark:bg-[#1E293B] hover:bg-[#C8A34D]/20 text-slate-700 dark:text-slate-200 hover:text-[#C8A34D] transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer shrink-0 border border-slate-200/80 dark:border-slate-800"
+              title="Back to AI Tools"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">AI Tools</span>
+            </button>
 
-          <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
+            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block shrink-0" />
 
-          <div>
-            <h1 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
-              <span>Draft Maker</span>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 uppercase">
-                Advocate Production Suite
-              </span>
-            </h1>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden md:block">
-              Generate professional legal drafts using AI from cases, uploaded documents, or manual information.
-            </p>
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-base font-black text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+                <span className="whitespace-nowrap">Draft Maker</span>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 uppercase whitespace-nowrap">
+                  Advocate Production Suite
+                </span>
+              </h1>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden md:block">
+                Generate professional legal drafts using AI from cases, uploaded documents, or manual information.
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Step Numbers Indicator */}
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-none shrink-0">
           {[
             { num: 1, label: 'Template' },
             { num: 2, label: 'Input Source' },
@@ -511,13 +515,32 @@ THROUGH ADVOCATE`;
           ].map(step => (
             <button
               key={step.num}
-              onClick={() => { if (step.num < currentStep) setCurrentStep(step.num); }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+              onClick={() => {
+                if (step.num === 1) {
+                  setCurrentStep(1);
+                } else if (step.num === 2) {
+                  setCurrentStep(2);
+                } else if (step.num === 3) {
+                  if (selectedTemplate) {
+                    setCurrentStep(3);
+                  } else {
+                    toast.error('Please select a template first');
+                  }
+                } else if (step.num === 4) {
+                  if (generatedDraftText) {
+                    setCurrentStep(4);
+                  } else {
+                    setCurrentStep(3);
+                    toast('Review your details and click Generate Draft to view Workspace', { icon: 'ℹ️' });
+                  }
+                }
+              }}
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 cursor-pointer ${
                 currentStep === step.num
-                  ? 'bg-[#C8A34D] text-[#111111] font-black shadow-md shadow-[#C8A34D]/20'
+                  ? 'bg-[#C8A34D] text-[#111111] font-black shadow-md shadow-[#C8A34D]/20 ring-2 ring-[#C8A34D]/50'
                   : currentStep > step.num
-                  ? 'bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 cursor-pointer hover:bg-[#C8A34D]/25'
-                  : 'bg-slate-100 dark:bg-[#1E293B] text-slate-400 cursor-not-allowed'
+                  ? 'bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 hover:bg-[#C8A34D]/25'
+                  : 'bg-slate-100 dark:bg-[#1E293B] text-slate-600 dark:text-slate-300 hover:text-[#C8A34D] hover:bg-slate-200 dark:hover:bg-[#25334a] border border-slate-200/80 dark:border-slate-800'
               }`}
             >
               <span>{step.num}. {step.label}</span>

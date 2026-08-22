@@ -448,40 +448,40 @@ export default function StrategyEngineWorkspace() {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 font-sans pb-16">
       
       {/* HEADER BAR */}
-      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 px-6 py-4 sticky top-0 z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3.5 sm:py-4 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             <button
               onClick={() => navigate('/dashboard/tools')}
-              className="p-2.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-600 dark:text-slate-300 hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 text-xs font-bold shadow-sm"
+              className="p-2 sm:p-2.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-600 dark:text-slate-300 hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 text-xs font-bold shadow-sm shrink-0"
               title="Back to AI Tools Suite"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Back to AI Tools</span>
             </button>
-            <div className="w-10 h-10 rounded-2xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D]">
+            <div className="w-10 h-10 rounded-2xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D] shrink-0 aspect-square">
               <Brain className="w-5 h-5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-base sm:text-xl font-black tracking-tight text-slate-900 dark:text-white whitespace-nowrap">
                   Strategy Engine
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[10px] font-extrabold uppercase tracking-wider">
+                <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider whitespace-nowrap border border-[#C8A34D]/30">
                   Litigation & Risk Engine
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1 sm:line-clamp-none">
                 Tactical litigation roadmap, opponent strategy prediction, evidence matrix, BSA compliance & risk mitigation.
               </p>
             </div>
           </div>
 
           {/* Header Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none shrink-0 w-full sm:w-auto justify-end">
             <button
               onClick={handleOpenSavedModal}
-              className="px-3.5 py-2 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 text-[#C8A34D] text-xs font-bold hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+              className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 text-[#C8A34D] text-xs font-bold hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer flex items-center gap-1.5 shadow-sm whitespace-nowrap"
               title="View Saved Strategies"
             >
               <HardDrive className="w-3.5 h-3.5" /> Saved Strategies
@@ -490,7 +490,7 @@ export default function StrategyEngineWorkspace() {
             {step !== 'INPUT_SELECT' && (
               <button
                 onClick={() => { setStep('INPUT_SELECT'); setUploadedFiles([]); }}
-                className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold hover:bg-slate-200 dark:hover:bg-[#242F42] transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold hover:bg-slate-200 dark:hover:bg-[#242F42] transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
               >
                 <RefreshCw className="w-3.5 h-3.5" /> Start New Strategy
               </button>

@@ -72,8 +72,8 @@ const MobileAppPage = lazy(() => import('./pages/MobileAppPage'));
 const isAuthenticated = () => {
   const tokenStr = localStorage.getItem('token');
   const userToken = getUserData()?.token;
-  return !!tokenStr && tokenStr !== 'undefined' && tokenStr !== 'null' && 
-         !!userToken && userToken !== 'undefined' && userToken !== 'null';
+  return !!tokenStr && tokenStr !== 'undefined' && tokenStr !== 'null' &&
+    !!userToken && userToken !== 'undefined' && userToken !== 'null';
 };
 
 // ------------------------------
@@ -238,7 +238,7 @@ const DashboardLayout = () => {
   // Re-evaluate user and token based on Recoil state changes or fallback to localStorage
   const user = currentUserData?.user || getUserData() || { name: 'Guest' };
   const token = currentUserData?.user?.token || getUserData()?.token;
-  
+
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -246,18 +246,22 @@ const DashboardLayout = () => {
   const currentMode = useRecoilValue(activeModeData);
   const selectedLegalTool = useRecoilValue(activeLegalToolData);
   const legalView = useRecoilValue(legalViewData);
-  const isMobile = window.innerWidth < 768;
   const searchParams = new URLSearchParams(location.search);
   const tool = searchParams.get("tool");
+  const isToolWorkspaceRoute = location.pathname.startsWith('/dashboard/tools/') && location.pathname !== '/dashboard/tools';
+  const isCaseDetailRoute = location.pathname.startsWith('/dashboard/case');
+  const isChatRoute = location.pathname.startsWith('/dashboard/chat');
   const hideNavbarTools = ["legal_my_case", "legal_precedents", "my-case", "legal-precedents"];
 
-  // Jaha navbar NAHI chahiye
+  // Jaha global navbar NAHI chahiye (bcz they have their own dedicated integrated header)
   const isHiddenTool =
     currentMode === 'LEGAL_TOOLKIT' ||
-    hideNavbarTools.includes(tool) ||
-    location.pathname === '/dashboard/cases';
+    (tool && hideNavbarTools.includes(tool)) ||
+    isToolWorkspaceRoute ||
+    isCaseDetailRoute ||
+    isChatRoute;
 
-  // Navbar is hidden if it's a restricted tool view, regardless of device.
+  // Navbar is hidden if it's a restricted tool view, individual tool workspace, case workspace or chat route.
   const allowNavbar = !isHiddenTool;
 
   const showOnScroll = useScrollNavbar();
@@ -322,32 +326,46 @@ const DashboardLayout = () => {
 
       <div className="flex-1 flex flex-col min-w-0 bg-transparent h-full relative">
 
-        {/* ─── FINAL RENDER (Navbar) ─── */}
+        {/* ─── Mobile Top Header Bar ─── */}
         {allowNavbar && !isFullScreen && !isSidebarOpen && !tglState.focusMode && (
-          <div
-            className={`navbar fixed top-0 left-0 right-0 z-[1001] transition-transform duration-300 lg:left-[280px]
-              ${showOnScroll ? "translate-y-0" : "-translate-y-full"}`}
+          <header
+            className="navbar lg:hidden fixed top-0 left-0 right-0 z-[1001] bg-white/95 dark:bg-[#0F172A]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800"
           >
-            <div className="flex items-center justify-between lg:justify-end px-6 py-3 bg-transparent shrink-0">
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setIsSidebarOpen(true)}
-                className="lg:hidden w-10 h-10 flex items-center justify-center bg-transparent rounded-xl border border-transparent text-primary"
-              >
-                <Menu className="w-6 h-6 stroke-[2.5]" />
-              </motion.button>
+            <div className="flex items-center justify-between px-3.5 sm:px-6 h-13">
+              <div className="flex items-center gap-2.5">
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-zinc-800 rounded-xl border border-slate-200/80 dark:border-zinc-700 text-slate-900 dark:text-zinc-100 hover:text-[#C8A34D] transition-colors cursor-pointer"
+                  title="Open Sidebar"
+                >
+                  <Menu className="w-5 h-5 stroke-[2.2]" />
+                </motion.button>
 
+                <div className="flex items-center gap-1.5">
+                  <img src="/logo/logo_gold_emblem.png" alt="AI Legal" className="w-5 h-5 object-contain" />
+                  <span className="font-extrabold text-sm text-slate-900 dark:text-white tracking-tight">AI Legal™</span>
+                </div>
+              </div>
 
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsNotifOpen(true)}
+                  className="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-zinc-800 rounded-xl border border-slate-200/80 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 hover:text-[#C8A34D] transition-colors cursor-pointer"
+                  title="Notifications"
+                >
+                  <Bell className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          </div>
+          </header>
         )}
 
         <NotificationCenter isOpen={isNotifOpen} onClose={() => setIsNotifOpen(false)} />
         {/* Outlet for pages */}
         <main
           ref={mainRef}
-          className={`flex-1 ${(location.pathname.includes('/chat') || (location.pathname.includes('/case') && !location.pathname.includes('case-predictor'))) ? 'overflow-hidden' : 'overflow-y-auto'} relative w-full scroll-smooth p-0 scrollbar-hide transition-all duration-300 ease-in-out`}
-          style={{ paddingTop: '0px' }}
+          className={`flex-1 ${(location.pathname.includes('/chat') || (location.pathname.startsWith('/dashboard/case/') && !location.pathname.includes('case-predictor'))) ? 'overflow-hidden' : 'overflow-y-auto'} ${allowNavbar ? 'pt-13 lg:pt-0' : 'pt-0'} relative w-full scroll-smooth p-0 scrollbar-hide transition-all duration-300 ease-in-out`}
         >
           <Suspense fallback={
             <div className="flex h-full w-full items-center justify-center bg-transparent">
@@ -480,160 +498,160 @@ const NavigateProvider = () => {
         <CreditUpsellPopup />
         <CookieConsentBanner />
         <Routes>
-        {/* Public Routes */}
-        <Route path={AppRoute.LANDING} element={<HomeRedirect />} />
-        <Route path="/splash" element={<SplashScreen />} />
-        <Route path="/onboarding" element={<GuestRoute><Onboarding /></GuestRoute>} />
-        <Route path={AppRoute.LOGIN} element={<GuestRoute><Login /></GuestRoute>} />
-        <Route path={AppRoute.SIGNUP} element={<GuestRoute><Signup /></GuestRoute>} />
+          {/* Public Routes */}
+          <Route path={AppRoute.LANDING} element={<HomeRedirect />} />
+          <Route path="/splash" element={<SplashScreen />} />
+          <Route path="/onboarding" element={<GuestRoute><Onboarding /></GuestRoute>} />
+          <Route path={AppRoute.LOGIN} element={<GuestRoute><Login /></GuestRoute>} />
+          <Route path={AppRoute.SIGNUP} element={<GuestRoute><Signup /></GuestRoute>} />
 
-        <Route path={AppRoute.E_Verification} element={<VerificationForm />} />
-        <Route path={AppRoute.FORGOT_PASSWORD} element={<ForgotPassword />} />
-        <Route path={AppRoute.RESET_PASSWORD} element={<ResetPassword />} />
+          <Route path={AppRoute.E_Verification} element={<VerificationForm />} />
+          <Route path={AppRoute.FORGOT_PASSWORD} element={<ForgotPassword />} />
+          <Route path={AppRoute.RESET_PASSWORD} element={<ResetPassword />} />
 
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms-of-service" element={<TermsOfService />} />
-        <Route path="/terms" element={<TermsOfService />} />
-        <Route path="/cookie-policy" element={<CookiePolicy />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/legal-pricing" element={<LegalPricingPortal />} />
-        <Route path="/subscription-checkout" element={<LegalPricingPortal />} />
-        <Route path="/share/:shareId" element={<SharedChat />} />
-        <Route path="/mobile-app" element={<Navigate to="/dashboard/mobile-app" replace />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/cookie-policy" element={<CookiePolicy />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/legal-pricing" element={<LegalPricingPortal />} />
+          <Route path="/subscription-checkout" element={<LegalPricingPortal />} />
+          <Route path="/share/:shareId" element={<SharedChat />} />
+          <Route path="/mobile-app" element={<Navigate to="/dashboard/mobile-app" replace />} />
 
-        {/* Dashboard (Protected) */}
-        <Route
-          path={AppRoute.DASHBOARD}
-          element={<DashboardLayout />}
-        >
-          <Route index element={<HomeDashboard />} />
-          <Route path="chat" element={<Navigate to="new" replace state={{ forceGlobal: true }} />} />
-          <Route path="chat/:sessionId" element={<LegalWorkspace />} />
-          <Route path="cases" element={<LegalWorkspace />} />
-          <Route path="cases/:caseId" element={<LegalWorkspace />} />
-          <Route path="case/:caseId" element={<LegalWorkspace />} />
-          <Route path="social-agent" element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />
-          <Route path="ai-personal-assistant" element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />
-          <Route path="ai-base" element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />
+          {/* Dashboard (Protected) */}
+          <Route
+            path={AppRoute.DASHBOARD}
+            element={<DashboardLayout />}
+          >
+            <Route index element={<HomeDashboard />} />
+            <Route path="chat" element={<Navigate to="new" replace state={{ forceGlobal: true }} />} />
+            <Route path="chat/:sessionId" element={<LegalWorkspace />} />
+            <Route path="cases" element={<LegalWorkspace />} />
+            <Route path="cases/:caseId" element={<LegalWorkspace />} />
+            <Route path="case/:caseId" element={<LegalWorkspace />} />
+            <Route path="social-agent" element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />
+            <Route path="ai-personal-assistant" element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />
+            <Route path="ai-base" element={<Navigate to="chat/new" replace state={{ forceGlobal: true }} />} />
 
-          <Route path="admin" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}>
-              <AdminDashboard />
-            </Suspense>
-          } />
-          <Route path="security" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}>
-              <SecurityAndGuidelines />
-            </Suspense>
-          } />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="profile" element={<SettingsPage />} />
-          <Route path="guide" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Product Guide...</div>}>
-              <ProductGuideWorkspace />
-            </Suspense>
-          } />
-          <Route path="tools/product-guide" element={<Navigate to="/dashboard/guide" replace />} />
-          <Route path="product-guide" element={<Navigate to="/dashboard/guide" replace />} />
-          <Route path="tools/knowledge-hub" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Knowledge Hub...</div>}>
-              <KnowledgeHubWorkspace />
-            </Suspense>
-          } />
-          <Route path="knowledge-hub" element={<Navigate to="/dashboard/tools/knowledge-hub" replace />} />
-          <Route path="tools" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Tools...</div>}>
-              <AiToolsPage />
-            </Suspense>
-          } />
-          <Route path="tools/draft-maker" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Draft Maker...</div>}>
-              <DraftMakerWorkspace />
-            </Suspense>
-          } />
-          <Route path="draft-maker" element={<Navigate to="/dashboard/tools/draft-maker" replace />} />
-          <Route path="tools/argument-builder" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Argument Builder...</div>}>
-              <ArgumentBuilderWorkspace />
-            </Suspense>
-          } />
-          <Route path="argument-builder" element={<Navigate to="/dashboard/tools/argument-builder" replace />} />
-          <Route path="tools/legal-precedents" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Legal Precedents...</div>}>
-              <LegalPrecedentsWorkspace />
-            </Suspense>
-          } />
-          <Route path="legal-precedents" element={<Navigate to="/dashboard/tools/legal-precedents" replace />} />
-          <Route path="tools/evidence-analyst" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Evidence Analyst...</div>}>
-              <EvidenceAnalystWorkspace />
-            </Suspense>
-          } />
-          <Route path="evidence-analyst" element={<Navigate to="/dashboard/tools/evidence-analyst" replace />} />
-          <Route path="tools/contract-analyzer" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Contract Analyzer...</div>}>
-              <ContractAnalyzerWorkspace />
-            </Suspense>
-          } />
-          <Route path="contract-analyzer" element={<Navigate to="/dashboard/tools/contract-analyzer" replace />} />
-          <Route path="tools/case-predictor" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Case Predictor...</div>}>
-              <CasePredictorWorkspace />
-            </Suspense>
-          } />
-          <Route path="case-predictor" element={<Navigate to="/dashboard/tools/case-predictor" replace />} />
-          <Route path="tools/strategy-engine" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Strategy Engine...</div>}>
-              <StrategyEngineWorkspace />
-            </Suspense>
-          } />
-          <Route path="strategy-engine" element={<Navigate to="/dashboard/tools/strategy-engine" replace />} />
-          <Route path="tools/mock-courtroom" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Mock Courtroom...</div>}>
-              <MockCourtroomWorkspace />
-            </Suspense>
-          } />
-          <Route path="mock-courtroom" element={<Navigate to="/dashboard/tools/mock-courtroom" replace />} />
-          <Route path="tools/client-connect" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Client Connect...</div>}>
-              <ClientConnectWorkspace />
-            </Suspense>
-          } />
-          <Route path="client-connect" element={<Navigate to="/dashboard/tools/client-connect" replace />} />
-          <Route path="tools/quiz-practice" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Quiz & MCQ Practice...</div>}>
-              <QuizPracticeWorkspace />
-            </Suspense>
-          } />
-          <Route path="quiz-practice" element={<Navigate to="/dashboard/tools/quiz-practice" replace />} />
-          <Route path="tools/notes-maker" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Notes Maker...</div>}>
-              <NotesMakerWorkspace />
-            </Suspense>
-          } />
-          <Route path="notes-maker" element={<Navigate to="/dashboard/tools/notes-maker" replace />} />
-          <Route path="knowledge-vault" element={<PlaceholderPage title="Knowledge Vault" />} />
-          <Route path="court-diary" element={<PlaceholderPage title="Court Diary" />} />
-          <Route path="templates" element={<PlaceholderPage title="Templates" />} />
-          <Route path="calculator" element={<PlaceholderPage title="Legal Calculator" />} />
-          <Route path="downloads" element={<PlaceholderPage title="Downloads" />} />
-          <Route path="bookmarks" element={<PlaceholderPage title="Bookmarks" />} />
-          <Route path="mobile-app" element={
-            <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Mobile App Ecosystem...</div>}>
-              <MobileAppPage />
-            </Suspense>
-          } />
-          <Route path="help-support" element={<HelpSupport />} />
-        </Route>
-
-
-        {/* Vendor Dashboard Routes (Public for MVP/Testing) */}
+            <Route path="admin" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}>
+                <AdminDashboard />
+              </Suspense>
+            } />
+            <Route path="security" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full">Loading...</div>}>
+                <SecurityAndGuidelines />
+              </Suspense>
+            } />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="profile" element={<SettingsPage />} />
+            <Route path="guide" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Product Guide...</div>}>
+                <ProductGuideWorkspace />
+              </Suspense>
+            } />
+            <Route path="tools/product-guide" element={<Navigate to="/dashboard/guide" replace />} />
+            <Route path="product-guide" element={<Navigate to="/dashboard/guide" replace />} />
+            <Route path="tools/knowledge-hub" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Knowledge Hub...</div>}>
+                <KnowledgeHubWorkspace />
+              </Suspense>
+            } />
+            <Route path="knowledge-hub" element={<Navigate to="/dashboard/tools/knowledge-hub" replace />} />
+            <Route path="tools" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Tools...</div>}>
+                <AiToolsPage />
+              </Suspense>
+            } />
+            <Route path="tools/draft-maker" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Draft Maker...</div>}>
+                <DraftMakerWorkspace />
+              </Suspense>
+            } />
+            <Route path="draft-maker" element={<Navigate to="/dashboard/tools/draft-maker" replace />} />
+            <Route path="tools/argument-builder" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Argument Builder...</div>}>
+                <ArgumentBuilderWorkspace />
+              </Suspense>
+            } />
+            <Route path="argument-builder" element={<Navigate to="/dashboard/tools/argument-builder" replace />} />
+            <Route path="tools/legal-precedents" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Legal Precedents...</div>}>
+                <LegalPrecedentsWorkspace />
+              </Suspense>
+            } />
+            <Route path="legal-precedents" element={<Navigate to="/dashboard/tools/legal-precedents" replace />} />
+            <Route path="tools/evidence-analyst" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Evidence Analyst...</div>}>
+                <EvidenceAnalystWorkspace />
+              </Suspense>
+            } />
+            <Route path="evidence-analyst" element={<Navigate to="/dashboard/tools/evidence-analyst" replace />} />
+            <Route path="tools/contract-analyzer" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Contract Analyzer...</div>}>
+                <ContractAnalyzerWorkspace />
+              </Suspense>
+            } />
+            <Route path="contract-analyzer" element={<Navigate to="/dashboard/tools/contract-analyzer" replace />} />
+            <Route path="tools/case-predictor" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Case Predictor...</div>}>
+                <CasePredictorWorkspace />
+              </Suspense>
+            } />
+            <Route path="case-predictor" element={<Navigate to="/dashboard/tools/case-predictor" replace />} />
+            <Route path="tools/strategy-engine" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Strategy Engine...</div>}>
+                <StrategyEngineWorkspace />
+              </Suspense>
+            } />
+            <Route path="strategy-engine" element={<Navigate to="/dashboard/tools/strategy-engine" replace />} />
+            <Route path="tools/mock-courtroom" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Mock Courtroom...</div>}>
+                <MockCourtroomWorkspace />
+              </Suspense>
+            } />
+            <Route path="mock-courtroom" element={<Navigate to="/dashboard/tools/mock-courtroom" replace />} />
+            <Route path="tools/client-connect" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Client Connect...</div>}>
+                <ClientConnectWorkspace />
+              </Suspense>
+            } />
+            <Route path="client-connect" element={<Navigate to="/dashboard/tools/client-connect" replace />} />
+            <Route path="tools/quiz-practice" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Quiz & MCQ Practice...</div>}>
+                <QuizPracticeWorkspace />
+              </Suspense>
+            } />
+            <Route path="quiz-practice" element={<Navigate to="/dashboard/tools/quiz-practice" replace />} />
+            <Route path="tools/notes-maker" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading AI Notes Maker...</div>}>
+                <NotesMakerWorkspace />
+              </Suspense>
+            } />
+            <Route path="notes-maker" element={<Navigate to="/dashboard/tools/notes-maker" replace />} />
+            <Route path="knowledge-vault" element={<PlaceholderPage title="Knowledge Vault" />} />
+            <Route path="court-diary" element={<PlaceholderPage title="Court Diary" />} />
+            <Route path="templates" element={<PlaceholderPage title="Templates" />} />
+            <Route path="calculator" element={<PlaceholderPage title="Legal Calculator" />} />
+            <Route path="downloads" element={<PlaceholderPage title="Downloads" />} />
+            <Route path="bookmarks" element={<PlaceholderPage title="Bookmarks" />} />
+            <Route path="mobile-app" element={
+              <Suspense fallback={<div className="flex items-center justify-center h-full text-slate-400">Loading Mobile App Ecosystem...</div>}>
+                <MobileAppPage />
+              </Suspense>
+            } />
+            <Route path="help-support" element={<HelpSupport />} />
+          </Route>
 
 
-        {/* Catch All */}
-      </Routes>
-    </SSOInterceptor>
-  </SubscriptionProvider>
+          {/* Vendor Dashboard Routes (Public for MVP/Testing) */}
+
+
+          {/* Catch All */}
+        </Routes>
+      </SSOInterceptor>
+    </SubscriptionProvider>
   );
 };
 

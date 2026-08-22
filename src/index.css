@@ -579,27 +579,17 @@ body {
   background: rgba(99, 102, 241, 0.45);
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
-}
-
+.no-scrollbar::-webkit-scrollbar,
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;
-  /* Chrome, Safari and Opera */
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.no-scrollbar,
+.scrollbar-hide {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 /* Chat Container - Ensures scrollability in all modes */
@@ -1670,9 +1660,9 @@ html.lenis body {
     padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
   }
 
-  /* Prevent overlapping of fixed navbar — 76px clears the 64px mobile header */
-  .chatgpt-container:not(.no-top-padding) {
-    padding-top: 76px !important;
+  /* Prevent overlapping of fixed navbar — only apply when not handling own integrated header */
+  .chatgpt-container.has-global-nav {
+    padding-top: 64px !important;
   }
 }
 
@@ -2122,14 +2112,24 @@ body.modal-open-hide-navbar {
   }
 }
 
-/* ── 6. Main flex area — overflow clipped, flex column ──
+/* ── 6. Main flex area — allow scroll when overflow-y-auto is set ──
    Scoped to #aisa-app-root to avoid breaking public page main containers */
 @media (max-width: 1023px) {
   #aisa-app-root main {
-    overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
     min-height: 0 !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  #aisa-app-root main.overflow-y-auto {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior-y: contain !important;
+  }
+
+  #aisa-app-root main.overflow-hidden {
+    overflow: hidden !important;
   }
 
   .flex-1 {
