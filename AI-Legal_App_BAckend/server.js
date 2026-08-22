@@ -132,6 +132,8 @@ const STATIC_CORS_ORIGINS = [
   'https://uwo24.com',
   'https://www.uwo24.com',
   'https://aisa.uwo24.com',
+  'https://ailegal.aisa24.com',
+  'https://www.ailegal.aisa24.com',
   'https://api.ailegal.com',
   'http://localhost:8080',
   'http://localhost:3000',
@@ -139,12 +141,12 @@ const STATIC_CORS_ORIGINS = [
   'http://localhost:19006',
   'http://localhost:8081',
   'http://127.0.0.1:8080',
-  'http://127.0.0.1:3000',
-  'https://ailegal.aisa24.com'
+  'http://127.0.0.1:3000'
 ];
 
 const ALLOWED_DOMAIN_PATTERNS = [
   /\.uwo24\.com$/,
+  /\.aisa24\.com$/,
   /\.run\.app$/,
   /\.vercel\.app$/,
   /\.netlify\.app$/,
