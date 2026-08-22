@@ -243,7 +243,8 @@ export class AuthService extends BaseService {
     user.lockoutUntil = undefined;
     user.lastLoginAt = new Date();
 
-    if (user.email && user.email.toLowerCase().trim() === 'aditi@uwo24.com') {
+    const emailLower = (user.email || '').toLowerCase().trim();
+    if (emailLower === 'aditi@uwo24.com' || emailLower === 'aditilakhera0@gmail.com') {
       user.role = 'SUPER_ADMIN';
     } else if (user.role === 'SUPER_ADMIN' || user.role === 'admin') {
       user.role = 'user';

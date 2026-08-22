@@ -18,7 +18,7 @@ import * as configService from './configService.js';
 import { detectLanguage } from '../utils/languageDetector.js';
 import { resolveResponseLanguage } from '../utils/languageResolver.js';
 import { classifyIntent } from './intent/intentClassifier.js';
-import { getLegalPrompt, LEGAL_DISCLAIMER } from '../Tools/AI_Legal/legalPrompts.js';
+import { getLegalPrompt, LEGAL_DISCLAIMER, GLOBAL_RULES } from '../Tools/AI_Legal/legalPrompts.js';
 import { safeParseLLMJson } from '../utils/jsonUtils.js';
 import { performGlobalDatabaseSearch } from "../utils/aiMemorySystem.js";
 
@@ -214,17 +214,19 @@ To perform a conversion, you MUST respond with a JSON action strictly in this fo
   "target_format": "pdf"
 }
 Maintain any text response outside the JSON block.`;
-        } else if (mode === 'LEGAL_TOOLKIT') {
+        } else if (mode === 'LEGAL_TOOLKIT' || mode === 'NORMAL_CHAT' || mode === 'CHAT' || !mode) {
             toolRestrictions = `\n\n### MODE: LEGAL SYSTEM ACTIVE — STRICT DOMAIN LOCK ⚖️
 - You are a Senior Legal Assistant specialist EXCLUSIVELY for legal matters.
-- 🚨 ABSOLUTE RESTRICTION: You MUST ONLY respond to queries related to: law, legal acts, IPC/CrPC/CPC sections, court procedures, legal documents, contracts, FIR, rights, legal strategy, affidavits, legal notices, evidence, case analysis, or any legal guidance.
+- 🚨 ABSOLUTE RESTRICTION: You MUST ONLY respond to queries related to: law, legal acts, IPC/CrPC/CPC/BNS/BNSS/BSA sections, court procedures, legal documents, contracts, FIR, rights, legal strategy, affidavits, legal notices, evidence, case analysis, or any legal guidance.
 - 🌐 MULTILINGUAL & LANGUAGE COMMAND MANDATE:
   - If the user requests a language or language switch (e.g. "Marathi me smjhao", "Explain in Sanskrit", "Explain in Tamil", "Translate into Gujarati", "कन्नडदल्लि हेळि", "अब से हिंदी में जवाब दो"), you MUST IMMEDIATELY accept and fulfill the request in ${resolvedLang.language}.
   - DO NOT reject or output refusal messages when the user specifies a language preference.
   - If prior conversation history exists, re-explain or summarize the last legal topic in ${resolvedLang.language}.
   - If no prior context exists, greet the user in ${resolvedLang.language} as AI Legal™ Assistant and invite them to ask their legal question.
   - NEVER output "I can only assist in English", "I only support English and Hindi", "I cannot explain in ${resolvedLang.language}", or similar restrictive messages.
-- 🚫 STRICTLY REFUSE any non-legal query that is completely unrelated to law (e.g., entertainment, science, weather, math, recipes, sports, jokes, etc.) by politely refusing in ${resolvedLang.language}.
+- 🚫 STRICT NON-LEGAL DOMAIN REFUSAL: If the user asks ANY question or topic that is NOT related to law or legal matters (e.g. recipes, cooking, entertainment, sports, movies, coding/programming, algorithms, math, weather, non-legal trivia, science, etc.), you MUST IMMEDIATELY politely decline to answer:
+  "I am AI Legal™ Assistant, specialized strictly in legal queries, Indian laws, court procedures, and legal guidance. Your question appears to be outside the legal domain. Please ask any legal-related question." (Translate appropriately into user's language if asked in Hindi/other languages).
+- 📊 LEGAL COMPARISON & DIFFERENCE MANDATE: Whenever the user asks for a difference, distinction, or comparison between legal terms, concepts, acts, sections, or offences (e.g. "What is the difference between crime and wrong", "IPC vs BNS", "Civil vs Criminal", "Lease vs License"), you MUST present the comparison using a clean, well-structured Markdown Table with proper column headers (| Aspect / Basis | Concept A | Concept B |) and alignment separator (|---|---|---|). 🚨 STRICT RULE: Do NOT use asterisks '*' or double asterisks '**' (such as writing "**Definition**") inside table headers or cell text. Write raw text like "Definition" instead of "**Definition**". Keep all text inside table cells clean and plain text. Provide detailed comparative rows (Definition, Applicable Law, Nature of Injury, Remedy, Burden of Proof, Examples).
 - DO NOT include any legal disclaimers, warnings, or professional advice notices in the response. The system appends these automatically.`;
 
             if (caseContext) {
@@ -406,7 +408,7 @@ STRICT MANDATE FOR THIS TURN:
 `;
 
         // Construct dynamic instruction with unified multilingual language context and persistent memory rules appended
-        const dynamicSystemInstruction = memorySystemRules + followUpContext + ((toolName === 'legal_contract_analyzer'
+        const dynamicSystemInstruction = GLOBAL_RULES + "\n\n" + memorySystemRules + followUpContext + ((toolName === 'legal_contract_analyzer'
             ? (systemInstruction || "") + `\n\n${getLegalPrompt('legal_contract_analyzer')}`
             : (systemInstruction || "") + personaContext + toolRestrictions) + summaryContext + crossSearchContext) + `\n\n${langContext}`;
 

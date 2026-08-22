@@ -332,8 +332,9 @@ export const normalizeWorkspace = (ws) => {
 export const resolveActiveUserPlan = async (user, targetWorkspace) => {
     if (!user) return 'FREE';
 
-    // SUPER_ADMIN: Permanent unlimited access — bypass all subscription logic strictly for aditi@uwo24.com
-    if (user.role === 'SUPER_ADMIN' && user.email && user.email.toLowerCase().trim() === 'aditi@uwo24.com') {
+    // SUPER_ADMIN: Permanent unlimited access — bypass all subscription logic strictly for aditi@uwo24.com and aditilakhera0@gmail.com
+    const emailLower = (user.email || '').toLowerCase().trim();
+    if (user.role === 'SUPER_ADMIN' && (emailLower === 'aditi@uwo24.com' || emailLower === 'aditilakhera0@gmail.com')) {
         return 'SUPER_ADMIN';
     }
 
@@ -1119,8 +1120,9 @@ export const getUsageStatus = async (userId, targetWorkspace) => {
         return { plan: 'FREE', badge: 'FREE', cases: { used: 0, limit: 3, remaining: 3 }, features: {} };
     }
 
-    // Auto-heal/verify role strictly for aditi@uwo24.com
-    if (user.email && user.email.toLowerCase().trim() === 'aditi@uwo24.com') {
+    // Auto-heal/verify role strictly for aditi@uwo24.com and aditilakhera0@gmail.com
+    const emailLower = (user.email || '').toLowerCase().trim();
+    if (emailLower === 'aditi@uwo24.com' || emailLower === 'aditilakhera0@gmail.com') {
         if (user.role !== 'SUPER_ADMIN') {
             user.role = 'SUPER_ADMIN';
             await user.save();
@@ -1129,7 +1131,7 @@ export const getUsageStatus = async (userId, targetWorkspace) => {
     } else if (user.role === 'SUPER_ADMIN' || user.role === 'admin') {
         user.role = 'user';
         await user.save();
-        console.log(`[Role Fix] Reset ${user.email} role from ${user.role} to 'user' in getUsageStatus`);
+        console.log(`[Self-Healing] Reset non-aditi account ${user.email} to user role`);
     }
 
     const storageStats = await getUserStorageUsage(userId);

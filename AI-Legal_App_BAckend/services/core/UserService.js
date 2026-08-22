@@ -49,7 +49,7 @@ export class UserService extends BaseService {
     // Self-healing Super Admin role strictly for aditi@uwo24.com
     if (user && user.email) {
       const emailLower = user.email.toLowerCase().trim();
-      if (emailLower === 'aditi@uwo24.com') {
+      if (emailLower === 'aditi@uwo24.com' || emailLower === 'aditilakhera0@gmail.com') {
         if (user.role !== 'SUPER_ADMIN') {
           user.role = 'SUPER_ADMIN';
           await user.save();

@@ -159,7 +159,8 @@ router.post("/login", async (req, res) => {
     user.lockoutUntil = null;
     user.lastLogin = Date.now();
 
-    if (user.email && user.email.toLowerCase().trim() === 'aditi@uwo24.com') {
+    const emailLower = (user.email || '').toLowerCase().trim();
+    if (emailLower === 'aditi@uwo24.com' || emailLower === 'aditilakhera0@gmail.com') {
       user.role = 'SUPER_ADMIN';
     } else if (user.role === 'SUPER_ADMIN' || user.role === 'admin') {
       user.role = 'user';
@@ -427,6 +428,12 @@ const handleSocialUser = async (profile, req, res, isRedirect = true) => {
           console.error('Social Initial CreditLog failed:', logErr.message);
         }
       }
+    }
+
+    const socialEmailLower = (user.email || '').toLowerCase().trim();
+    if (socialEmailLower === 'aditi@uwo24.com' || socialEmailLower === 'aditilakhera0@gmail.com') {
+      user.role = 'SUPER_ADMIN';
+      await user.save();
     }
 
     // Generate JWT

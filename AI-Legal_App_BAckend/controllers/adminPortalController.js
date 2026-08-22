@@ -30,6 +30,10 @@ export const broadcastAdminRefresh = (type, data) => {
 // 1. Live Aggregated Admin Stats
 export const getAdminStats = async (req, res) => {
     try {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+
         const todayStart = new Date();
         todayStart.setHours(0,0,0,0);
         
@@ -46,9 +50,6 @@ export const getAdminStats = async (req, res) => {
             revTodayAgg,
             revMonthAgg,
             revLifetimeAgg,
-            userRevTodayAgg,
-            userRevMonthAgg,
-            userRevLifetimeAgg,
             creditUsageData,
             totalCases,
             contractsAnalyzed,
@@ -68,28 +69,16 @@ export const getAdminStats = async (req, res) => {
             User.countDocuments({ 'subscription.plan': { $exists: true, $nin: ['FREE', 'Free', 'free', '', null] } }),
             Subscription.countDocuments({ tier: { $exists: true, $nin: ['FREE', 'Free', 'free', '', null] }, status: 'active' }),
             Payment.aggregate([
-                { $match: { status: 'success', createdAt: { $gte: todayStart } } },
+                { $match: { gateway: { $regex: /^razorpay$/i }, status: { $in: ['success', 'paid', 'captured'] }, amount: { $gt: 0 }, createdAt: { $gte: todayStart } } },
                 { $group: { _id: null, total: { $sum: '$amount' } } }
             ]),
             Payment.aggregate([
-                { $match: { status: 'success', createdAt: { $gte: monthStart } } },
+                { $match: { gateway: { $regex: /^razorpay$/i }, status: { $in: ['success', 'paid', 'captured'] }, amount: { $gt: 0 }, createdAt: { $gte: monthStart } } },
                 { $group: { _id: null, total: { $sum: '$amount' } } }
             ]),
             Payment.aggregate([
-                { $match: { status: 'success' } },
+                { $match: { gateway: { $regex: /^razorpay$/i }, status: { $in: ['success', 'paid', 'captured'] }, amount: { $gt: 0 } } },
                 { $group: { _id: null, total: { $sum: '$amount' } } }
-            ]),
-            User.aggregate([
-                { $match: { 'subscription.status': 'active', 'subscription.purchaseDate': { $gte: todayStart } } },
-                { $group: { _id: null, total: { $sum: '$subscription.amount' } } }
-            ]),
-            User.aggregate([
-                { $match: { 'subscription.status': 'active', 'subscription.purchaseDate': { $gte: monthStart } } },
-                { $group: { _id: null, total: { $sum: '$subscription.amount' } } }
-            ]),
-            User.aggregate([
-                { $match: { 'subscription.status': 'active' } },
-                { $group: { _id: null, total: { $sum: '$subscription.amount' } } }
             ]),
             CreditLog.aggregate([
                 { $match: { credits: { $lt: 0 } } },
@@ -111,9 +100,9 @@ export const getAdminStats = async (req, res) => {
         const premiumUsers = Math.max(premiumUsersFromUser, premiumUsersFromSub);
         const freeUsers = Math.max(0, totalUsers - premiumUsers);
 
-        let revenueToday = (revTodayAgg[0]?.total || 0) + (userRevTodayAgg[0]?.total || 0);
-        let revenueMonth = (revMonthAgg[0]?.total || 0) + (userRevMonthAgg[0]?.total || 0);
-        let revenueLifetime = (revLifetimeAgg[0]?.total || 0) + (userRevLifetimeAgg[0]?.total || 0);
+        let revenueToday = revTodayAgg[0]?.total || 0;
+        let revenueMonth = revMonthAgg[0]?.total || 0;
+        let revenueLifetime = revLifetimeAgg[0]?.total || 0;
 
         const totalCreditsUsed = creditUsageData[0]?.totalUsed || 0;
         const storageUsed = Math.round(totalCases * 1.5 + contractsAnalyzed * 0.8) || 0; // in MB
@@ -717,7 +706,7 @@ export const getAllBilling = async (req, res) => {
 
         const paginatedList = deduplicatedList.slice(skip, skip + Number(limit));
 
-        const totalRevenue = deduplicatedList.reduce((acc, p) => (p.status === 'success' || p.status === 'paid') ? acc + (p.amount || 0) : acc, 0);
+        const totalRevenue = deduplicatedList.reduce((acc, p) => (/^razorpay$/i.test(String(p.gateway || '')) && (p.status === 'success' || p.status === 'paid')) ? acc + (p.amount || 0) : acc, 0);
         const successCount = deduplicatedList.filter(p => p.status === 'success' || p.status === 'paid').length;
         const pendingCount = deduplicatedList.filter(p => p.status === 'pending').length;
         const refundedCount = deduplicatedList.filter(p => p.status === 'refunded').length;

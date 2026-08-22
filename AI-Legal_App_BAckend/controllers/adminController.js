@@ -6,6 +6,7 @@ import CreditPackage from '../models/CreditPackage.js';
 import CreditLog from '../models/CreditLog.js';
 import SupportTicket from '../models/SupportTicket.js';
 import FeatureCredit from '../models/FeatureCredit.js';
+import Payment from '../models/Payment.js';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 const pdf = require('pdf-parse');
@@ -57,35 +58,31 @@ export const getAdminStats = async (req, res) => {
           subscriptionStatus: 'active' 
         });
 
-        // Revenue calculation: Sum of plan prices for all successful/active paid subscriptions
-        // Note: Joining with Plan model to get the current price at the time of calculation
-        const revenueAggregation = await Subscription.aggregate([
-          { $match: { subscriptionStatus: 'active', paymentId: { $exists: true, $ne: "" } } },
-          {
-            $lookup: {
-              from: 'plans',
-              localField: 'planId',
-              foreignField: '_id',
-              as: 'planDetails'
-            }
-          },
-          { $unwind: '$planDetails' },
-          {
-            $group: {
-              _id: null,
-              total: {
-                $sum: {
-                  $cond: [
-                    { $eq: ['$billingCycle', 'yearly'] },
-                    '$planDetails.priceYearly',
-                    '$planDetails.priceMonthly'
-                  ]
-                }
-              }
-            }
-          }
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+
+        const monthStart = new Date();
+        monthStart.setDate(1);
+        monthStart.setHours(0, 0, 0, 0);
+
+        const [revTodayAgg, revMonthAgg, revLifetimeAgg] = await Promise.all([
+          Payment.aggregate([
+            { $match: { gateway: { $regex: /^razorpay$/i }, status: { $in: ['success', 'paid', 'captured'] }, amount: { $gt: 0 }, createdAt: { $gte: todayStart } } },
+            { $group: { _id: null, total: { $sum: '$amount' } } }
+          ]),
+          Payment.aggregate([
+            { $match: { gateway: { $regex: /^razorpay$/i }, status: { $in: ['success', 'paid', 'captured'] }, amount: { $gt: 0 }, createdAt: { $gte: monthStart } } },
+            { $group: { _id: null, total: { $sum: '$amount' } } }
+          ]),
+          Payment.aggregate([
+            { $match: { gateway: { $regex: /^razorpay$/i }, status: { $in: ['success', 'paid', 'captured'] }, amount: { $gt: 0 } } },
+            { $group: { _id: null, total: { $sum: '$amount' } } }
+          ])
         ]);
-        const totalRevenue = revenueAggregation.length > 0 ? revenueAggregation[0].total : 0;
+
+        const revenueTodayVal = revTodayAgg[0]?.total || 0;
+        const revenueMonthVal = revMonthAgg[0]?.total || 0;
+        const revenueLifetimeVal = revLifetimeAgg[0]?.total || 0;
 
         // Credit usage from real logs
         const creditUsageData = await CreditLog.aggregate([
@@ -113,11 +110,6 @@ export const getAdminStats = async (req, res) => {
         const freeUsersCount = Math.max(0, totalUsers - premiumUsersCount);
         const onlineUsersCount = (global.onlineUserSockets && global.onlineUserSockets.size) || 1;
         const activeUsersCount = Math.max(1, Math.round(totalUsers * 0.75));
-
-        // Revenue Breakdown
-        const revenueMonthVal = totalRevenue > 0 ? totalRevenue : 124500;
-        const revenueTodayVal = Math.round(revenueMonthVal / 15);
-        const revenueLifetimeVal = revenueMonthVal * 12;
 
         // Daily Activity Bar Graph Data (Last 7 Days)
         const dailyActivityData = [

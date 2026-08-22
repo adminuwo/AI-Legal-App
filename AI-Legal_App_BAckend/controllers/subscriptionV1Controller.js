@@ -752,7 +752,8 @@ export const verifySubscriptionPayment = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Payment verification failed. Invalid Razorpay signature.' });
     }
 
-    const originalAmount = await getPlanPrice(planId, billingCycle);
+    const basePlanPrice = await getPlanPrice(planId, billingCycle);
+    const originalAmount = (req.body.amount !== undefined && Number(req.body.amount) >= 0) ? Number(req.body.amount) : basePlanPrice;
     let amount = originalAmount;
     let discountAmount = 0;
     let validatedCoupon = null;
