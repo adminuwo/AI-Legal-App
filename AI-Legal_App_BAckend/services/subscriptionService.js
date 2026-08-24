@@ -96,27 +96,27 @@ export const getToolCost = (toolName, body = {}) => {
 
 const getToolLabel = (toolName) => {
     switch ((toolName || '').toLowerCase()) {
-        case 'chat': return 'AISA Chat (Text)';
-        case 'agent_chat': return 'AISA Agent Chat';
-        case 'realtime_chat': return 'AISA Realtime Chat';
-        case 'knowledge_base': return 'AISA Knowledge Base';
-        case 'web_search': return 'AISA Web Search';
-        case 'deep_search': return 'AISA Deep Search';
-        case 'generate_image_hd': return 'AISA Image HD';
-        case 'generate_image_ultra': return 'AISA Image Ultra';
-        case 'generate_image': return 'AISA Image';
-        case 'edit_image': return 'AISA Edit Image';
-        case 'generate_video': return 'AISA Video Generation';
-        case 'code_writer': return 'AISA Code Writer';
-        case 'convert_document': return 'AISA Document Analysis';
-        case 'legal_toolkit': return 'AISA AI Legal';
-        case 'ai_cashflow': return 'AISA CashFlow Explorer';
+        case 'chat': return 'AI LEGAL™ Chat (Text)';
+        case 'agent_chat': return 'AI LEGAL™ Agent Chat';
+        case 'realtime_chat': return 'AI LEGAL™ Realtime Chat';
+        case 'knowledge_base': return 'AI LEGAL™ Knowledge Base';
+        case 'web_search': return 'AI LEGAL™ Web Search';
+        case 'deep_search': return 'AI LEGAL™ Deep Search';
+        case 'generate_image_hd': return 'AI LEGAL™ Image HD';
+        case 'generate_image_ultra': return 'AI LEGAL™ Image Ultra';
+        case 'generate_image': return 'AI LEGAL™ Image';
+        case 'edit_image': return 'AI LEGAL™ Edit Image';
+        case 'generate_video': return 'AI LEGAL™ Video Generation';
+        case 'code_writer': return 'AI LEGAL™ Code Writer';
+        case 'convert_document': return 'AI LEGAL™ Document Analysis';
+        case 'legal_toolkit': return 'AI LEGAL™ Legal Intelligence';
+        case 'ai_cashflow': return 'AI LEGAL™ CashFlow Explorer';
         case 'ai_ads_agent': return 'AI Ads Agent (Visual Post)';
         case 'gemini_flash': return 'AI Ads Agent (Website Scrapping)';
         case 'activate_strategy': return 'AI Ads Agent (30-Day Strategy)';
         case 'generate_content': return 'AI Ads Agent (Content Generation)';
         case 'regenerate_content': return 'AI Ads Agent (Content Refresh)';
-        default: return 'AISA Service';
+        default: return 'AI LEGAL™ Service';
     }
 };
 

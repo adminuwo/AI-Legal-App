@@ -194,11 +194,12 @@ const POLICY_DOCUMENTS = {
       { id: '1', title: '1. Information We Collect', content: 'To provide secure AI processing, we collect: (a) Account Information: name, email address, phone number, and billing logs; (b) Workspace Data: legal documents, PDF case files, evidence images, and chat logs; (c) Telemetry Data: device identification, crash details, OS versions, and application performance metrics.' },
       { id: '2', title: '2. How We Use Data', content: 'Data is processed strictly to execute requested features: (a) Optical Character Recognition (OCR) text extraction; (b) Semantic indexing of precedent files and contract risk audits; (c) Personalizing response language preferences; (d) Platform security, billing compliance, and active threat detection.' },
       { id: '3', title: '3. Data Sharing & Non-Sale Policy', content: 'We enforce a strict data protection policy: we NEVER sell, trade, rent, or monetize your personal files, evidence briefs, or workspace logs to advertising networks, brokers, or third parties. Data is processed exclusively inside encrypted cloud services required to execute the platform features.' },
-      { id: '4', title: '4. International Data Transfers', content: 'AI LEGAL™ serves global legal workspaces. Your data may be processed in secure database regions closest to your selected jurisdiction. Any transfers across international borders are protected under standard contractual clauses, ensuring uniform data security guidelines.' },
-      { id: '5', title: '5. Security & Encryption Standards', content: 'We apply top-tier security controls: (a) End-to-end TLS 1.3 encryption for all data in transit; (b) AES-256 block encryption at rest for databases and file servers; (c) Isolated tenant sandboxing to prevent cross-account leaks; (d) Continuous intrusion monitoring and vulnerability scans.' },
-      { id: '6', title: '6. Data Retention & Permanent Deletion', content: 'Case files and chat transcripts are stored only for as long as you maintain your account. Toggling deletion on a file immediately flags it for purge. Permanent account deletions remove all corresponding database collections, document buffers, and billing logs from active nodes within 48 hours.' },
-      { id: '7', title: '7. User Rights & Data Portability', content: 'You maintain absolute ownership of your data. You have the right to inspect, download a copy of your chat history and case metadata, correct account information, restrict processing, or permanently delete your entire profile directly from the Settings panel.' },
-      { id: '8', title: '8. Privacy Policy Updates', content: 'We may modify this document as technology or compliance mandates evolve. For significant updates, we notify users via in-app alerts or email registered accounts at least 15 days before amendments take effect.' }
+      { id: '4', title: '4. AI Data Processing & Third-Party AI Services', content: 'AI LEGAL™ utilizes secure enterprise AI API providers (such as Google Gemini) to process user queries for legal research, drafting, and analysis. Data transmitted to AI processing infrastructure is encrypted via HTTPS and strictly used to return immediate real-time outputs requested by the user. User input data is never sold, shared with unauthorized third parties, or utilized to train public AI models.' },
+      { id: '5', title: '5. International Data Transfers', content: 'AI LEGAL™ serves global legal workspaces. Your data may be processed in secure database regions closest to your selected jurisdiction. Any transfers across international borders are protected under standard contractual clauses, ensuring uniform data security guidelines.' },
+      { id: '6', title: '6. Security & Encryption Standards', content: 'We apply top-tier security controls: (a) End-to-end TLS 1.3 encryption for all data in transit; (b) AES-256 block encryption at rest for databases and file servers; (c) Isolated tenant sandboxing to prevent cross-account leaks; (d) Continuous intrusion monitoring and vulnerability scans.' },
+      { id: '7', title: '7. Data Retention & Permanent Deletion', content: 'Case files and chat transcripts are stored only for as long as you maintain your account. Toggling deletion on a file immediately flags it for purge. Permanent account deletions remove all corresponding database collections, document buffers, and billing logs from active nodes within 48 hours.' },
+      { id: '8', title: '8. User Rights & Data Portability', content: 'You maintain absolute ownership of your data. You have the right to inspect, download a copy of your chat history and case metadata, correct account information, restrict processing, or permanently delete your entire profile directly from the Settings panel.' },
+      { id: '9', title: '9. Privacy Policy Updates', content: 'We may modify this document as technology or compliance mandates evolve. For significant updates, we notify users via in-app alerts or email registered accounts at least 15 days before amendments take effect.' }
     ]
   },
   terms: {
@@ -849,7 +850,7 @@ const POLICY_DOCUMENTS = {
               </div>
 
               <div
-                onClick={() => setActivePolicyKey('privacy')}
+                onClick={() => navigate('/privacy-policy')}
                 className="p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl flex items-center justify-between cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
               >
                 <div className="flex items-center gap-3">
@@ -863,7 +864,7 @@ const POLICY_DOCUMENTS = {
               </div>
 
               <div
-                onClick={() => setActivePolicyKey('terms')}
+                onClick={() => navigate('/terms-of-service')}
                 className="p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl flex items-center justify-between cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
               >
                 <div className="flex items-center gap-3">

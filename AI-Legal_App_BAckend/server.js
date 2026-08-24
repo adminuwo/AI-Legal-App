@@ -234,8 +234,14 @@ app.use((req, res, next) => {
 // app.use(fileUpload()); // Removed to avoid conflict with Multer (New AIBASE)
 
 
-// Serve static frontend files from 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static frontend files from 'public' directory with no-cache on HTML
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+  }
+}));
 
 // Serve Standalone AI Legal Pricing Subscription Web Portal
 app.get(['/legal-pricing', '/subscription-checkout'], (req, res) => {
@@ -364,6 +370,7 @@ app.use('/api/aibase/knowledge', verifyToken, creditMiddleware, knowledgeRoute);
 // SPA Catch-all to serve index.html for unknown non-API routes
 app.use((req, res, next) => {
   if (req.method === 'GET' && !req.path.startsWith('/api')) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     return res.sendFile(path.join(__dirname, 'public', 'index.html'));
   }
   next();
