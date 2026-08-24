@@ -9,7 +9,7 @@ export const PLAN_LIMITS = {
     // Advocate Plans
     ADVOCATE_FREE: {
         cases: 3,
-        ai_chat: 50,
+        ai_chat: 100,
         draft_maker: 2,
         court_prep: 2,
         legal_precedent: 2,
@@ -64,6 +64,7 @@ export const PLAN_LIMITS = {
     // Student Plans
     STUDENT_FREE: {
         cases: 3,
+        ai_chat: 100,
         quiz_practice: 2,
         draft_maker: 1,
         legal_precedent: 1,
@@ -111,6 +112,7 @@ export const PLAN_LIMITS = {
     FIRM_FREE: {
         team_members: 1,
         cases: 3,
+        ai_chat: 100,
         draft_maker: 1,
         contract_review: 1,
         legal_precedent: 1
@@ -185,7 +187,7 @@ export const PLAN_LIMITS = {
     // Fallback Generic Tier Keys
     FREE: {
         cases: 3,
-        ai_chat: 50,
+        ai_chat: 100,
         draft_maker: 2,
         court_prep: 2,
         legal_precedent: 2,
@@ -551,7 +553,7 @@ export const checkAccess = async (userId, feature, targetWorkspace) => {
 
     const limit = limits[normalizedFeature] !== undefined 
         ? limits[normalizedFeature] 
-        : (limits['ai_chat'] !== undefined ? limits['ai_chat'] : 50);
+        : (limits['ai_chat'] !== undefined ? limits['ai_chat'] : 100);
     if (limit === Infinity) {
         // Get used count but don't limit
         const usage = await PlanUsage.findOne({ userId, feature: normalizedFeature });
@@ -640,7 +642,7 @@ export const incrementUsage = async (userId, feature) => {
 
     const allPlanLimits = await getDynamicPlanLimits();
     const limits = allPlanLimits[plan] || PLAN_LIMITS.FREE;
-    const limit = limits[normalizedFeature] !== undefined ? limits[normalizedFeature] : (limits['ai_chat'] !== undefined ? limits['ai_chat'] : 50);
+    const limit = limits[normalizedFeature] !== undefined ? limits[normalizedFeature] : (limits['ai_chat'] !== undefined ? limits['ai_chat'] : 100);
 
     // Consolidate legacy unnormalized records if normalizedFeature is ai_chat
     if (normalizedFeature === 'ai_chat') {

@@ -184,27 +184,7 @@ const isAllowedOrigin = (origin) => {
   return false;
 };
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (isAllowedOrigin(origin)) return callback(null, true);
-    return callback(null, true); // Allow all web app origins
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: '*',
-  optionsSuccessStatus: 200
-}));
-
 app.use((req, res, next) => {
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  if (process.env.NODE_ENV === 'production') {
-    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  }
-
   const origin = req.headers.origin || req.headers.Origin;
   if (origin) {
     res.setHeader('Access-Control-Allow-Origin', origin);
@@ -226,6 +206,16 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+app.use(cors({
+  origin: function (origin, callback) {
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: '*',
+  optionsSuccessStatus: 200
+}));
 app.use(cookieParser())
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ extended: true, limit: "100mb" }));
