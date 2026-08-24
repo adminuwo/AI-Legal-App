@@ -437,6 +437,7 @@ const NavigateProvider = () => {
           element={<DashboardLayout />}
         >
           <Route index element={<HomeDashboard />} />
+          <Route path="home" element={<HomeDashboard />} />
           <Route path="chat" element={<Navigate to="new" replace state={{ forceGlobal: true }} />} />
           <Route path="chat/:sessionId" element={<LegalWorkspace />} />
           <Route path="cases" element={<LegalWorkspace />} />
