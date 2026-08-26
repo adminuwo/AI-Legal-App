@@ -27,6 +27,7 @@ import { langStorage } from '../middleware/langContext.js';
 import CaseService from '../services/core/CaseService.js';
 import { createWorkspaceActivity } from '../services/activityService.js';
 import { CaseActivityService } from '../services/CaseActivityService.js';
+import ContractService from '../services/contract.service.js';
 import { AccessControlService } from '../services/accessControl.service.js';
 import { TaskAccessControlService } from '../services/taskAccessControl.service.js';
 import AuditLogService from '../services/auditLog.service.js';
@@ -4255,82 +4256,11 @@ Ensure the JSON is valid and strictly match the schema.`;
 // @access  Private
 router.post('/:id/contracts', verifyToken, uploadMiddleware, async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ error: "No file uploaded" });
-        }
-        
-        const project = await Project.findOne({ _id: req.params.id, userId: req.user.id });
-        if (!project) return res.status(404).json({ error: "Case not found" });
-
-        // Calculate file checksum hash
-        const checksum = crypto.createHash('md5').update(req.file.buffer).digest('hex');
-
-        // Check duplicates
-        const isDuplicate = project.contracts && project.contracts.some(c => c.hash === checksum);
-        if (isDuplicate) {
-            return res.status(400).json({ error: "This contract file has already been uploaded." });
-        }
-
-        let fileUrl = "";
-        let gcsFilename = "";
-
-        // Upload to GCS
-        try {
-            const uploadParams = {
-                mimetype: req.file.mimetype,
-                originalname: req.file.originalname
-            };
-            const gcsResult = await uploadToGCS(req.file.buffer, uploadParams);
-            fileUrl = gcsResult.url;
-            gcsFilename = gcsResult.filename;
-            console.log("[CONTRACT UPLOAD] Uploaded via GCS successfully:", fileUrl);
-        } catch (gcsError) {
-            console.warn("[CONTRACT UPLOAD] GCS upload failed, trying Cloudinary fallback:", gcsError.message);
-            try {
-                const uploadParams = {
-                    mimetype: req.file.mimetype,
-                    originalname: req.file.originalname
-                };
-                const cloudinaryResult = await uploadToCloudinary(req.file.buffer, uploadParams);
-                fileUrl = cloudinaryResult.secure_url || cloudinaryResult.url;
-                console.log("[CONTRACT UPLOAD] Uploaded via Cloudinary successfully:", fileUrl);
-            } catch (cloudinaryError) {
-                console.error("[CONTRACT UPLOAD] Cloudinary fallback failed:", cloudinaryError.message);
-                return res.status(500).json({
-                    error: "Failed to upload contract file",
-                    details: cloudinaryError.message
-                });
-            }
-        }
-
-        const sizeStr = req.file.size > 1024 * 1024 
-            ? `${(req.file.size / (1024 * 1024)).toFixed(1)} MB` 
-            : `${Math.round(req.file.size / 1024)} KB`;
-
-        const ext = req.file.originalname.split('.').pop()?.toUpperCase() || 'PDF';
-
-        const newContract = {
-            _id: crypto.randomUUID(),
-            name: req.file.originalname,
-            url: fileUrl,
-            storedName: gcsFilename || req.file.originalname,
-            hash: checksum,
-            uploadedDate: new Date(),
-            fileSize: sizeStr,
-            fileType: ext,
-            ocrStatus: 'Complete',
-            aiStatus: 'Not Analyzed',
-            analysisReport: null
-        };
-
-        if (!project.contracts) project.contracts = [];
-        project.contracts.push(newContract);
-        await project.save();
-
+        const newContract = await ContractService.uploadContract(req.params.id, req.file);
         res.status(200).json({ success: true, data: newContract });
     } catch (error) {
         console.error('[CONTRACT UPLOAD ERROR]', error);
-        res.status(500).json({ error: 'Failed to upload case contract', details: error.message });
+        res.status(error.status || 500).json({ error: error.message || 'Failed to upload case contract' });
     }
 });
 
@@ -4339,22 +4269,11 @@ router.post('/:id/contracts', verifyToken, uploadMiddleware, async (req, res) =>
 // @access  Private
 router.delete('/:id/contracts/:contractId', verifyToken, async (req, res) => {
     try {
-        const project = await Project.findOne({ _id: req.params.id, userId: req.user.id });
-        if (!project) return res.status(404).json({ error: 'Project not found' });
-
-        const contractIndex = (project.contracts || []).findIndex(c => 
-            (c._id && c._id.toString() === req.params.contractId) || 
-            (c.id && c.id.toString() === req.params.contractId)
-        );
-        if (contractIndex === -1) return res.status(404).json({ error: 'Contract not found' });
-
-        project.contracts.splice(contractIndex, 1);
-        await project.save();
-
+        await ContractService.deleteContract(req.params.id, req.params.contractId);
         res.status(200).json({ success: true, message: 'Contract deleted successfully.' });
     } catch (error) {
         console.error('[CONTRACT DELETE ERROR]', error);
-        res.status(500).json({ error: 'Failed to delete contract', details: error.message });
+        res.status(error.status || 500).json({ error: error.message || 'Failed to delete contract' });
     }
 });
 
@@ -4363,7 +4282,7 @@ router.delete('/:id/contracts/:contractId', verifyToken, async (req, res) => {
 // @access  Private
 router.post('/:id/contracts/:contractId/analyze', verifyToken, async (req, res) => {
     try {
-        const project = await Project.findOne({ _id: req.params.id, userId: req.user.id });
+        const project = await Project.findById(req.params.id);
         if (!project) return res.status(404).json({ error: 'Project not found' });
 
         const contractIndex = (project.contracts || []).findIndex(c => 
