@@ -65,6 +65,7 @@ import courtOrderRoutes from './routes/courtOrderRoutes.js';
 import workspaceRoutes from './routes/workspaceRoutes.js';
 import studentNoteRoutes from './routes/studentNoteRoutes.js';
 import appUpdateRoutes from './routes/appUpdateRoutes.js';
+import enterpriseRoutes from './routes/enterpriseRoutes.js';
 
 import { startPlanExpiryService } from './services/planExpiryService.js';
 import { langMiddleware } from './middleware/langContext.js';
@@ -320,6 +321,7 @@ app.use('/api/connectors', connectorsRoutes);
 app.use('/api/pricing', pricingRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/enterprise', enterpriseRoutes);
 
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/media', mediaProxyRoutes);
