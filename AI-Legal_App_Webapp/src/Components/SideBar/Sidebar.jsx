@@ -17,6 +17,7 @@ import ExperienceRoleSelector from '../ExperienceRoleSelector';
 import { useSubscription } from '../../context/SubscriptionContext';
 import { logo } from '../../constants';
 import { isSuperAdmin } from '../../utils/isSuperAdmin';
+import toast from 'react-hot-toast';
 
 const CORE_VIEWS = [
   { name: 'Dashboard', icon: LayoutGrid, path: '/dashboard' },
@@ -158,15 +159,37 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
     };
   }, [showDropdown]);
 
+  const isToolDisabledByInstitution = (path) => {
+    if (!path) return false;
+    const rulesStr = localStorage.getItem('enterpriseFeatureAccessRules');
+    if (!rulesStr) return false;
+    try {
+      const rules = JSON.parse(rulesStr);
+      if (path.includes('evidence-analyst') && rules.evidenceAnalyst === false) return true;
+      if (path.includes('case-predictor') && rules.casePredictor === false) return true;
+      if (path.includes('contract-analyzer') && rules.contractAnalyzer === false) return true;
+      if (path.includes('mock-courtroom') && rules.mockCourtroom === false) return true;
+      if (path.includes('draft-maker') && rules.draftMaker === false) return true;
+      if (path.includes('legal-precedents') && rules.legalResearch === false) return true;
+      if (path.includes('strategy-engine') && rules.strategyEngine === false) return true;
+    } catch (e) {}
+    return false;
+  };
+
   const renderLink = (item) => {
     const isLinkActive = isActive(item.path);
+    const isDisabled = isToolDisabledByInstitution(item.path);
 
     if (isCollapsed) {
       return (
         <button
           key={item.name}
-          title={item.name}
+          title={isDisabled ? `🔒 Disabled by Institution Admin` : item.name}
           onClick={() => {
+            if (isDisabled) {
+              toast.error(`🔒 Access to "${item.name}" has been disabled by your Law College Administrator.`);
+              return;
+            }
             if (item.path.startsWith('/dashboard/chat/new')) {
               navigate(item.path, { state: { forceGlobal: true } });
             } else {
@@ -175,7 +198,9 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
             if (window.innerWidth < 1024) onClose();
           }}
           className={`w-11 h-11 mx-auto flex items-center justify-center rounded-xl mb-2 transition-all cursor-pointer ${
-            isLinkActive
+            isDisabled
+              ? 'opacity-40 grayscale cursor-not-allowed text-slate-400'
+              : isLinkActive
               ? 'bg-[#C8A34D]/20 text-[#C8A34D] border border-[#C8A34D]/40 font-extrabold shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
           }`}
@@ -193,6 +218,10 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
       <button
         key={item.name}
         onClick={() => {
+          if (isDisabled) {
+            toast.error(`🔒 Access to "${item.name}" has been disabled by your Law College Administrator.`);
+            return;
+          }
           if (item.path.startsWith('/dashboard/chat/new')) {
             navigate(item.path, { state: { forceGlobal: true } });
           } else {
@@ -201,7 +230,9 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
           if (window.innerWidth < 1024) onClose();
         }}
         className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl mb-1 transition-all cursor-pointer ${
-          isLinkActive
+          isDisabled
+            ? 'opacity-40 grayscale cursor-not-allowed text-slate-400'
+            : isLinkActive
             ? 'bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 font-extrabold shadow-xs'
             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white font-semibold'
         }`}
@@ -210,6 +241,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
           <item.icon className={`w-4 h-4 ${isLinkActive ? 'text-[#C8A34D]' : 'text-slate-400'}`} />
           <span className="text-sm">{item.name}</span>
         </div>
+        {isDisabled && <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-500">🔒 Lock</span>}
       </button>
     );
   };
@@ -227,6 +259,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
       { name: profileLabel, icon: User, action: 'profile' },
       { name: 'Settings', icon: Settings2, path: '/dashboard/settings' },
       { name: 'Pricing & Plans', icon: CreditCard, path: '/legal-pricing' },
+      { name: 'Enterprise Dashboard', icon: Building2, path: '/dashboard/enterprise' },
       ...(isAdminUser ? [
         { name: 'AI Product Guide Knowledge', icon: BookOpen, path: '/dashboard/guide?mode=knowledge' },
         { name: 'Admin Portal', icon: Shield, path: '/dashboard/admin' }

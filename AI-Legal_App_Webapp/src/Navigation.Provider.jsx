@@ -31,6 +31,7 @@ import PrivacyPolicy from './landingpage/PrivacyPolicy.jsx';
 import TermsOfService from './landingpage/TermsOfService.jsx';
 import CookiePolicy from './landingpage/CookiePolicy.jsx';
 import LegalPricingPortal from './pages/LegalPricingPortal.jsx';
+import EnterprisePage from './pages/EnterprisePage.jsx';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { lazy, Suspense } from 'react';
@@ -68,6 +69,21 @@ const ClientConnectWorkspace = lazy(() => import('./pages/ClientConnectWorkspace
 const QuizPracticeWorkspace = lazy(() => import('./pages/QuizPracticeWorkspace'));
 const NotesMakerWorkspace = lazy(() => import('./pages/NotesMakerWorkspace'));
 const MobileAppPage = lazy(() => import('./pages/MobileAppPage'));
+
+const EnterpriseSetupPage = lazy(() => import('./pages/Enterprise/EnterpriseSetupPage'));
+const EnterpriseDashboardLayout = lazy(() => import('./pages/Enterprise/EnterpriseDashboardLayout'));
+const EnterpriseOverview = lazy(() => import('./pages/Enterprise/EnterpriseOverview'));
+const EnterpriseStudents = lazy(() => import('./pages/Enterprise/EnterpriseStudents'));
+const EnterpriseFaculty = lazy(() => import('./pages/Enterprise/EnterpriseFaculty'));
+const EnterpriseAcademic = lazy(() => import('./pages/Enterprise/EnterpriseAcademic'));
+const EnterpriseCurriculum = lazy(() => import('./pages/Enterprise/EnterpriseCurriculum'));
+const EnterpriseFeatureAccess = lazy(() => import('./pages/Enterprise/EnterpriseFeatureAccess'));
+const EnterpriseUsageCredits = lazy(() => import('./pages/Enterprise/EnterpriseUsageCredits'));
+const EnterpriseAnalytics = lazy(() => import('./pages/Enterprise/EnterpriseAnalytics'));
+const EnterpriseAnnouncements = lazy(() => import('./pages/Enterprise/EnterpriseAnnouncements'));
+const EnterpriseAddons = lazy(() => import('./pages/Enterprise/EnterpriseAddons'));
+const EnterpriseReports = lazy(() => import('./pages/Enterprise/EnterpriseReports'));
+const EnterpriseSettings = lazy(() => import('./pages/Enterprise/EnterpriseSettings'));
 
 const isAuthenticated = () => {
   const tokenStr = localStorage.getItem('token');
@@ -428,6 +444,32 @@ const NavigateProvider = () => {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/legal-pricing" element={<LegalPricingPortal />} />
         <Route path="/subscription-checkout" element={<LegalPricingPortal />} />
+        <Route path="/enterprise" element={<EnterprisePage />} />
+        <Route path="/enterprise/setup" element={
+          <Suspense fallback={<div className="flex items-center justify-center h-screen bg-slate-950 text-[#C8A34D] font-bold">Loading Enterprise Setup...</div>}>
+            <EnterpriseSetupPage />
+          </Suspense>
+        } />
+
+        <Route path="/dashboard/enterprise" element={
+          <Suspense fallback={<div className="flex items-center justify-center h-screen bg-slate-950 text-[#C8A34D] font-bold">Loading Enterprise Dashboard...</div>}>
+            <EnterpriseDashboardLayout />
+          </Suspense>
+        }>
+          <Route index element={<EnterpriseOverview />} />
+          <Route path="students" element={<EnterpriseStudents />} />
+          <Route path="faculty" element={<EnterpriseFaculty />} />
+          <Route path="academic" element={<EnterpriseAcademic />} />
+          <Route path="curriculum" element={<EnterpriseCurriculum />} />
+          <Route path="feature-access" element={<EnterpriseFeatureAccess />} />
+          <Route path="usage-credits" element={<EnterpriseUsageCredits />} />
+          <Route path="analytics" element={<EnterpriseAnalytics />} />
+          <Route path="announcements" element={<EnterpriseAnnouncements />} />
+          <Route path="add-ons" element={<EnterpriseAddons />} />
+          <Route path="reports" element={<EnterpriseReports />} />
+          <Route path="settings" element={<EnterpriseSettings />} />
+        </Route>
+
         <Route path="/share/:shareId" element={<SharedChat />} />
         <Route path="/mobile-app" element={<Navigate to="/dashboard/mobile-app" replace />} />
 
