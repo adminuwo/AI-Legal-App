@@ -259,7 +259,6 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
       { name: profileLabel, icon: User, action: 'profile' },
       { name: 'Settings', icon: Settings2, path: '/dashboard/settings' },
       { name: 'Pricing & Plans', icon: CreditCard, path: '/legal-pricing' },
-      { name: 'Enterprise Dashboard', icon: Building2, path: '/dashboard/enterprise' },
       ...(isAdminUser ? [
         { name: 'AI Product Guide Knowledge', icon: BookOpen, path: '/dashboard/guide?mode=knowledge' },
         { name: 'Admin Portal', icon: Shield, path: '/dashboard/admin' }

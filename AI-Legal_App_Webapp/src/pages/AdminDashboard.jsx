@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BarChart3, Users, CreditCard, Package, Ticket, Lightbulb, Bug, AlertTriangle, 
-  MessageSquare, Globe, Settings, Shield, ShieldAlert, Search, RefreshCw, Plus, 
+  MessageSquare, Globe, Settings, Shield, ShieldAlert, Search, RefreshCw, Plus, PlusCircle, 
   Edit2, Edit3, Trash2, Lock, Unlock, CheckCircle2, XCircle, ExternalLink, Key, DollarSign, 
   TrendingUp, Activity, HardDrive, Terminal, Send, Eye, EyeOff, ChevronRight, X, 
   FileText, Check, RotateCw, Building2, UserCheck, Zap, ArrowLeft, Download, Tag, Wrench
