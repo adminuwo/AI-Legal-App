@@ -1,4 +1,5 @@
 import Enterprise from '../models/Enterprise.js';
+import Organization from '../models/Organization.js';
 import EnterpriseMember from '../models/EnterpriseMember.js';
 import EnterpriseAcademic from '../models/EnterpriseAcademic.js';
 import EnterpriseFeaturePolicy from '../models/EnterpriseFeaturePolicy.js';
@@ -54,6 +55,30 @@ export const setupEnterprise = async (req, res) => {
     });
 
     await enterprise.save();
+
+    // Fetch Creator User Email
+    const creatorUser = await User.findById(userId);
+    const userEmail = creatorUser?.email || req.user.email || officialEmail;
+
+    // Sync to organizations collection in AISA database using Creator User's Email
+    try {
+      await Organization.updateOne(
+        { _id: enterprise._id },
+        {
+          $set: {
+            organizationName: name,
+            name: name,
+            userEmail: userEmail.toLowerCase().trim(),
+            email: userEmail.toLowerCase().trim(),
+            createdBy: userId,
+            status: 'active'
+          }
+        },
+        { upsert: true }
+      );
+    } catch (orgErr) {
+      console.warn('[ORGANIZATION SYNC WARN]:', orgErr.message);
+    }
 
     // Assign Creator as Enterprise Owner & Enterprise Admin
     const ownerMember = new EnterpriseMember({
@@ -385,6 +410,8 @@ export const inviteStudent = async (req, res) => {
         name: name.trim(),
         email: cleanEmail,
         role: 'user',
+        provider: 'enterprise',
+        providerId: `enterprise_${enterpriseId}_${cleanEmail}`,
         isVerified: true
       });
       await user.save();
@@ -461,6 +488,8 @@ export const bulkImportStudents = async (req, res) => {
           name: item.name.trim(),
           email: item.email.trim().toLowerCase(),
           role: 'user',
+          provider: 'enterprise',
+          providerId: `enterprise_${enterpriseId}_${item.email.trim().toLowerCase()}`,
           isVerified: true
         });
         await user.save();
@@ -547,6 +576,8 @@ export const addFaculty = async (req, res) => {
         name,
         email,
         role: 'user',
+        provider: 'enterprise',
+        providerId: `enterprise_${enterpriseId}_${email}`,
         isVerified: true
       });
       await user.save();
@@ -976,3 +1007,54 @@ export const generateReport = async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 };
+
+// ----------------------------------------------------
+// 15. Get Organizations (Fetch ONLY organizationId, organizationName, and email)
+// ----------------------------------------------------
+export const getOrganizationsList = async (req, res) => {
+  try {
+    const orgs = await Organization.find({})
+      .populate('createdBy', 'email')
+      .select('_id organizationName name email officialEmail userEmail createdBy');
+
+    const enterprises = await Enterprise.find({})
+      .populate('createdBy', 'email')
+      .select('_id name officialEmail createdBy');
+
+    const formattedList = [];
+    const seenIds = new Set();
+
+    orgs.forEach(o => {
+      const idStr = o._id.toString();
+      seenIds.add(idStr);
+      const userEmail = o.createdBy?.email || o.userEmail || o.email || o.officialEmail || '';
+      formattedList.push({
+        organizationId: idStr,
+        organizationName: o.organizationName || o.name || 'Unnamed Organization',
+        email: userEmail
+      });
+    });
+
+    enterprises.forEach(e => {
+      const idStr = e._id.toString();
+      if (!seenIds.has(idStr)) {
+        const userEmail = e.createdBy?.email || e.officialEmail || '';
+        formattedList.push({
+          organizationId: idStr,
+          organizationName: e.name || 'Unnamed Organization',
+          email: userEmail
+        });
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: formattedList.length,
+      organizations: formattedList
+    });
+  } catch (error) {
+    console.error('[GET ORGANIZATIONS LIST ERROR]:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+

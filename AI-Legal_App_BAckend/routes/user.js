@@ -2,7 +2,7 @@ import express from "express"
 import userModel from "../models/User.js"
 import mongoose from "mongoose";
 import Subscription from "../models/Subscription.js"
-import { verifyToken } from "../middleware/authorization.js"
+import { verifyToken, isAdmin } from "../middleware/authorization.js"
 import Session from "../models/Session.js";
 import { createSession } from "../utils/sessionHelper.js";
 import * as FeatureAccessManager from "../services/featureAccessManager.js";
@@ -369,7 +369,7 @@ route.post("/personalizations/reset", verifyToken, async (req, res) => {
 });
 
 // GET /api/user/all - Admin only, fetch all users with details
-route.get("/all", verifyToken, async (req, res) => {
+route.get("/all", verifyToken, isAdmin, async (req, res) => {
     try {
         // DB Down Fallback
         if (mongoose.connection.readyState !== 1) {
@@ -378,7 +378,7 @@ route.get("/all", verifyToken, async (req, res) => {
 
         const users = await userModel.find({ role: 'user' })
             .populate('agents', 'agentName pricing')
-            .select('-password');
+            .select('-password -resetPasswordToken -verificationCode');
 
         const spendMap = {};
 
@@ -411,7 +411,7 @@ route.get("/all", verifyToken, async (req, res) => {
 });
 
 // PUT /api/user/:id/block - Admin only, block/unblock user
-route.put("/:id/block", verifyToken, async (req, res) => {
+route.put("/:id/block", verifyToken, isAdmin, async (req, res) => {
     try {
         const userId = req.params.id;
         const { isBlocked } = req.body; // Expect boolean or toggle if not provided? Best to be explicit.
@@ -421,7 +421,7 @@ route.put("/:id/block", verifyToken, async (req, res) => {
         if (!user) return res.status(404).json({ error: "User not found" });
 
         // Prevent blocking self or other admins? optional
-        if (user.role === 'admin') {
+        if (user.role === 'admin' || user.role === 'SUPER_ADMIN') {
             return res.status(403).json({ error: "Cannot block admins" });
         }
 
@@ -443,7 +443,13 @@ route.put("/:id/block", verifyToken, async (req, res) => {
 route.delete("/:id", verifyToken, async (req, res) => {
     try {
         const targetUserId = req.params.id;
-        const requesterId = req.user.id || req.user._id;
+        const requesterId = (req.user.id || req.user._id).toString();
+        const isAdminUser = req.user.role === 'admin' || req.user.role === 'SUPER_ADMIN';
+
+        // Authorization check: Only account owner or admin can delete
+        if (!isAdminUser && requesterId !== targetUserId) {
+            return res.status(403).json({ error: "Access denied: You can only delete your own account" });
+        }
 
         // DB Down Fallback
         if (mongoose.connection.readyState !== 1) {

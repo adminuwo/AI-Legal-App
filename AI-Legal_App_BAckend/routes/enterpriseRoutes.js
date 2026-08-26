@@ -22,10 +22,15 @@ import {
   createAnnouncement,
   getAddons,
   requestAddon,
-  generateReport
+  generateReport,
+  getOrganizationsList
 } from '../controllers/enterpriseController.js';
 
 const router = express.Router();
+
+// Organizations (Fetch ONLY organizationId, organizationName, and email)
+router.get('/organizations', verifyToken, getOrganizationsList);
+router.get('/organizations/list', getOrganizationsList);
 
 // Onboarding & Setup
 router.post('/setup', verifyToken, setupEnterprise);
