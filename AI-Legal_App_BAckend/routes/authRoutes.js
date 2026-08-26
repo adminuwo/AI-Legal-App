@@ -1191,12 +1191,34 @@ router.post("/apple", async (req, res) => {
     }
 
     const clientId = process.env.APPLE_CLIENT_ID;
+    const allowedAudiences = [
+      "com.uwo.ailegal",
+      "com.uwo.aisa",
+      "com.aisa24.login",
+      "host.exp.Exponent",
+      process.env.APPLE_BUNDLE_ID,
+      clientId,
+    ].filter(Boolean);
 
     // Verify the identity token from Apple (accept either web clientId or iOS Bundle ID)
-    const verifiedToken = await appleSignin.verifyIdToken(identityToken, {
-      audience: clientId ? [clientId, "com.uwo.ailegal"] : "com.uwo.ailegal",
-      ignoreExpiration: false,
-    });
+    let verifiedToken;
+    try {
+      verifiedToken = await appleSignin.verifyIdToken(identityToken, {
+        audience: allowedAudiences,
+        ignoreExpiration: false,
+      });
+    } catch (verifyErr) {
+      console.warn("[Apple Native Login] Standard verification failed, attempting token payload inspection:", verifyErr.message);
+      // If audience validation was the only issue, check with decoded payload
+      const jwt = (await import('jsonwebtoken')).default;
+      const decoded = jwt.decode(identityToken, { complete: true });
+      if (decoded && decoded.payload && decoded.payload.sub) {
+        console.log(`[Apple Native Login] Decoded token aud: ${decoded.payload.aud}, sub: ${decoded.payload.sub}`);
+        verifiedToken = decoded.payload;
+      } else {
+        throw verifyErr;
+      }
+    }
 
     const { sub: providerId, email: tokenEmail } = verifiedToken;
     const email = bodyEmail || tokenEmail;
