@@ -2325,4 +2325,39 @@ html.dark select option,
   color: #ffffff !important;
 }
 
+/* 19. Custom Scrollbar Styling (Horizontal & Vertical) */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #C8A34D #E2E8F0;
+}
+
+.dark .custom-scrollbar {
+  scrollbar-color: #C8A34D #1E293B;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  display: block !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.8);
+  border-radius: 9999px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.8);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(200, 163, 77, 0.7);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(200, 163, 77, 1);
+}
+
+
 

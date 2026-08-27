@@ -4,7 +4,7 @@ import {
   Settings2, Palette, Sparkles, Bell, Shield, Database, HelpCircle, 
   Search, Sliders, Moon, Sun, Monitor, Type, Info, Key, LogOut, Trash2, 
   ShieldAlert, Cloud, FileText, Check, AlertTriangle, 
-  ChevronRight, Volume2, Globe, Calendar, Clock, Laptop, Eye, Heart, Download,
+  ChevronRight, ChevronLeft, Volume2, Globe, Calendar, Clock, Laptop, Eye, Heart, Download,
   Bug, MessageSquare, BookOpen, Star, Send, Paperclip, CheckCircle2, MessageCircle,
   Award, ShieldCheck, ChevronDown, RefreshCw, Smartphone, Lock, Mail, Menu, ArrowLeft
 } from 'lucide-react';
@@ -239,6 +239,38 @@ const POLICY_DOCUMENTS = {
   // Policy Modal Viewer State
   const [activePolicyKey, setActivePolicyKey] = useState(null); // 'privacy' | 'terms' | 'disclaimer' | null
 
+  // Tab navigation scroll ref & drag scroll handlers
+  const tabsNavRef = useRef(null);
+  const [isTabDragging, setIsTabDragging] = useState(false);
+  const [tabStartX, setTabStartX] = useState(0);
+  const [tabScrollLeft, setTabScrollLeft] = useState(0);
+
+  const scrollTabs = (direction) => {
+    if (tabsNavRef.current) {
+      const scrollAmount = direction === 'left' ? -220 : 220;
+      tabsNavRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const handleTabMouseDown = (e) => {
+    if (!tabsNavRef.current) return;
+    setIsTabDragging(true);
+    setTabStartX(e.pageX - tabsNavRef.current.offsetLeft);
+    setTabScrollLeft(tabsNavRef.current.scrollLeft);
+  };
+
+  const handleTabMouseLeaveOrUp = () => {
+    setIsTabDragging(false);
+  };
+
+  const handleTabMouseMove = (e) => {
+    if (!isTabDragging || !tabsNavRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - tabsNavRef.current.offsetLeft;
+    const walk = (x - tabStartX) * 2.5;
+    tabsNavRef.current.scrollLeft = tabScrollLeft - walk;
+  };
+
   // Dialog State
   const [dialogConfig, setDialogConfig] = useState({ show: false, type: '', title: '', desc: '', action: null });
 
@@ -404,70 +436,100 @@ const POLICY_DOCUMENTS = {
   };
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A] flex flex-col font-sans select-text p-4 sm:p-6 lg:p-8 text-slate-900 dark:text-white transition-colors duration-200 max-w-6xl mx-auto space-y-6">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A] flex flex-col font-sans select-text p-3.5 sm:p-6 lg:p-8 text-slate-900 dark:text-white transition-colors duration-200 max-w-6xl mx-auto space-y-4 sm:space-y-6">
       
       {/* Header Bar matching Mobile App Screenshots 1-5 */}
-      <div className="flex items-center gap-3 pb-2 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex items-center gap-2.5 sm:gap-3 pb-2 sm:pb-3 border-b border-slate-200 dark:border-slate-800">
         <button
           onClick={() => navigate('/dashboard')}
-          className="p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-all"
+          className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-all shrink-0"
           title="Back to Dashboard"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
         </button>
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">System Settings</h1>
-          <p className="text-[10px] font-black uppercase tracking-wider text-slate-400">ADVOCATE SETTINGS CONSOLE</p>
+          <h1 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">System Settings</h1>
+          <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400">ADVOCATE SETTINGS CONSOLE</p>
         </div>
       </div>
 
       {/* Top Horizontal Scrollable Pill Navigation Bar matching Mobile Screenshots 1-5 */}
-      <div className="bg-slate-100 dark:bg-slate-900 p-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-x-auto custom-scrollbar flex items-center gap-2">
-        {[
-          { id: 'general', label: 'General Settings', icon: Sliders },
-          { id: 'appearance', label: 'Appearance Settings', icon: Palette },
-          { id: 'notifications', label: 'Notification Preferences', icon: Bell },
-          { id: 'security', label: 'Security Settings', icon: Shield },
-          { id: 'help', label: 'Help & Support', icon: HelpCircle }
-        ].map(cat => {
-          const Icon = cat.icon;
-          const isActive = activeCategory === cat.id;
-          return (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-2 shadow-xs ${
-                isActive
-                  ? 'bg-white dark:bg-[#1E293B] border border-[#C8A34D] text-[#C8A34D] font-black shadow-sm ring-1 ring-[#C8A34D]/30'
-                  : 'bg-white/80 dark:bg-[#1E293B]/80 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-[#C8A34D]/50 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              <Icon size={14} className={isActive ? 'text-[#C8A34D]' : 'text-slate-400'} />
-              <span>{cat.label}</span>
-            </button>
-          );
-        })}
+      <div className="relative flex items-center w-full min-w-0 gap-1.5 sm:gap-2">
+        <button
+          onClick={() => scrollTabs('left')}
+          className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 shrink-0 cursor-pointer transition-all shadow-xs"
+          title="Scroll tabs left"
+        >
+          <ChevronLeft size={16} />
+        </button>
+
+        <div
+          ref={tabsNavRef}
+          onMouseDown={handleTabMouseDown}
+          onMouseLeave={handleTabMouseLeaveOrUp}
+          onMouseUp={handleTabMouseLeaveOrUp}
+          onMouseMove={handleTabMouseMove}
+          onWheel={(e) => {
+            if (e.deltaY) {
+              e.currentTarget.scrollLeft += e.deltaY;
+            }
+          }}
+          className={`bg-slate-100/90 dark:bg-slate-900/90 p-2 sm:p-2.5 rounded-2xl border border-slate-200/90 dark:border-slate-800 overflow-x-auto scroll-smooth flex items-center gap-2 sm:gap-3 custom-scrollbar pb-3 pt-2 px-2 flex-1 min-w-0 touch-pan-x select-none ${isTabDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        >
+          {[
+            { id: 'general', label: 'General Settings', icon: Sliders },
+            { id: 'appearance', label: 'Appearance Settings', icon: Palette },
+            { id: 'notifications', label: 'Notification Preferences', icon: Bell },
+            { id: 'security', label: 'Security Settings', icon: Shield },
+            { id: 'help', label: 'Help & Support', icon: HelpCircle }
+          ].map(cat => {
+            const Icon = cat.icon;
+            const isActive = activeCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 sm:gap-2 shadow-xs min-h-[38px] ${
+                  isActive
+                    ? 'bg-white dark:bg-[#1E293B] border-2 border-[#C8A34D] text-[#C8A34D] shadow-sm ring-2 ring-[#C8A34D]/20'
+                    : 'bg-white/90 dark:bg-[#1E293B]/90 border border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:border-[#C8A34D]/50 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Icon size={15} className={isActive ? 'text-[#C8A34D]' : 'text-slate-400'} />
+                <span>{cat.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={() => scrollTabs('right')}
+          className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 shrink-0 cursor-pointer transition-all shadow-xs"
+          title="Scroll tabs right"
+        >
+          <ChevronRight size={16} />
+        </button>
       </div>
 
       {/* Content Body for Active Tab */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         
         {/* CATEGORY 1: GENERAL SETTINGS (Screenshot 1 Parity) */}
         {activeCategory === 'general' && (
-          <div className="space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs">
+          <div className="space-y-4 sm:space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xs">
             <div>
               <h3 className="text-base font-black text-slate-900 dark:text-white">General Settings</h3>
               <p className="text-xs font-semibold text-slate-400 mt-0.5">Configure basic navigation and locales.</p>
             </div>
 
-            <div className="space-y-4 pt-2">
+            <div className="space-y-3 sm:space-y-4 pt-1 sm:pt-2">
               {/* DEFAULT WORKSPACE */}
-              <div className="p-4 bg-slate-100 dark:bg-slate-900/90 rounded-2xl space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">DEFAULT WORKSPACE</label>
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">DEFAULT WORKSPACE</label>
                 <select
                   value={generalSettings.defaultDashboard || '/dashboard'}
                   onChange={(e) => handleSelectChange('general', 'defaultDashboard', e.target.value)}
-                  className="w-full bg-transparent text-slate-900 dark:text-white text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
                 >
                   <option value="/dashboard" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Main Dashboard</option>
                   <option value="/dashboard/chat/new" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">AI Legal Assistant</option>
@@ -477,12 +539,12 @@ const POLICY_DOCUMENTS = {
               </div>
 
               {/* LEGAL JURISDICTION */}
-              <div className="p-4 bg-slate-100 dark:bg-slate-900/90 rounded-2xl space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">LEGAL JURISDICTION</label>
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">LEGAL JURISDICTION</label>
                 <select
                   value={generalSettings.jurisdiction || 'India'}
                   onChange={(e) => handleSelectChange('general', 'jurisdiction', e.target.value)}
-                  className="w-full bg-transparent text-slate-900 dark:text-white text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
                 >
                   <option value="India" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">🇮🇳 India</option>
                   <option value="Supreme Court of India" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Supreme Court of India</option>
@@ -492,12 +554,12 @@ const POLICY_DOCUMENTS = {
               </div>
 
               {/* LANGUAGE SELECTION */}
-              <div className="p-4 bg-slate-100 dark:bg-slate-900/90 rounded-2xl space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">LANGUAGE SELECTION</label>
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">LANGUAGE SELECTION</label>
                 <select
                   value={generalSettings.language || 'English'}
                   onChange={(e) => handleSelectChange('general', 'language', e.target.value)}
-                  className="w-full bg-transparent text-slate-900 dark:text-white text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
                 >
                   <option value="English" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">English</option>
                   <option value="Hindi" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Hindi (हिंदी)</option>
@@ -506,12 +568,12 @@ const POLICY_DOCUMENTS = {
               </div>
 
               {/* TIME ZONE */}
-              <div className="p-4 bg-slate-100 dark:bg-slate-900/90 rounded-2xl space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">TIME ZONE</label>
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">TIME ZONE</label>
                 <select
                   value={generalSettings.timeZone || 'IST'}
                   onChange={(e) => handleSelectChange('general', 'timeZone', e.target.value)}
-                  className="w-full bg-transparent text-slate-900 dark:text-white text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
                 >
                   <option value="IST" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">IST</option>
                   <option value="UTC" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">UTC</option>
@@ -519,12 +581,12 @@ const POLICY_DOCUMENTS = {
               </div>
 
               {/* DATE FORMAT */}
-              <div className="p-4 bg-slate-100 dark:bg-slate-900/90 rounded-2xl space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">DATE FORMAT</label>
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">DATE FORMAT</label>
                 <select
                   value={generalSettings.dateFormat || 'DD/MM/YYYY'}
                   onChange={(e) => handleSelectChange('general', 'dateFormat', e.target.value)}
-                  className="w-full bg-transparent text-slate-900 dark:text-white text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
                 >
                   <option value="DD/MM/YYYY" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">DD/MM/YYYY</option>
                   <option value="MM/DD/YYYY" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">MM/DD/YYYY</option>
@@ -533,12 +595,12 @@ const POLICY_DOCUMENTS = {
               </div>
 
               {/* TIME FORMAT */}
-              <div className="p-4 bg-slate-100 dark:bg-slate-900/90 rounded-2xl space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">TIME FORMAT</label>
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">TIME FORMAT</label>
                 <select
                   value={generalSettings.timeFormat || '12 Hour (AM/PM)'}
                   onChange={(e) => handleSelectChange('general', 'timeFormat', e.target.value)}
-                  className="w-full bg-transparent text-slate-900 dark:text-white text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
                 >
                   <option value="12 Hour (AM/PM)" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">12 Hour (AM/PM)</option>
                   <option value="24 Hour" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">24 Hour</option>
@@ -546,28 +608,28 @@ const POLICY_DOCUMENTS = {
               </div>
 
               {/* Show Product Guide Tips Again */}
-              <div className="flex items-center justify-between p-4 border-t border-slate-100 dark:border-slate-800 pt-5">
-                <div>
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 border-t border-slate-100 dark:border-slate-800 pt-4 sm:pt-5">
+                <div className="flex-1 min-w-0 pr-2">
                   <h4 className="text-xs font-black text-slate-900 dark:text-white">Show Product Guide Tips Again</h4>
                   <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Enable this to show the onboarding guide on your dashboard again</p>
                 </div>
                 <button 
                   onClick={() => handleToggle('general', 'showGuideTips', generalSettings.showGuideTips !== false)}
-                  className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${generalSettings.showGuideTips !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                  className={`w-11 h-6 rounded-full p-0.5 shrink-0 transition-all duration-300 ${generalSettings.showGuideTips !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
                 >
                   <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 ${generalSettings.showGuideTips !== false ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
 
               {/* Reset Preferences */}
-              <div className="flex items-center justify-between p-4 border-t border-slate-100 dark:border-slate-800 pt-5">
-                <div>
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 border-t border-slate-100 dark:border-slate-800 pt-4 sm:pt-5">
+                <div className="flex-1 min-w-0 pr-2">
                   <h4 className="text-xs font-black text-slate-900 dark:text-white">Reset Preferences</h4>
                   <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Restore clean preferences without deleting case documents</p>
                 </div>
                 <button
                   onClick={() => triggerConfirm('reset', 'Reset Preferences', 'Restore clean preferences without deleting case documents?', handleResetAll)}
-                  className="px-5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-900 dark:text-white font-black text-xs transition-colors cursor-pointer border border-slate-200/80 dark:border-slate-700"
+                  className="px-4 sm:px-5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-900 dark:text-white font-black text-xs transition-colors cursor-pointer border border-slate-200/80 dark:border-slate-700 shrink-0"
                 >
                   Reset
                 </button>
@@ -578,23 +640,23 @@ const POLICY_DOCUMENTS = {
 
         {/* CATEGORY 2: APPEARANCE SETTINGS (Screenshot 2 Parity) */}
         {activeCategory === 'appearance' && (
-          <div className="space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs">
+          <div className="space-y-4 sm:space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xs">
             <div>
               <h3 className="text-base font-black text-slate-900 dark:text-white">Appearance Settings</h3>
               <p className="text-xs font-semibold text-slate-400 mt-0.5">Personalize accent branding and content scaling overrides.</p>
             </div>
 
-            <div className="space-y-4 pt-2">
+            <div className="space-y-3 sm:space-y-4 pt-1 sm:pt-2">
               {/* THEME PREFERENCE */}
-              <div className="p-4 bg-slate-100 dark:bg-slate-900/90 rounded-2xl space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">THEME PREFERENCE</label>
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">THEME PREFERENCE</label>
                 <select
                   value={theme}
                   onChange={(e) => {
                     setTheme(e.target.value);
                     handleSelectChange('general', 'theme', e.target.value);
                   }}
-                  className="w-full bg-transparent text-slate-900 dark:text-white text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
                 >
                   <option value="light" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">light</option>
                   <option value="dark" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">dark</option>
@@ -603,12 +665,12 @@ const POLICY_DOCUMENTS = {
               </div>
 
               {/* FONT SIZE SCALE */}
-              <div className="p-4 bg-slate-100 dark:bg-slate-900/90 rounded-2xl space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block">FONT SIZE SCALE</label>
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">FONT SIZE SCALE</label>
                 <select
                   value={personalizationPrefs.fontSize || 'Medium'}
                   onChange={(e) => handleSelectChange('personalization', 'fontSize', e.target.value)}
-                  className="w-full bg-transparent text-slate-900 dark:text-white text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
                 >
                   <option value="Small" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Small</option>
                   <option value="Medium" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Medium</option>
@@ -621,60 +683,60 @@ const POLICY_DOCUMENTS = {
 
         {/* CATEGORY 3: NOTIFICATIONS SETTINGS */}
         {activeCategory === 'notifications' && (
-          <div className="space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs">
+          <div className="space-y-4 sm:space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xs">
             <div>
               <h3 className="text-base font-black text-slate-900 dark:text-white">Notification Preferences</h3>
               <p className="text-xs font-semibold text-slate-400 mt-0.5">Manage hearing alerts, daily cause lists, and AI updates.</p>
             </div>
 
-            <div className="space-y-4 pt-2">
-              <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
-                <div>
+            <div className="space-y-3 sm:space-y-4 pt-1 sm:pt-2">
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex-1 min-w-0 pr-2">
                   <h4 className="text-xs font-black text-slate-900 dark:text-white">Hearing Reminders</h4>
                   <p className="text-[11px] font-semibold text-slate-400">Receive alerts 24 hours prior to court hearings</p>
                 </div>
                 <button 
                   onClick={() => handleToggle('notifications', 'hearingReminder', notifPrefs.hearingReminder !== false)}
-                  className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${notifPrefs.hearingReminder !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                  className={`w-11 h-6 rounded-full p-0.5 shrink-0 transition-all duration-300 ${notifPrefs.hearingReminder !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
                 >
                   <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 ${notifPrefs.hearingReminder !== false ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
 
-              <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
-                <div>
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex-1 min-w-0 pr-2">
                   <h4 className="text-xs font-black text-slate-900 dark:text-white">Daily Cause List Updates</h4>
                   <p className="text-[11px] font-semibold text-slate-400">Daily cause list notification digest</p>
                 </div>
                 <button 
                   onClick={() => handleToggle('notifications', 'pushNotif', notifPrefs.pushNotif !== false)}
-                  className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${notifPrefs.pushNotif !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                  className={`w-11 h-6 rounded-full p-0.5 shrink-0 transition-all duration-300 ${notifPrefs.pushNotif !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
                 >
                   <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 ${notifPrefs.pushNotif !== false ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
 
-              <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
-                <div>
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex-1 min-w-0 pr-2">
                   <h4 className="text-xs font-black text-slate-900 dark:text-white">AI Research Complete Alerts</h4>
                   <p className="text-[11px] font-semibold text-slate-400">Notify when background AI draft or analysis completes</p>
                 </div>
                 <button 
                   onClick={() => handleToggle('notifications', 'draftCompleted', notifPrefs.draftCompleted !== false)}
-                  className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${notifPrefs.draftCompleted !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                  className={`w-11 h-6 rounded-full p-0.5 shrink-0 transition-all duration-300 ${notifPrefs.draftCompleted !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
                 >
                   <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 ${notifPrefs.draftCompleted !== false ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
 
-              <div className="flex items-center justify-between p-4">
-                <div>
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4">
+                <div className="flex-1 min-w-0 pr-2">
                   <h4 className="text-xs font-black text-slate-900 dark:text-white">Email Notifications</h4>
                   <p className="text-[11px] font-semibold text-slate-400">Receive schedule digests via email</p>
                 </div>
                 <button 
                   onClick={() => handleToggle('notifications', 'emailNotif', notifPrefs.emailNotif !== false)}
-                  className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${notifPrefs.emailNotif !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                  className={`w-11 h-6 rounded-full p-0.5 shrink-0 transition-all duration-300 ${notifPrefs.emailNotif !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
                 >
                   <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 ${notifPrefs.emailNotif !== false ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
@@ -685,9 +747,9 @@ const POLICY_DOCUMENTS = {
 
         {/* CATEGORY 4: SECURITY SETTINGS (Screenshots 3 & 4 Parity) */}
         {activeCategory === 'security' && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-4 sm:space-y-6 animate-fade-in">
             {/* Password & Authentication Card */}
-            <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 space-y-4 shadow-xs">
               <div>
                 <h3 className="text-base font-black text-slate-900 dark:text-white">Password & Authentication</h3>
                 <p className="text-xs font-semibold text-slate-400 mt-0.5">Update your master passphrase and secure your account access.</p>
@@ -700,26 +762,26 @@ const POLICY_DOCUMENTS = {
                   placeholder="Current Password"
                   value={passwordForm.currentPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                  className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#C8A34D]"
+                  className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border-none rounded-xl sm:rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#C8A34D]"
                 />
                 <input
                   type="password"
                   placeholder="New Password"
                   value={passwordForm.newPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                  className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#C8A34D]"
+                  className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border-none rounded-xl sm:rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#C8A34D]"
                 />
                 <input
                   type="password"
                   placeholder="Confirm New Password"
                   value={passwordForm.confirmPassword}
                   onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                  className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border-none rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#C8A34D]"
+                  className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border-none rounded-xl sm:rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#C8A34D]"
                 />
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-2xl text-xs shadow-xs transition-all cursor-pointer mt-2"
+                  className="w-full py-3.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl sm:rounded-2xl text-xs shadow-xs transition-all cursor-pointer mt-2"
                 >
                   Update Password
                 </button>
@@ -727,41 +789,41 @@ const POLICY_DOCUMENTS = {
             </div>
 
             {/* Active Login Sessions Card */}
-            <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 space-y-4 shadow-xs">
               <div>
                 <h3 className="text-base font-black text-slate-900 dark:text-white">Active Login Sessions</h3>
                 <p className="text-xs font-semibold text-slate-400 mt-0.5">Devices currently logged into your advocate portal database.</p>
               </div>
 
               <div className="space-y-3 pt-1">
-                <div className="p-4 border border-slate-200/80 dark:border-slate-800 rounded-2xl flex items-center justify-between">
+                <div className="p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 border-2 border-slate-400 rounded-xs flex items-center justify-center text-[10px] font-black">💻</div>
+                    <div className="w-6 h-6 border-2 border-slate-400 rounded-xs flex items-center justify-center text-[10px] font-black shrink-0">💻</div>
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="text-xs font-black text-slate-900 dark:text-white">Browser Client</h4>
                         <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-black rounded-md">Current Device</span>
                       </div>
                       <p className="text-[11px] font-semibold text-slate-400">Chrome • Unknown Location • Active: Today - 12:11 pm</p>
                     </div>
                   </div>
-                  <button onClick={() => toast.success("Session logged out.")} className="px-3.5 py-1.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-black cursor-pointer">Logout</button>
+                  <button onClick={() => toast.success("Session logged out.")} className="px-3.5 py-1.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-black cursor-pointer self-start sm:self-center shrink-0">Logout</button>
                 </div>
 
-                <div className="p-4 border border-slate-200/80 dark:border-slate-800 rounded-2xl flex items-center justify-between">
+                <div className="p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 border-2 border-slate-400 rounded-xs flex items-center justify-center text-[10px] font-black">📱</div>
+                    <div className="w-6 h-6 border-2 border-slate-400 rounded-xs flex items-center justify-center text-[10px] font-black shrink-0">📱</div>
                     <div>
                       <h4 className="text-xs font-black text-slate-900 dark:text-white">Browser Client</h4>
                       <p className="text-[11px] font-semibold text-slate-400">Other • Unknown Location • Active: Today - 11:53 am</p>
                     </div>
                   </div>
-                  <button onClick={() => toast.success("Session logged out.")} className="px-3.5 py-1.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-black cursor-pointer">Logout</button>
+                  <button onClick={() => toast.success("Session logged out.")} className="px-3.5 py-1.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-black cursor-pointer self-start sm:self-center shrink-0">Logout</button>
                 </div>
 
                 <button
                   onClick={() => toast.success("Logged out from all other devices!")}
-                  className="w-full py-3 rounded-2xl border border-rose-300 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-black cursor-pointer transition-all mt-2"
+                  className="w-full py-3 rounded-xl sm:rounded-2xl border border-rose-300 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-black cursor-pointer transition-all mt-2"
                 >
                   Logout From All Other Devices
                 </button>
@@ -769,7 +831,7 @@ const POLICY_DOCUMENTS = {
             </div>
 
             {/* Delete Account Card (Red outline) */}
-            <div className="bg-white dark:bg-[#1E293B] border-2 border-rose-500/40 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+            <div className="bg-white dark:bg-[#1E293B] border-2 border-rose-500/40 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 space-y-4 shadow-xs">
               <div>
                 <h3 className="text-base font-black text-rose-600 dark:text-rose-400">Delete Account</h3>
                 <p className="text-xs font-semibold text-slate-400 mt-0.5">Configure temporary deactivation or complete profile clearance.</p>
@@ -804,17 +866,17 @@ const POLICY_DOCUMENTS = {
 
         {/* CATEGORY 5: HELP & SUPPORT (Screenshot 5 Parity) */}
         {activeCategory === 'help' && (
-          <div className="space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs">
+          <div className="space-y-4 sm:space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xs">
             <div>
               <h3 className="text-base font-black text-slate-900 dark:text-white">Help & Support</h3>
               <p className="text-xs font-semibold text-slate-400 mt-0.5">Connect with helpdesk agents or view compliance policies.</p>
             </div>
 
             {/* 2 Top Grid Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1 sm:pt-2">
               <button
                 onClick={() => navigate('/dashboard/guide')}
-                className="p-5 bg-slate-100 dark:bg-slate-900 rounded-2xl text-center space-y-2 hover:border-[#C8A34D] border border-transparent transition-all cursor-pointer group"
+                className="p-4 sm:p-5 bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl text-center space-y-2 hover:border-[#C8A34D] border border-transparent transition-all cursor-pointer group"
               >
                 <div className="w-10 h-10 rounded-xl bg-[#C8A34D]/10 text-[#C8A34D] flex items-center justify-center mx-auto text-lg group-hover:scale-110 transition-transform">
                   ✨
@@ -824,7 +886,7 @@ const POLICY_DOCUMENTS = {
 
               <button
                 onClick={() => setIsFeatureModalOpen(true)}
-                className="p-5 bg-slate-100 dark:bg-slate-900 rounded-2xl text-center space-y-2 hover:border-[#C8A34D] border border-transparent transition-all cursor-pointer group"
+                className="p-4 sm:p-5 bg-slate-100 dark:bg-slate-900 rounded-2xl text-center space-y-2 hover:border-[#C8A34D] border border-transparent transition-all cursor-pointer group"
               >
                 <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto text-lg group-hover:scale-110 transition-transform">
                   💡
@@ -837,58 +899,58 @@ const POLICY_DOCUMENTS = {
             <div className="space-y-3 pt-2">
               <div
                 onClick={() => setIsBugModalOpen(true)}
-                className="p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl flex items-center justify-between cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
+                className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-between gap-3 cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
               >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">🐛</div>
-                  <div>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 shrink-0">🐛</div>
+                  <div className="min-w-0 flex-1">
                     <h4 className="text-xs font-black text-slate-900 dark:text-white">Report Bug</h4>
-                    <p className="text-[11px] font-semibold text-slate-400">Attach device diagnostic logs and submit error tickets to support</p>
+                    <p className="text-[11px] font-semibold text-slate-400 truncate sm:whitespace-normal">Attach device diagnostic logs and submit error tickets to support</p>
                   </div>
                 </div>
-                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors" />
+                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors shrink-0" />
               </div>
 
               <div
                 onClick={() => navigate('/privacy-policy')}
-                className="p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl flex items-center justify-between cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
+                className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-between gap-3 cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
               >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500">🛡️</div>
-                  <div>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500 shrink-0">🛡️</div>
+                  <div className="min-w-0 flex-1">
                     <h4 className="text-xs font-black text-slate-900 dark:text-white">Privacy Policy</h4>
-                    <p className="text-[11px] font-semibold text-slate-400">Read data encryption standards, non-sale guidelines, and retention policies</p>
+                    <p className="text-[11px] font-semibold text-slate-400 truncate sm:whitespace-normal">Read data encryption standards, non-sale guidelines, and retention policies</p>
                   </div>
                 </div>
-                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors" />
+                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors shrink-0" />
               </div>
 
               <div
                 onClick={() => navigate('/terms-of-service')}
-                className="p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl flex items-center justify-between cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
+                className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-between gap-3 cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
               >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">📜</div>
-                  <div>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 shrink-0">📜</div>
+                  <div className="min-w-0 flex-1">
                     <h4 className="text-xs font-black text-slate-900 dark:text-white">Terms & Conditions</h4>
-                    <p className="text-[11px] font-semibold text-slate-400">View user license agreements, subscriber terms, and jurisdiction rules</p>
+                    <p className="text-[11px] font-semibold text-slate-400 truncate sm:whitespace-normal">View user license agreements, subscriber terms, and jurisdiction rules</p>
                   </div>
                 </div>
-                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors" />
+                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors shrink-0" />
               </div>
 
               <div
                 onClick={() => setActivePolicyKey('disclaimer')}
-                className="p-4 bg-slate-100 dark:bg-slate-900 rounded-2xl flex items-center justify-between cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
+                className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-between gap-3 cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
               >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">⚠️</div>
-                  <div>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 shrink-0">⚠️</div>
+                  <div className="min-w-0 flex-1">
                     <h4 className="text-xs font-black text-slate-900 dark:text-white">AI Disclaimer</h4>
-                    <p className="text-[11px] font-semibold text-slate-400">Algorithmic limits, advisory scope, and precedent verification rules</p>
+                    <p className="text-[11px] font-semibold text-slate-400 truncate sm:whitespace-normal">Algorithmic limits, advisory scope, and precedent verification rules</p>
                   </div>
                 </div>
-                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors" />
+                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors shrink-0" />
               </div>
             </div>
           </div>

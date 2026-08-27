@@ -6,7 +6,7 @@ import {
   SearchCode, FileCheck, Gavel, Lightbulb, Scale, Calendar, 
   Users, Bell, User, Settings2, LogOut, ChevronRight, ChevronLeft, Binary,
   Sun, Moon, Globe, ChevronDown, Bookmark, HelpCircle, Download,
-  CreditCard, Shield, Zap, GraduationCap, Building2, MessageSquare, BookOpen, Smartphone
+  CreditCard, Shield, Zap, GraduationCap, Building2, MessageSquare, BookOpen, Smartphone, X
 } from 'lucide-react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userData, selectedRoleState, clearUser } from '../../userStore/userData';
@@ -270,21 +270,30 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
     return (
       <div className="flex flex-col w-full font-sans select-none bg-white dark:bg-[#1E293B]">
         {/* User Identity Header */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-[#1E293B]">
-          <div className="w-10 h-10 rounded-full bg-[#C8A34D]/10 flex items-center justify-center shrink-0 overflow-hidden border border-[#C8A34D]/25">
-            {user.avatar ? (
-              <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = ''; }} />
-            ) : (
-              <span className="text-[#C8A34D] font-bold text-sm">{user.name?.charAt(0) || 'A'}</span>
-            )}
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-[#1E293B]">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-full bg-[#C8A34D]/10 flex items-center justify-center shrink-0 overflow-hidden border border-[#C8A34D]/25">
+              {user.avatar ? (
+                <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = ''; }} />
+              ) : (
+                <span className="text-[#C8A34D] font-bold text-sm">{user.name?.charAt(0) || 'A'}</span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-extrabold text-slate-800 dark:text-white truncate leading-tight capitalize">{user.name || 'Advocate Profile'}</p>
+              <p className="text-[11px] font-semibold text-slate-400 truncate mt-0.5">{user.email || 'Advocate Account'}</p>
+              <span className="inline-block mt-1 px-2 py-0.5 rounded bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/20 text-[9px] font-bold uppercase tracking-wider">
+                {isAdminUser ? 'SUPER ADMIN' : selectedRole === 'student' ? 'Law Student' : selectedRole === 'law_firm' ? 'Law Firm Associate' : 'Advocate / Practitioner'}
+              </span>
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-extrabold text-slate-800 dark:text-white truncate leading-tight capitalize">{user.name || 'Advocate Profile'}</p>
-            <p className="text-[11px] font-semibold text-slate-400 truncate mt-0.5">{user.email || 'Advocate Account'}</p>
-            <span className="inline-block mt-1 px-2 py-0.5 rounded bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/20 text-[9px] font-bold uppercase tracking-wider">
-              {isAdminUser ? 'SUPER ADMIN' : selectedRole === 'student' ? 'Law Student' : selectedRole === 'law_firm' ? 'Law Firm Associate' : 'Advocate / Practitioner'}
-            </span>
-          </div>
+          <button
+            onClick={() => setShowDropdown(false)}
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+            title="Close menu"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Action Items List */}
@@ -495,7 +504,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
               className="relative w-full bg-white dark:bg-[#1E293B] rounded-t-3xl max-h-[85vh] overflow-hidden flex flex-col p-4 z-10 shadow-[0_-8px_30px_rgba(0,0,0,0.2)] border-t border-slate-100 dark:border-slate-800"
             >
-              <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-4 shrink-0" />
+              <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-3 shrink-0" />
               {renderDropdownContent()}
             </motion.div>
           </div>
