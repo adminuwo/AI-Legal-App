@@ -493,9 +493,9 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="relative w-full bg-white rounded-t-2xl max-h-[85vh] overflow-hidden flex flex-col p-4 z-10 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] border-t border-slate-100"
+              className="relative w-full bg-white dark:bg-[#1E293B] rounded-t-3xl max-h-[85vh] overflow-hidden flex flex-col p-4 z-10 shadow-[0_-8px_30px_rgba(0,0,0,0.2)] border-t border-slate-100 dark:border-slate-800"
             >
-              <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-4 shrink-0" />
+              <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-4 shrink-0" />
               {renderDropdownContent()}
             </motion.div>
           </div>

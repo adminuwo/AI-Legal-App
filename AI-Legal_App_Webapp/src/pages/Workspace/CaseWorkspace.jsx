@@ -2203,135 +2203,135 @@ export const CaseWorkspace = ({
 
   const renderOverview = () => {
     return (
-      <div className="space-y-6 max-w-7xl mx-auto">
+      <div className="space-y-4 max-w-7xl mx-auto">
         {/* Top Header Card (Title & Edit) */}
-        <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 uppercase tracking-wider">
+        <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 sm:p-5 shadow-xs flex flex-row items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5">
+              <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 uppercase tracking-wider">
                 {caseData.status || 'ACTIVE'}
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-800 uppercase tracking-wider">
+              <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-800 uppercase tracking-wider">
                 {caseData.priority || 'HIGH'}
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-[#0F172A] dark:text-white tracking-tight">
+            <h1 className="text-lg sm:text-2xl font-black text-[#0F172A] dark:text-white tracking-tight">
               {caseData.name || 'hddh'}
             </h1>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setActiveTab('settings')}
-              className="px-4 py-2 bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D] hover:bg-[#C8A34D]/25 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D] hover:bg-[#C8A34D]/25 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap"
             >
-              <Edit2 size={14} /> Edit Case
+              <Edit2 size={13} /> Edit Case
             </button>
           </div>
         </div>
 
         {/* 2-Column Responsive Layout matching Mobile Screenshots */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
           {/* Card 1: CASE INFORMATION */}
-          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-            <h3 className="text-xs font-black text-[#C8A34D] uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 sm:p-5 shadow-xs space-y-2.5">
+            <h3 className="text-xs font-black text-[#C8A34D] uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">
               CASE INFORMATION
             </h3>
 
-            <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
+            <div className="grid grid-cols-2 gap-y-2.5 sm:gap-y-3.5 gap-x-3 sm:gap-x-6 text-xs">
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Case Title</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">{caseData.name || 'hddh'}</strong>
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Case Title</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">{caseData.name || 'hddh'}</strong>
               </div>
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Case Number</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">{caseData.caseNumber || caseData.number || 'CIV-2026-00154'}</strong>
-              </div>
-
-              <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Case Type</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">{caseData.caseType || caseData.category || 'Civil'}</strong>
-              </div>
-              <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Practice Area</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">{caseData.practiceArea || caseData.subCategory || 'Property Dispute'}</strong>
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Case Number</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">{caseData.caseNumber || caseData.number || 'CIV-2026-00154'}</strong>
               </div>
 
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Status</span>
-                <span className="inline-block px-2.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold text-[11px]">
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Case Type</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">{caseData.caseType || caseData.category || 'Civil'}</strong>
+              </div>
+              <div>
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Practice Area</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">{caseData.practiceArea || caseData.subCategory || 'Property Dispute'}</strong>
+              </div>
+
+              <div>
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Status</span>
+                <span className="inline-block px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-bold text-[10px] sm:text-[11px]">
                   {caseData.status || 'Active'}
                 </span>
               </div>
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Priority</span>
-                <span className="inline-block px-2.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 font-bold text-[11px]">
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Priority</span>
+                <span className="inline-block px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400 font-bold text-[10px] sm:text-[11px]">
                   {caseData.priority || 'High'}
                 </span>
               </div>
 
-              <div className="col-span-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Current Stage</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">{caseData.stage || caseData.currentStage || 'Pre-litigation'}</strong>
+              <div className="col-span-2 pt-1.5 border-t border-slate-100 dark:border-slate-800">
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Current Stage</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">{caseData.stage || caseData.currentStage || 'Pre-litigation'}</strong>
               </div>
             </div>
           </div>
 
           {/* Card 2: PARTIES */}
-          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-            <h3 className="text-xs font-black text-[#C8A34D] uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-3 flex justify-between items-center">
+          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 sm:p-5 shadow-xs space-y-2.5">
+            <h3 className="text-xs font-black text-[#C8A34D] uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2 flex justify-between items-center">
               <span>PARTIES</span>
-              <button onClick={() => setActiveTab('parties')} className="text-[11px] font-bold text-[#C8A34D] hover:underline">View Parties →</button>
+              <button onClick={() => setActiveTab('parties')} className="text-[10px] sm:text-[11px] font-bold text-[#C8A34D] hover:underline">View Parties →</button>
             </h3>
 
-            <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
+            <div className="grid grid-cols-2 gap-y-2.5 sm:gap-y-3.5 gap-x-3 sm:gap-x-6 text-xs">
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Client</span>
-                <strong className="font-bold text-slate-800 dark:text-[#E2E8F0] text-sm">{caseData.clientName || 'Aditi Lakhera'}</strong>
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Client</span>
+                <strong className="font-bold text-slate-800 dark:text-[#E2E8F0] text-xs sm:text-sm">{caseData.clientName || 'Aditi Lakhera'}</strong>
               </div>
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Client Role</span>
-                <strong className="font-bold text-slate-800 dark:text-[#E2E8F0] text-sm">{caseData.clientRole || 'Plaintiff'}</strong>
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Client Role</span>
+                <strong className="font-bold text-slate-800 dark:text-[#E2E8F0] text-xs sm:text-sm">{caseData.clientRole || 'Plaintiff'}</strong>
               </div>
 
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Opponent</span>
-                <strong className="font-bold text-slate-800 dark:text-[#E2E8F0] text-sm">{caseData.opponentName || caseData.accused || 'Respondent'}</strong>
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Opponent</span>
+                <strong className="font-bold text-slate-800 dark:text-[#E2E8F0] text-xs sm:text-sm">{caseData.opponentName || caseData.accused || 'Respondent'}</strong>
               </div>
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Opponent Role</span>
-                <strong className="font-bold text-slate-800 dark:text-[#E2E8F0] text-sm">{caseData.opponentRole || 'Defendant'}</strong>
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Opponent Role</span>
+                <strong className="font-bold text-slate-800 dark:text-[#E2E8F0] text-xs sm:text-sm">{caseData.opponentRole || 'Defendant'}</strong>
               </div>
             </div>
           </div>
 
           {/* Card 3: IMPORTANT DATES */}
-          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-            <h3 className="text-xs font-black text-[#C8A34D] uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 sm:p-5 shadow-xs space-y-2.5">
+            <h3 className="text-xs font-black text-[#C8A34D] uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">
               IMPORTANT DATES
             </h3>
 
-            <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
+            <div className="grid grid-cols-2 gap-y-2.5 sm:gap-y-3.5 gap-x-3 sm:gap-x-6 text-xs">
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Created</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Created</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
                   {caseData.createdAt ? new Date(caseData.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '19 Aug 2026'}
                 </strong>
               </div>
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Filed</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">{caseData.filedDate || caseData.filingDate || '15 June 2026'}</strong>
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Filed</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">{caseData.filedDate || caseData.filingDate || '15 June 2026'}</strong>
               </div>
 
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Next Hearing</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Next Hearing</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
                   {caseData.nextHearingDate || (caseData.hearings?.[0]?.date) || 'Not Scheduled Yet'}
                 </strong>
               </div>
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Last Updated</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Last Updated</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
                   {caseData.updatedAt ? new Date(caseData.updatedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '19 Aug 2026'}
                 </strong>
               </div>
@@ -2339,15 +2339,15 @@ export const CaseWorkspace = ({
           </div>
 
           {/* Card 4: TEAM INFORMATION */}
-          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-4">
-            <h3 className="text-xs font-black text-[#C8A34D] uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 sm:p-5 shadow-xs space-y-2.5">
+            <h3 className="text-xs font-black text-[#C8A34D] uppercase tracking-widest border-b border-slate-100 dark:border-slate-800 pb-2">
               TEAM INFORMATION
             </h3>
 
-            <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-xs">
+            <div className="grid grid-cols-2 gap-y-2.5 sm:gap-y-3.5 gap-x-3 sm:gap-x-6 text-xs">
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Lead Advocate</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Lead Advocate</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
                   {caseData.leadAdvocate || caseData.ownerName || (() => {
                     try {
                       const u = JSON.parse(localStorage.getItem('user') || '{}');
@@ -2357,15 +2357,15 @@ export const CaseWorkspace = ({
                 </strong>
               </div>
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Assigned Team</span>
-                <button onClick={() => setIsTeamModalOpen(true)} className="font-bold text-[#C8A34D] hover:underline text-sm flex items-center gap-1 cursor-pointer">
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Assigned Team</span>
+                <button onClick={() => setIsTeamModalOpen(true)} className="font-bold text-[#C8A34D] hover:underline text-xs sm:text-sm flex items-center gap-1 cursor-pointer">
                   2 Members →
                 </button>
               </div>
 
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Case Owner</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Case Owner</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
                   {caseData.caseOwner || caseData.firmName || (() => {
                     try {
                       const u = JSON.parse(localStorage.getItem('user') || '{}');
@@ -2376,8 +2376,8 @@ export const CaseWorkspace = ({
                 </strong>
               </div>
               <div>
-                <span className="text-[11px] font-medium text-slate-400 block mb-0.5">Created By</span>
-                <strong className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                <span className="text-[10px] sm:text-[11px] font-medium text-slate-400 block mb-0.5">Created By</span>
+                <strong className="font-bold text-slate-800 dark:text-slate-200 text-xs sm:text-sm">
                   {caseData.createdBy || (() => {
                     try {
                       const u = JSON.parse(localStorage.getItem('user') || '{}');
@@ -2390,7 +2390,7 @@ export const CaseWorkspace = ({
           </div>
 
           {/* Card 5: ✨ AI Case Summary (Full Width Banner) */}
-          <div className="md:col-span-2 bg-gradient-to-r from-amber-500/5 via-white to-amber-500/5 dark:from-amber-950/20 dark:via-[#1E293B] dark:to-amber-950/20 border border-[#C8A34D]/40 rounded-2xl p-6 shadow-xs space-y-4">
+          <div className="sm:col-span-2 bg-gradient-to-r from-amber-500/5 via-white to-amber-500/5 dark:from-amber-950/20 dark:via-[#1E293B] dark:to-amber-950/20 border border-[#C8A34D]/40 rounded-2xl p-4 sm:p-6 shadow-xs space-y-2.5">
             <h3 className="text-xs font-black text-[#0F172A] dark:text-white uppercase tracking-widest flex items-center gap-2">
               <Sparkles size={16} className="text-[#C8A34D]" />
               <span>AI Case Summary</span>
@@ -2399,15 +2399,6 @@ export const CaseWorkspace = ({
             <p className="text-xs text-slate-700 dark:text-slate-300 font-medium leading-relaxed">
               {caseData.summary || caseData.caseSummary || personalAnalysis?.completeCaseSummary || caseData.description || 'No AI summary has been generated yet for this case master record.'}
             </p>
-
-            <button
-              onClick={handleRunAiAnalysis}
-              disabled={isLoadingAnalysis}
-              className="w-full py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-bold rounded-xl text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
-            >
-              <Sparkles size={14} />
-              <span>{isLoadingAnalysis ? "Generating Summary..." : "✨ Generate Summary"}</span>
-            </button>
           </div>
         </div>
       </div>
@@ -14825,104 +14816,104 @@ Through Counsel
 
       {/* ─── Case Team Modal (Matching Mobile Screenshot 2 Parity) ─── */}
       {isTeamModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 shadow-2xl max-w-md w-full space-y-5 animate-in fade-in zoom-in duration-150 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-3.5 sm:p-6 shadow-2xl max-w-md w-full space-y-3.5 sm:space-y-5 animate-in fade-in zoom-in duration-150 relative max-h-[85vh] overflow-y-auto custom-scrollbar">
             {/* Modal Close Button */}
             <button 
               onClick={() => setIsTeamModalOpen(false)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1.5 sm:p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
               <X size={18} />
             </button>
 
             {/* Modal Header */}
             <div>
-              <h2 className="text-lg font-black text-[#0F172A] dark:text-white tracking-tight flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-black text-[#0F172A] dark:text-white tracking-tight flex items-center gap-2">
                 <span>Case Team</span>
               </h2>
               <p className="text-xs font-medium text-slate-500">{caseData.name || 'hddh'}</p>
             </div>
 
             {/* CASE TEAM SUMMARY Card */}
-            <div className="bg-gradient-to-br from-amber-500/5 via-white to-amber-500/5 dark:from-amber-950/20 dark:via-[#1E293B] dark:to-amber-950/20 border border-[#C8A34D]/50 rounded-2xl p-4 space-y-3">
+            <div className="bg-gradient-to-br from-amber-500/5 via-white to-amber-500/5 dark:from-amber-950/20 dark:via-[#1E293B] dark:to-amber-950/20 border border-[#C8A34D]/50 rounded-2xl p-3 sm:p-4 space-y-2.5 sm:space-y-3">
               <h3 className="text-[10px] font-black text-[#C8A34D] uppercase tracking-widest">
                 CASE TEAM SUMMARY
               </h3>
 
-              <div className="grid grid-cols-4 gap-2 text-center border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="grid grid-cols-4 gap-1.5 sm:gap-2 text-center border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-3">
                 <div>
-                  <div className="text-lg font-black text-slate-800 dark:text-slate-100">1</div>
+                  <div className="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100">1</div>
                   <div className="text-[9px] font-medium text-slate-400">Lead Advocate</div>
                 </div>
                 <div>
-                  <div className="text-lg font-black text-slate-800 dark:text-slate-100">2</div>
+                  <div className="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100">2</div>
                   <div className="text-[9px] font-medium text-slate-400">Advocates</div>
                 </div>
                 <div>
-                  <div className="text-lg font-black text-slate-800 dark:text-slate-100">0</div>
+                  <div className="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100">0</div>
                   <div className="text-[9px] font-medium text-slate-400">Research</div>
                 </div>
                 <div>
-                  <div className="text-lg font-black text-slate-800 dark:text-slate-100">0</div>
+                  <div className="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100">0</div>
                   <div className="text-[9px] font-medium text-slate-400">Paralegal</div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs pt-1">
+              <div className="flex items-center justify-between text-xs pt-0.5">
                 <span className="font-bold text-slate-600 dark:text-slate-400">Assigned to this Case</span>
                 <span className="font-black text-[#C8A34D]">3 Members</span>
               </div>
             </div>
 
             {/* ASSIGNED MEMBERS (3) */}
-            <div className="space-y-3">
+            <div className="space-y-2.5 sm:space-y-3">
               <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                 ASSIGNED MEMBERS (3)
               </h4>
 
               {/* Member 1: Aditi Lakhera (Lead) */}
-              <div className="bg-slate-50 dark:bg-slate-900/60 border border-[#C8A34D]/40 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-2xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#C8A34D]/20 text-[#C8A34D] font-black flex items-center justify-center text-sm border border-[#C8A34D]/40 shrink-0">
+              <div className="bg-slate-50 dark:bg-slate-900/60 border border-[#C8A34D]/40 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2.5 sm:gap-3 shadow-2xs">
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#C8A34D]/20 text-[#C8A34D] font-black flex items-center justify-center text-xs sm:text-sm border border-[#C8A34D]/40 shrink-0">
                     AL
                   </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-black text-slate-800 dark:text-white text-xs">Aditi Lakhera</span>
-                      <span className="px-1.5 py-0.5 bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-300 dark:border-amber-700 rounded text-[9px] font-bold">👑 Lead</span>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-black text-slate-800 dark:text-white text-xs truncate">Aditi Lakhera</span>
+                      <span className="px-1.5 py-0.2 bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-300 dark:border-amber-700 rounded text-[9px] font-bold">👑 Lead</span>
                     </div>
                     <div className="text-[11px] font-bold text-[#C8A34D] mt-0.5">Lead Advocate</div>
-                    <div className="text-[10px] text-slate-400 font-medium">Managing Partner • Corporate Law</div>
+                    <div className="text-[10px] text-slate-400 font-medium truncate">Managing Partner • Corporate Law</div>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-full text-[9px] font-bold shrink-0">🟢 Active</span>
               </div>
 
               {/* Member 2: Advocate */}
-              <div className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-2xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-500 text-white font-black flex items-center justify-center text-sm shrink-0">
+              <div className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2.5 sm:gap-3 shadow-2xs">
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500 text-white font-black flex items-center justify-center text-xs sm:text-sm shrink-0">
                     A
                   </div>
-                  <div>
-                    <div className="font-black text-slate-800 dark:text-white text-xs">Advocate</div>
+                  <div className="min-w-0">
+                    <div className="font-black text-slate-800 dark:text-white text-xs truncate">Advocate</div>
                     <div className="text-[11px] font-bold text-[#C8A34D] mt-0.5">Assigned Advocate</div>
-                    <div className="text-[10px] text-slate-400 font-medium">Associate Advocate • Civil & Criminal Practice</div>
+                    <div className="text-[10px] text-slate-400 font-medium truncate">Associate Advocate • Civil & Criminal</div>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-full text-[9px] font-bold shrink-0">🟢 Active</span>
               </div>
 
               {/* Member 3: Aditi */}
-              <div className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-2xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-blue-500 text-white font-black flex items-center justify-center text-sm shrink-0">
+              <div className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2.5 sm:gap-3 shadow-2xs">
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-500 text-white font-black flex items-center justify-center text-xs sm:text-sm shrink-0">
                     A
                   </div>
-                  <div>
-                    <div className="font-black text-slate-800 dark:text-white text-xs">Aditi</div>
+                  <div className="min-w-0">
+                    <div className="font-black text-slate-800 dark:text-white text-xs truncate">Aditi</div>
                     <div className="text-[11px] font-bold text-[#C8A34D] mt-0.5">Junior Advocate</div>
-                    <div className="text-[10px] text-slate-400 font-medium">Junior Advocate • Civil Litigation</div>
+                    <div className="text-[10px] text-slate-400 font-medium truncate">Junior Advocate • Civil Litigation</div>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-full text-[9px] font-bold shrink-0">🟢 Active</span>

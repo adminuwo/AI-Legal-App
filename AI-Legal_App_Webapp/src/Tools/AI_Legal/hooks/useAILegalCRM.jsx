@@ -167,11 +167,31 @@ export const useAILegalCRM = ({
       const all = await apiService.getProjects();
       if (Array.isArray(all)) {
         setAllProjects(all);
+      } else {
+        setAllProjects([]);
       }
     } catch (err) {
       console.error("Failed to fetch legal cases:", err);
+      setAllProjects([]);
     }
   };
+
+  // User identity / Role change listener to prevent cross-account case retention in Recoil state
+  useEffect(() => {
+    const handleRoleOrWsChange = () => {
+      fetchLegalCases(true);
+    };
+    window.addEventListener('user_role_changed', handleRoleOrWsChange);
+    window.addEventListener('workspace_changed', handleRoleOrWsChange);
+    return () => {
+      window.removeEventListener('user_role_changed', handleRoleOrWsChange);
+      window.removeEventListener('workspace_changed', handleRoleOrWsChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchLegalCases(true);
+  }, [location.pathname]);
 
   // Automatic Window Focus Listener to ensure real-time sync with Mobile App updates
   useEffect(() => {

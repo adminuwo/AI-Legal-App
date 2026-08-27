@@ -286,17 +286,17 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto shrink-0">
           <button
             onClick={() => setIsInviteModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-xl bg-[#C8A34D] hover:bg-[#b59240] text-slate-950 font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#C8A34D] hover:bg-[#b59240] text-slate-950 font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer whitespace-nowrap"
           >
             <UserPlus className="w-4 h-4" />
-            <span>Invite Team Member</span>
+            <span>Invite Team</span>
           </button>
           <button
             onClick={() => navigate('/dashboard/subscription')}
-            className="inline-flex items-center gap-2 px-4.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs sm:text-sm transition-all cursor-pointer"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap"
           >
             <CreditCard className="w-4 h-4 text-[#C8A34D]" />
             <span>Manage Seats</span>
@@ -338,61 +338,61 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
       )}
 
       {/* 2. Firm KPI Overview (4 Grid Cards matching Mobile App) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Card 1: Active Firm Cases */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
+        <div className="p-3.5 sm:p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-900 dark:text-white">Active Firm Cases</span>
-            <div className="p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
-              <Briefcase className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-bold text-slate-900 dark:text-white">Active Firm Cases</span>
+            <div className="p-1.5 sm:p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
+              <Briefcase className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-3">
-            <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{totalActiveCases}</span>
+          <div className="mt-2 sm:mt-3">
+            <span className="text-xl sm:text-3xl font-black text-slate-900 dark:text-white">{totalActiveCases}</span>
           </div>
-          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-2">{totalActiveCases} Live dockets</p>
+          <p className="text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2">{totalActiveCases} Live dockets</p>
         </div>
 
         {/* Card 2: Today's Hearings */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
+        <div className="p-3.5 sm:p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-900 dark:text-white">Today's Hearings</span>
-            <div className="p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
-              <Calendar className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-bold text-slate-900 dark:text-white">Today's Hearings</span>
+            <div className="p-1.5 sm:p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
+              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-3">
-            <span className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{todaysHearingsCount}</span>
+          <div className="mt-2 sm:mt-3">
+            <span className="text-xl sm:text-3xl font-black text-slate-900 dark:text-white">{todaysHearingsCount}</span>
           </div>
-          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-2">{todaysHearingsCount > 0 ? `${todaysHearingsCount} scheduled today` : 'Nothing scheduled today'}</p>
+          <p className="text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2">{todaysHearingsCount > 0 ? `${todaysHearingsCount} scheduled` : 'Nothing scheduled'}</p>
         </div>
 
         {/* Card 3: Pending Reviews */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
+        <div className="p-3.5 sm:p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-900 dark:text-white">Pending Reviews</span>
-            <div className="p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
-              <FileText className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-bold text-slate-900 dark:text-white">Pending Reviews</span>
+            <div className="p-1.5 sm:p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
+              <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-3">
-            <span className="text-2xl sm:text-3xl font-black text-amber-600 dark:text-amber-400">{totalPendingReviews}</span>
+          <div className="mt-2 sm:mt-3">
+            <span className="text-xl sm:text-3xl font-black text-amber-600 dark:text-amber-400">{totalPendingReviews}</span>
           </div>
-          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-2">{totalPendingReviews > 0 ? `${totalPendingReviews} pending items` : 'No pending reviews'}</p>
+          <p className="text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2">{totalPendingReviews > 0 ? `${totalPendingReviews} pending` : 'No pending reviews'}</p>
         </div>
 
         {/* Card 4: Team Members */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
+        <div className="p-3.5 sm:p-5 rounded-2xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-900 dark:text-white">Team Members</span>
-            <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-              <Users className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-bold text-slate-900 dark:text-white">Team Members</span>
+            <div className="p-1.5 sm:p-2 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-3">
-            <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">{usedSeats}</span>
+          <div className="mt-2 sm:mt-3">
+            <span className="text-xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400">{usedSeats}</span>
           </div>
-          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-2">{usedSeats} Active - 0 Pending</p>
+          <p className="text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1 sm:mt-2">{usedSeats} Active - 0 Pending</p>
         </div>
       </div>
 
@@ -510,15 +510,15 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
             <p>No team members yet. Invite your first advocate to start building your firm workspace.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+          <div className="overflow-x-auto -mx-1 px-1">
+            <table className="w-full min-w-[650px] text-left text-xs border-collapse whitespace-nowrap">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px] font-bold">
-                  <th className="py-3 px-4">Member Name</th>
-                  <th className="py-3 px-4">Role / Designation</th>
-                  <th className="py-3 px-4">Active Matters</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-3 sm:px-4">Member Name</th>
+                  <th className="py-3 px-3 sm:px-4">Role / Designation</th>
+                  <th className="py-3 px-3 sm:px-4">Active Matters</th>
+                  <th className="py-3 px-3 sm:px-4">Status</th>
+                  <th className="py-3 px-3 sm:px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -526,7 +526,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
                   const casesCount = getMemberCaseCount(member);
                   return (
                     <tr key={member.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
-                      <td className="py-3 px-4 font-semibold text-slate-900 dark:text-white">
+                      <td className="py-3 px-3 sm:px-4 font-semibold text-slate-900 dark:text-white">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-[#C8A34D]/20 border border-[#C8A34D]/40 flex items-center justify-center font-bold text-[#C8A34D] text-xs shrink-0">
                             {member.name.charAt(0).toUpperCase()}
@@ -542,15 +542,15 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
                           </div>
                         </div>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-3 sm:px-4">
                         <span className="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[11px]">
                           {member.role}
                         </span>
                       </td>
-                      <td className="py-3 px-4 font-bold text-slate-700 dark:text-slate-200">
+                      <td className="py-3 px-3 sm:px-4 font-bold text-slate-700 dark:text-slate-200">
                         {casesCount} Cases
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-3 sm:px-4">
                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
                           member.status === 'Active' 
                             ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' 
@@ -559,7 +559,7 @@ export default function LawFirmDashboardSection({ user, cases = [], workspaces =
                           {member.status}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right relative">
+                      <td className="py-3 px-3 sm:px-4 text-right relative">
                         {!member.isOwner && (
                           <div className="inline-block relative">
                             <button
