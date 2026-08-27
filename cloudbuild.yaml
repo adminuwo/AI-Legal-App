@@ -1,18 +1,12 @@
-<<<<<<< HEAD
 # Google Cloud Build Pipeline for AI-Legal-App (Unified Single Service)
 # Builds the multi-stage container and deploys to Cloud Run
 
 steps:
   # 1. Build the unified container image
-=======
-steps:
-  # Build the container image
->>>>>>> c9e07ffc6999687175e12f3f1b4540ebb90d6e06
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
       - '-t'
-<<<<<<< HEAD
       - 'gcr.io/$PROJECT_ID/ai-legal-app:$COMMIT_SHA'
       - '-t'
       - 'gcr.io/$PROJECT_ID/ai-legal-app:latest'
@@ -32,24 +26,11 @@ steps:
       - 'gcr.io/$PROJECT_ID/ai-legal-app:latest'
 
   # 3. Deploy to Cloud Run as a single unified service
-=======
-      - 'gcr.io/$PROJECT_ID/aisa-frontend:$COMMIT_SHA'
-      - '--build-arg'
-      - 'VITE_GOOGLE_CLIENT_ID=743928421487-4k3rngu52s9ts2mpr032ladvu72v6ll7.apps.googleusercontent.com'
-      - '.'
-
-  # Push the container image to Container Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/aisa-frontend:$COMMIT_SHA']
-
-  # Deploy container image to Cloud Run
->>>>>>> c9e07ffc6999687175e12f3f1b4540ebb90d6e06
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
-<<<<<<< HEAD
       - '${_SERVICE_NAME}'
       - '--image'
       - 'gcr.io/$PROJECT_ID/ai-legal-app:$COMMIT_SHA'
@@ -77,16 +58,3 @@ images:
 
 options:
   logging: CLOUD_LOGGING_ONLY
-=======
-      - 'aisa-frontend'
-      - '--image'
-      - 'gcr.io/$PROJECT_ID/aisa-frontend:$COMMIT_SHA'
-      - '--region'
-      - 'asia-south1'
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
-
-images:
-  - 'gcr.io/$PROJECT_ID/aisa-frontend:$COMMIT_SHA'
->>>>>>> c9e07ffc6999687175e12f3f1b4540ebb90d6e06
