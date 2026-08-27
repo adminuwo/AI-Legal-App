@@ -486,7 +486,7 @@ export const normalizeFeatureKey = (feature) => {
     if (['court_prep', 'argument_builder', 'legal_argument_builder', 'court_preparation', 'prep'].includes(key)) {
         return 'court_prep';
     }
-    if (['legal_precedent', 'legal_precedents', 'precedents', 'case_law', 'legal_case_law_research', 'legal_research_assistant', 'research_assistant', 'case_research'].includes(key)) {
+    if (['legal_precedent', 'legal_precedents', 'precedents', 'case_law', 'legal_case_law_research', 'legal_research_assistant', 'research_assistant', 'case_research', 'knowledge_hub', 'knowledgehub', 'legal_knowledge_hub', 'knowledge_base'].includes(key)) {
         return 'legal_precedent';
     }
     if (['evidence_analysis', 'evidence_analyst', 'evidence_checker', 'legal_evidence_checker', 'evidence'].includes(key)) {

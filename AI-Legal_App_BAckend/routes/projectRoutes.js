@@ -434,7 +434,7 @@ router.post('/', verifyToken, verifyMatterCreationAccess, async (req, res) => {
             workspaceTypeToSave = 'student';
             roleToSave = 'student';
             activeWorkspaceId = 'personal_practice';
-        } else if (reqWsType === 'law_firm' || (activeWorkspaceId && activeWorkspaceId !== 'personal_practice' && !String(activeWorkspaceId).startsWith('personal_') && mongoose.Types.ObjectId.isValid(activeWorkspaceId))) {
+        } else if (reqWsType === 'law_firm' || req.body.role === 'law_firm' || (activeWorkspaceId && activeWorkspaceId !== 'personal_practice' && !String(activeWorkspaceId).startsWith('personal_') && mongoose.Types.ObjectId.isValid(activeWorkspaceId))) {
             workspaceTypeToSave = 'law_firm';
             roleToSave = 'law_firm';
         } else {
@@ -491,13 +491,16 @@ router.post('/', verifyToken, verifyMatterCreationAccess, async (req, res) => {
 
         await project.save();
 
-        // Socket.IO case creation broadcast
+        // Socket.IO case creation broadcast (user-scoped)
         try {
             const { getIO } = await import('../utils/socket.js');
             const io = getIO();
-            io.emit('case:created', { _id: project._id, name: project.name, userId: project.userId, role: project.role, workspaceType: project.workspaceType });
+            const targetUserRoom = project.userId ? project.userId.toString() : null;
+            if (targetUserRoom) {
+                io.to(targetUserRoom).emit('case:created', { _id: project._id, name: project.name, userId: project.userId, role: project.role, workspaceType: project.workspaceType });
+            }
         } catch (e) {
-            console.warn('[Socket] case:created broadcast failed:', e.message);
+            console.warn('[Socket] case:created emission failed:', e.message);
         }
 
         console.log(`[STRICT WORKSPACE ISOLATION] Case "${project.name}" saved with workspaceId: ${project.workspaceId} (${project.workspaceType}) by user ${req.user.id}`);
@@ -551,21 +554,16 @@ router.get('/', verifyToken, async (req, res) => {
             requestedWsType = userRoleHeader;
         }
         
-        const isLawFirmWs = activeWorkspaceId && activeWorkspaceId !== 'personal_practice' && !String(activeWorkspaceId).startsWith('personal_') && mongoose.Types.ObjectId.isValid(activeWorkspaceId);
+        const isLawFirmWs = requestedWsType === 'law_firm' && activeWorkspaceId && activeWorkspaceId !== 'personal_practice' && !String(activeWorkspaceId).startsWith('personal_') && mongoose.Types.ObjectId.isValid(activeWorkspaceId);
 
-        // Safe legacy case auto-migration
-        await Project.updateMany(
-            { userId: req.user.id, role: 'student', $or: [{ workspaceType: { $exists: false } }, { workspaceType: 'personal' }, { workspaceType: null }] },
-            { $set: { workspaceType: 'student' } }
-        );
-        await Project.updateMany(
-            { userId: req.user.id, role: 'advocate', $or: [{ workspaceType: { $exists: false } }, { workspaceType: 'personal' }, { workspaceType: null }] },
-            { $set: { workspaceType: 'advocate' } }
-        );
+        const authUserId = (req.user?.id || req.user?._id || '').toString();
+        if (!authUserId) {
+            return res.status(401).json({ error: 'User ID missing in token' });
+        }
 
-        let userIdConditions = [req.user.id];
-        if (mongoose.Types.ObjectId.isValid(req.user.id)) {
-            userIdConditions.push(new mongoose.Types.ObjectId(req.user.id));
+        let userIdConditions = [authUserId];
+        if (mongoose.Types.ObjectId.isValid(authUserId)) {
+            userIdConditions.push(new mongoose.Types.ObjectId(authUserId));
         }
 
         let roleQuery = {};
@@ -604,27 +602,39 @@ router.get('/', verifyToken, async (req, res) => {
         } else if (requestedWsType === 'student') {
             // STRICT STUDENT WORKSPACE QUERY
             roleQuery = {
-                $or: [
-                    { userId: { $in: userIdConditions } },
-                    { assignedMembers: { $in: userIdConditions } }
-                ],
-                $or: [
-                    { workspaceType: 'student' },
-                    { role: 'student' }
+                $and: [
+                    {
+                        $or: [
+                            { userId: { $in: userIdConditions } },
+                            { assignedMembers: { $in: userIdConditions } }
+                        ]
+                    },
+                    {
+                        $or: [
+                            { workspaceType: 'student' },
+                            { role: 'student' }
+                        ]
+                    }
                 ]
             };
         } else {
             // STRICT ADVOCATE / PERSONAL PRACTICE QUERY
-            // Returns cases owned by or assigned to authenticated user in personal practice
+            // Returns cases owned by or assigned to authenticated user in advocate practice only
             roleQuery = {
-                $or: [
-                    { userId: { $in: userIdConditions } },
-                    { assignedMembers: { $in: userIdConditions } },
-                    { assignedUserIds: { $in: userIdConditions } },
-                    { leadAdvocateUserId: { $in: userIdConditions } }
-                ],
-                role: { $ne: 'student' },
-                workspaceType: { $ne: 'student' }
+                $and: [
+                    {
+                        $or: [
+                            { userId: { $in: userIdConditions } },
+                            { assignedMembers: { $in: userIdConditions } },
+                            { assignedUserIds: { $in: userIdConditions } },
+                            { leadAdvocateUserId: { $in: userIdConditions } }
+                        ]
+                    },
+                    {
+                        role: { $nin: ['student', 'law_firm'] },
+                        workspaceType: { $nin: ['student', 'law_firm'] }
+                    }
+                ]
             };
         }
 

@@ -124,6 +124,9 @@ router.post("/", optionalVerifyToken, identifyGuest, async (req, res) => {
     'legal_case_predictor': 'legal_case_predictor',
     'legal_evidence_checker': 'legal_evidence_checker',
     'legal_research_assistant': 'legal_research_assistant',
+    'legal_knowledge_hub': 'legal_knowledge_hub',
+    'knowledgeHub': 'legal_knowledge_hub',
+    'knowledge_hub': 'legal_knowledge_hub',
     'legal_my_case': 'legal_my_case',
     'caseAssistant': 'legal_my_case'
   };
@@ -400,7 +403,7 @@ router.post("/", optionalVerifyToken, identifyGuest, async (req, res) => {
           if (!session) {
             const words = (content || '').trim().split(/\s+/);
             const aiTitle = words.slice(0, 5).join(' ') + (words.length > 5 ? '...' : '') || 'New Chat';
-            const reqPid = (req.body.projectId === 'default' || req.body.projectId === 'all') ? null : (req.body.projectId || req.body.caseId || null);
+            const reqPid = sanitizeProjectId(req.body.projectId || req.body.caseId);
             const reqTool = req.body.activeTool || null;
             const autoConvType = req.body.conversationType || (reqPid ? 'case' : (reqTool && reqTool !== 'legal_my_case' && reqTool !== 'none' ? 'tool' : 'global'));
 
