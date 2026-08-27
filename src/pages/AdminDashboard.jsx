@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BarChart3, Users, CreditCard, Package, Ticket, Lightbulb, Bug, AlertTriangle, 
-  MessageSquare, Globe, Settings, Shield, ShieldAlert, Search, RefreshCw, Plus, 
+  MessageSquare, Globe, Settings, Shield, ShieldAlert, Search, RefreshCw, Plus, PlusCircle, 
   Edit2, Edit3, Trash2, Lock, Unlock, CheckCircle2, XCircle, ExternalLink, Key, DollarSign, 
   TrendingUp, Activity, HardDrive, Terminal, Send, Eye, EyeOff, ChevronRight, X, 
   FileText, Check, RotateCw, Building2, UserCheck, Zap, ArrowLeft, Download, Tag, Wrench
@@ -22,6 +22,7 @@ const TABS = [
   { id: 'billing', label: 'Billing', icon: CreditCard },
   { id: 'plans', label: 'Plans', icon: Package },
   { id: 'coupons', label: 'Coupons', icon: Ticket },
+  { id: 'addons', label: 'Add-on Requests', icon: PlusCircle },
   { id: 'features', label: 'Requests', icon: Lightbulb },
   { id: 'bugs', label: 'Bugs', icon: Bug },
   { id: 'crashes', label: 'Crash Reports', icon: AlertTriangle },
@@ -43,6 +44,7 @@ export default function AdminDashboard() {
       user.role === 'admin' ||
       user.role === 'SUPER_ADMIN' ||
       email === 'aditi@uwo24.com' ||
+      email === 'aditilakhera0@gmail.com' ||
       email === 'admin@uwo24.com' ||
       isSuperAdmin(user)
     );
@@ -89,6 +91,70 @@ export default function AdminDashboard() {
   const [complaintsList, setComplaintsList] = useState([]);
   const [crashesList, setCrashesList] = useState([]);
   const [crashStats, setCrashStats] = useState({ total: 0, unresolved: 0 });
+
+  // Enterprise Add-on Requests State & Sync
+  const [addonRequestsList, setAddonRequestsList] = useState(() => {
+    const saved = localStorage.getItem('adminAddonRequests');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return [
+      {
+        _id: 'addon-req-101',
+        addonId: 'evidence-analyst',
+        addonName: 'Evidence Analyst & Forensic Scanner',
+        category: 'Advocate Practitioner Suite',
+        institutionName: 'Rani Durgavati Vishwavidyalaya (RDVV)',
+        institutionEmail: 'admin@rdvv.ac.in',
+        requestedBy: 'University Admin (RDVV)',
+        notes: 'Requested for BA LLB Final Year moot court preparation & evidence examination.',
+        status: 'Pending',
+        createdAt: new Date().toISOString()
+      }
+    ];
+  });
+
+  const handleApproveAddonRequest = (req) => {
+    const updatedList = addonRequestsList.map(item =>
+      item._id === req._id ? { ...item, status: 'Approved' } : item
+    );
+    setAddonRequestsList(updatedList);
+    localStorage.setItem('adminAddonRequests', JSON.stringify(updatedList));
+
+    const approvedStr = localStorage.getItem('approvedAddonsList');
+    let approvedList = approvedStr ? JSON.parse(approvedStr) : [];
+    if (!approvedList.includes(req.addonId)) {
+      approvedList.push(req.addonId);
+    }
+    localStorage.setItem('approvedAddonsList', JSON.stringify(approvedList));
+
+    const featureMap = {
+      'argument-builder': 'argumentBuilder',
+      'evidence-analyst': 'evidenceAnalyst',
+      'contract-analyzer': 'contractAnalyzer',
+      'case-predictor': 'casePredictor',
+      'strategy-engine': 'strategyEngine',
+      'client-connect': 'clientConnect',
+      'client-communication': 'teamCommunication'
+    };
+    const targetKey = featureMap[req.addonId] || req.addonId;
+
+    const rulesStr = localStorage.getItem('enterpriseFeatureAccessRules');
+    let currentRules = rulesStr ? JSON.parse(rulesStr) : {};
+    currentRules[targetKey] = true;
+    localStorage.setItem('enterpriseFeatureAccessRules', JSON.stringify(currentRules));
+
+    toast.success(`✅ Add-on "${req.addonName}" APPROVED & LIVE enabled for ${req.institutionName} students across Web & Mobile app!`);
+  };
+
+  const handleRejectAddonRequest = (req) => {
+    const updatedList = addonRequestsList.map(item =>
+      item._id === req._id ? { ...item, status: 'Rejected' } : item
+    );
+    setAddonRequestsList(updatedList);
+    localStorage.setItem('adminAddonRequests', JSON.stringify(updatedList));
+    toast.error(`❌ Add-on request for "${req.addonName}" rejected.`);
+  };
   const [adminSettings, setAdminSettings] = useState({
     maintenanceMode: false,
     sessionTimeout: 30,
@@ -200,10 +266,18 @@ export default function AdminDashboard() {
 
     try {
       const token = user?.token || localStorage.getItem('token');
-      const authHeader = { headers: { Authorization: `Bearer ${token}` } };
+      const tStamp = Date.now();
+      const authHeader = { 
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        } 
+      };
+      const noCacheAuthHeader = authHeader;
 
       const [statsRes, usersRes, billingRes, plansRes, couponsRes, featuresRes, bugsRes, settingsRes, complaintsRes, crashesRes] = await Promise.all([
-        axios.get(`${API}/admin/stats`, authHeader).catch(() => ({ data: { success: false } })),
+        axios.get(`${API}/admin/stats?_t=${tStamp}`, noCacheAuthHeader).catch((err) => ({ data: { success: false, code: err.response?.data?.code } })),
         axios.get(`${API}/admin/users?limit=200`, authHeader).catch(() => ({ data: { list: [] } })),
         axios.get(`${API}/admin/billing?limit=200`, authHeader).catch(() => ({ data: { list: [] } })),
         axios.get(`${API}/admin/plans`, authHeader).catch(() => ({ data: { plans: [] } })),
@@ -215,8 +289,19 @@ export default function AdminDashboard() {
         axios.get(`${API}/admin/crashes?limit=200`, authHeader).catch(() => ({ data: { crashes: [], stats: null } }))
       ]);
 
-      if (statsRes.data?.success && statsRes.data.stats) {
-        setStats(prev => ({ ...prev, ...statsRes.data.stats }));
+      if (statsRes.data?.code === 'SESSION_REVOKED') {
+        toast.error('Session expired or logged in from another device. Please log in again.');
+        setStats(prev => ({ ...prev, revenueMonth: 0, revenueToday: 0, revenueLifetime: 0 }));
+      } else if (statsRes.data?.success && statsRes.data.stats) {
+        setStats(prev => ({ 
+          ...prev, 
+          ...statsRes.data.stats,
+          revenueToday: Number(statsRes.data.stats.revenueToday || 0),
+          revenueMonth: Number(statsRes.data.stats.revenueMonth || 0),
+          revenueLifetime: Number(statsRes.data.stats.revenueLifetime || 0)
+        }));
+      } else {
+        setStats(prev => ({ ...prev, revenueMonth: 0, revenueToday: 0, revenueLifetime: 0 }));
       }
       if (Array.isArray(usersRes.data?.list)) setUsersList(usersRes.data.list);
       if (Array.isArray(billingRes.data?.list)) setPaymentsList(billingRes.data.list);
@@ -276,10 +361,12 @@ export default function AdminDashboard() {
     let failedCount = 0;
 
     paymentsList.forEach(p => {
+      const gw = String(p.gateway || '').toLowerCase();
+      const isRazorpay = gw.includes('razorpay');
       const st = String(p.status || 'success').toLowerCase();
       const amt = Number(p.amount || 0);
 
-      if (st === 'success' || st === 'paid') {
+      if (isRazorpay && (st === 'success' || st === 'paid')) {
         totalRevenue += amt;
         successCount += 1;
       } else if (st === 'pending') {
@@ -322,9 +409,22 @@ export default function AdminDashboard() {
     });
   }, [paymentsList, billingSearch, billingFilter]);
 
-  // --- Filtered Feature Requests List ---
+  // --- Filtered Feature Requests List (Backend + Enterprise Custom Proposals) ---
   const filteredFeatures = useMemo(() => {
-    return featuresList.filter(f => {
+    let combined = [...featuresList];
+    const savedCustom = localStorage.getItem('adminFeatureRequests');
+    if (savedCustom) {
+      try {
+        const parsed = JSON.parse(savedCustom);
+        parsed.forEach(cReq => {
+          if (!combined.some(f => f._id === cReq._id)) {
+            combined.unshift(cReq);
+          }
+        });
+      } catch (e) {}
+    }
+
+    return combined.filter(f => {
       const q = featureSearch.toLowerCase().trim();
       const titleMatch = (f.title || '').toLowerCase().includes(q);
       const descMatch = (f.description || '').toLowerCase().includes(q);
@@ -1164,12 +1264,12 @@ export default function AdminDashboard() {
                 </div>
                 <div>
                   <h3 className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
-                    ₹{(stats.revenueMonth || 0).toLocaleString('en-IN')}
+                    ₹{(stats.revenueMonth || liveBillingStats.totalRevenue || 0).toLocaleString('en-IN')}
                   </h3>
                   <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100 dark:border-zinc-800/80 text-[11px] font-semibold text-slate-500 dark:text-zinc-400 truncate">
                     <span>Today: <strong className="text-slate-900 dark:text-white font-black">₹{(stats.revenueToday || 0).toLocaleString('en-IN')}</strong></span>
                     <span className="text-slate-300 dark:text-zinc-700">•</span>
-                    <span>Life: <strong className="text-slate-900 dark:text-white font-black">₹{(stats.revenueLifetime || 0).toLocaleString('en-IN')}</strong></span>
+                    <span>Life: <strong className="text-slate-900 dark:text-white font-black">₹{(stats.revenueLifetime || liveBillingStats.totalRevenue || 0).toLocaleString('en-IN')}</strong></span>
                   </div>
                 </div>
               </div>
@@ -2064,12 +2164,105 @@ export default function AdminDashboard() {
                           onClick={() => setCouponDeleteConfirmModal({ isOpen: true, coupon: c })}
                           className="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 border border-red-500/20 rounded-xl transition-all cursor-pointer"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </div>
+        ) : activeTab === 'addons' ? (
+          /* TAB: INSTITUTIONAL ADD-ON REQUESTS APPROVAL PANEL */
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-[#1E293B] p-6 rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <PlusCircle className="text-[#C8A34D]" size={22} /> Institutional Add-on Feature Requests
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium mt-1">
+                  Review and allow add-on feature requests submitted by Law Universities for their students & faculty.
+                </p>
+              </div>
+              <div className="px-3.5 py-1.5 rounded-full bg-[#C8A34D]/10 border border-[#C8A34D]/30 text-xs font-black text-[#C8A34D]">
+                {addonRequestsList.filter(r => r.status === 'Pending').length} Pending Approvals
+              </div>
+            </div>
+
+            {addonRequestsList.length === 0 ? (
+              <div className="bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-sm p-12 text-center space-y-2">
+                <PlusCircle className="w-10 h-10 text-slate-300 dark:text-zinc-700 mx-auto" />
+                <p className="text-xs font-bold text-slate-500 dark:text-zinc-400">No Add-on Requests Submitted Yet</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {addonRequestsList.map((req) => (
+                  <div
+                    key={req._id}
+                    className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 border border-slate-200/80 dark:border-zinc-800 shadow-sm space-y-4 flex flex-col justify-between hover:shadow-md transition-all"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-wider text-[#C8A34D] px-2.5 py-0.5 rounded-full bg-[#C8A34D]/10 border border-[#C8A34D]/20">
+                          🏛️ {req.institutionName || 'RDVV Law University'}
+                        </span>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase border ${
+                          req.status === 'Approved'
+                            ? 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30'
+                            : req.status === 'Rejected'
+                            ? 'bg-rose-500/15 text-rose-500 border-rose-500/30'
+                            : 'bg-amber-500/15 text-amber-500 border-amber-500/30 animate-pulse'
+                        }`}>
+                          ● {req.status || 'Pending'}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">{req.category}</span>
+                        <h3 className="text-base font-black text-slate-900 dark:text-white mt-0.5">{req.addonName}</h3>
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800 text-xs space-y-1">
+                        <p className="text-slate-500 font-medium">
+                          Requested By: <strong className="text-slate-800 dark:text-zinc-200">{req.requestedBy || req.institutionEmail}</strong>
+                        </p>
+                        <p className="text-slate-600 dark:text-zinc-300 font-semibold italic">
+                          "{req.notes || 'No custom notes provided.'}"
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-end gap-2 text-xs">
+                      {req.status === 'Approved' ? (
+                        <div className="w-full py-2 rounded-xl bg-emerald-500/15 text-emerald-500 font-black text-center border border-emerald-500/30 flex items-center justify-center gap-1.5">
+                          <CheckCircle2 size={16} /> Approved & Live Unlocked for Students
+                        </div>
+                      ) : req.status === 'Rejected' ? (
+                        <div className="w-full py-2 rounded-xl bg-rose-500/15 text-rose-500 font-black text-center border border-rose-500/30">
+                          ❌ Request Rejected
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleRejectAddonRequest(req)}
+                            className="px-3.5 py-2 rounded-xl border border-rose-500/30 text-rose-500 font-bold hover:bg-rose-500/10 cursor-pointer"
+                          >
+                            Reject
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleApproveAddonRequest(req)}
+                            className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black shadow-md hover:brightness-110 cursor-pointer flex items-center gap-1.5"
+                          >
+                            <CheckCircle2 size={15} /> Allow & Approve Feature
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>

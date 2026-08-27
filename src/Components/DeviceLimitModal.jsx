@@ -38,12 +38,20 @@ export default function DeviceLimitModal({ visible, activeSessions = [], email, 
   const handleRevoke = async (sessionToRevoke) => {
     setRevokingId(sessionToRevoke.sessionId || sessionToRevoke._id);
     try {
-      const baseUrl = window._env_?.VITE_AISA_BACKEND_API || import.meta.env.VITE_AISA_BACKEND_API || 'http://localhost:8080/api';
+      const baseUrl = window._env_?.VITE_AISA_BACKEND_API || import.meta.env.VITE_AISA_BACKEND_API || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8080/api' : (typeof window !== 'undefined' ? `${window.location.origin}/api` : 'http://localhost:8080/api'));
+
+      const userStr = localStorage.getItem('user');
+      const token = userStr ? JSON.parse(userStr)?.token : null;
+      const headers = {};
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       await axios.post(`${baseUrl}/security/logout-session`, {
         sessionId: sessionToRevoke.sessionId || sessionToRevoke._id,
         email,
         password
-      });
+      }, { headers });
 
       toast.success(`Logged out ${sessionToRevoke.deviceName || 'device'} successfully.`);
       setConfirmSession(null);

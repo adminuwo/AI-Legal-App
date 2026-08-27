@@ -6,7 +6,7 @@ import {
   SearchCode, FileCheck, Gavel, Lightbulb, Scale, Calendar, 
   Users, Bell, User, Settings2, LogOut, ChevronRight, ChevronLeft, Binary,
   Sun, Moon, Globe, ChevronDown, Bookmark, HelpCircle, Download,
-  CreditCard, Shield, Zap, GraduationCap, Building2, MessageSquare, BookOpen, Smartphone
+  CreditCard, Shield, Zap, GraduationCap, Building2, MessageSquare, BookOpen, Smartphone, X
 } from 'lucide-react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userData, selectedRoleState, clearUser } from '../../userStore/userData';
@@ -17,6 +17,7 @@ import ExperienceRoleSelector from '../ExperienceRoleSelector';
 import { useSubscription } from '../../context/SubscriptionContext';
 import { logo } from '../../constants';
 import { isSuperAdmin } from '../../utils/isSuperAdmin';
+import toast from 'react-hot-toast';
 
 const CORE_VIEWS = [
   { name: 'Dashboard', icon: LayoutGrid, path: '/dashboard' },
@@ -158,15 +159,37 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
     };
   }, [showDropdown]);
 
+  const isToolDisabledByInstitution = (path) => {
+    if (!path) return false;
+    const rulesStr = localStorage.getItem('enterpriseFeatureAccessRules');
+    if (!rulesStr) return false;
+    try {
+      const rules = JSON.parse(rulesStr);
+      if (path.includes('evidence-analyst') && rules.evidenceAnalyst === false) return true;
+      if (path.includes('case-predictor') && rules.casePredictor === false) return true;
+      if (path.includes('contract-analyzer') && rules.contractAnalyzer === false) return true;
+      if (path.includes('mock-courtroom') && rules.mockCourtroom === false) return true;
+      if (path.includes('draft-maker') && rules.draftMaker === false) return true;
+      if (path.includes('legal-precedents') && rules.legalResearch === false) return true;
+      if (path.includes('strategy-engine') && rules.strategyEngine === false) return true;
+    } catch (e) {}
+    return false;
+  };
+
   const renderLink = (item) => {
     const isLinkActive = isActive(item.path);
+    const isDisabled = isToolDisabledByInstitution(item.path);
 
     if (isCollapsed) {
       return (
         <button
           key={item.name}
-          title={item.name}
+          title={isDisabled ? `🔒 Disabled by Institution Admin` : item.name}
           onClick={() => {
+            if (isDisabled) {
+              toast.error(`🔒 Access to "${item.name}" has been disabled by your Law College Administrator.`);
+              return;
+            }
             if (item.path.startsWith('/dashboard/chat/new')) {
               navigate(item.path, { state: { forceGlobal: true } });
             } else {
@@ -175,7 +198,9 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
             if (window.innerWidth < 1024) onClose();
           }}
           className={`w-11 h-11 mx-auto flex items-center justify-center rounded-xl mb-2 transition-all cursor-pointer ${
-            isLinkActive
+            isDisabled
+              ? 'opacity-40 grayscale cursor-not-allowed text-slate-400'
+              : isLinkActive
               ? 'bg-[#C8A34D]/20 text-[#C8A34D] border border-[#C8A34D]/40 font-extrabold shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
           }`}
@@ -193,6 +218,10 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
       <button
         key={item.name}
         onClick={() => {
+          if (isDisabled) {
+            toast.error(`🔒 Access to "${item.name}" has been disabled by your Law College Administrator.`);
+            return;
+          }
           if (item.path.startsWith('/dashboard/chat/new')) {
             navigate(item.path, { state: { forceGlobal: true } });
           } else {
@@ -201,7 +230,9 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
           if (window.innerWidth < 1024) onClose();
         }}
         className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl mb-1 transition-all cursor-pointer ${
-          isLinkActive
+          isDisabled
+            ? 'opacity-40 grayscale cursor-not-allowed text-slate-400'
+            : isLinkActive
             ? 'bg-[#C8A34D]/15 text-[#C8A34D] border border-[#C8A34D]/30 font-extrabold shadow-xs'
             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white font-semibold'
         }`}
@@ -210,6 +241,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
           <item.icon className={`w-4 h-4 ${isLinkActive ? 'text-[#C8A34D]' : 'text-slate-400'}`} />
           <span className="text-sm">{item.name}</span>
         </div>
+        {isDisabled && <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-500">🔒 Lock</span>}
       </button>
     );
   };
@@ -228,7 +260,7 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
       { name: 'Settings', icon: Settings2, path: '/dashboard/settings' },
       { name: 'Pricing & Plans', icon: CreditCard, path: '/legal-pricing' },
       ...(isAdminUser ? [
-        { name: 'AI Product Guide Knowledge', icon: BookOpen, path: '/dashboard/guide' },
+        { name: 'AI Product Guide Knowledge', icon: BookOpen, path: '/dashboard/guide?mode=knowledge' },
         { name: 'Admin Portal', icon: Shield, path: '/dashboard/admin' }
       ] : []),
       { isDivider: true },
@@ -238,21 +270,30 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
     return (
       <div className="flex flex-col w-full font-sans select-none bg-white dark:bg-[#1E293B]">
         {/* User Identity Header */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-[#1E293B]">
-          <div className="w-10 h-10 rounded-full bg-[#C8A34D]/10 flex items-center justify-center shrink-0 overflow-hidden border border-[#C8A34D]/25">
-            {user.avatar ? (
-              <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = ''; }} />
-            ) : (
-              <span className="text-[#C8A34D] font-bold text-sm">{user.name?.charAt(0) || 'A'}</span>
-            )}
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-slate-50/50 dark:bg-[#1E293B]">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-full bg-[#C8A34D]/10 flex items-center justify-center shrink-0 overflow-hidden border border-[#C8A34D]/25">
+              {user.avatar ? (
+                <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = ''; }} />
+              ) : (
+                <span className="text-[#C8A34D] font-bold text-sm">{user.name?.charAt(0) || 'A'}</span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-extrabold text-slate-800 dark:text-white truncate leading-tight capitalize">{user.name || 'Advocate Profile'}</p>
+              <p className="text-[11px] font-semibold text-slate-400 truncate mt-0.5">{user.email || 'Advocate Account'}</p>
+              <span className="inline-block mt-1 px-2 py-0.5 rounded bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/20 text-[9px] font-bold uppercase tracking-wider">
+                {isAdminUser ? 'SUPER ADMIN' : selectedRole === 'student' ? 'Law Student' : selectedRole === 'law_firm' ? 'Law Firm Associate' : 'Advocate / Practitioner'}
+              </span>
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-extrabold text-slate-800 dark:text-white truncate leading-tight capitalize">{user.name || 'Advocate Profile'}</p>
-            <p className="text-[11px] font-semibold text-slate-400 truncate mt-0.5">{user.email || 'Advocate Account'}</p>
-            <span className="inline-block mt-1 px-2 py-0.5 rounded bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/20 text-[9px] font-bold uppercase tracking-wider">
-              {isAdminUser ? 'SUPER ADMIN' : selectedRole === 'student' ? 'Law Student' : selectedRole === 'law_firm' ? 'Law Firm Associate' : 'Advocate / Practitioner'}
-            </span>
-          </div>
+          <button
+            onClick={() => setShowDropdown(false)}
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+            title="Close menu"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Action Items List */}
@@ -461,9 +502,9 @@ const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="relative w-full bg-white rounded-t-2xl max-h-[85vh] overflow-hidden flex flex-col p-4 z-10 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] border-t border-slate-100"
+              className="relative w-full bg-white dark:bg-[#1E293B] rounded-t-3xl max-h-[85vh] overflow-hidden flex flex-col p-4 z-10 shadow-[0_-8px_30px_rgba(0,0,0,0.2)] border-t border-slate-100 dark:border-slate-800"
             >
-              <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-4 shrink-0" />
+              <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-3 shrink-0" />
               {renderDropdownContent()}
             </motion.div>
           </div>

@@ -59,11 +59,19 @@ export const AppRoute = {
 };
 
 const getApiUrl = () => {
-  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-    // Hardcoded to 8080 to bypass cached 8888 environment variable issues in the user's terminal
-    return 'http://localhost:8080/api';
+  if (typeof window !== 'undefined') {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:8080/api';
+    }
+    if (window._env_?.VITE_AISA_BACKEND_API || window._env_?.AISA_BACKEND_API) {
+      return window._env_?.VITE_AISA_BACKEND_API || window._env_?.AISA_BACKEND_API;
+    }
+    if (import.meta.env.VITE_AISA_BACKEND_API) {
+      return import.meta.env.VITE_AISA_BACKEND_API;
+    }
+    return `${window.location.origin}/api`;
   }
-  return window._env_?.VITE_AISA_BACKEND_API || window._env_?.AISA_BACKEND_API || import.meta.env.VITE_AISA_BACKEND_API || "https://ai-legal-app-backend-743928421487.asia-south1.run.app/api";
+  return 'http://localhost:8080/api';
 };
 
 const API = getApiUrl();

@@ -128,13 +128,14 @@ export const InviteTeamMemberModal = ({ isOpen, onClose, onSuccess }) => {
 
     try {
       const res = await apiService.post(`/workspaces/${activeWsId}/invitations`, payload);
-      if (res?.success || res?.invitation) {
+      const data = res?.data || res;
+      if (data?.success || data?.invitation) {
         toast.success(`✨ Invitation successfully sent to ${fullName.trim()}!`, { id: tid });
-        if (onSuccess) onSuccess(res?.invitation || payload);
+        if (onSuccess) onSuccess(data?.invitation || payload);
         onClose();
         resetForm();
       } else {
-        toast.error(res?.error || 'Failed to send invitation.', { id: tid });
+        toast.error(data?.error || 'Failed to send invitation.', { id: tid });
       }
     } catch (err) {
       console.error('[Invite Team Member] Submit Error:', err);

@@ -4,11 +4,32 @@ import {
   Brain, Upload, Sparkles, Copy, Download, ShieldAlert, CheckCircle2, 
   AlertTriangle, ShieldCheck, ArrowRight, ArrowLeft, RefreshCw, FileCheck, Layers,
   HardDrive, Gavel, Eye, Search, Edit3, User, Calendar, Clock, DollarSign,
-  AlertCircle, Scale, MessageSquare, ChevronRight, Zap, Check, Lock, BookOpen, GitFork, Trophy, Swords
+  AlertCircle, Scale, MessageSquare, ChevronRight, Zap, Check, Lock, BookOpen, GitFork, Trophy, Swords, Menu
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
 import { useSubscription } from '../context/SubscriptionContext';
+
+const CASE_TYPES = [
+  'Cheque Bounce (Sec 138 NI Act)',
+  'Consumer Complaint (COPRA 2019)',
+  'Commercial Rent & Property Dispute',
+  'Bail Application (CrPC / BNS)',
+  'Arbitration & Contractual Breach',
+  'Civil Suit for Recovery & Damages',
+  'Family & Matrimonial Matter',
+  'Criminal Proceeding / FIR Quashing',
+  'Constitutional Writ Petition'
+];
+
+const COURT_LEVELS = [
+  'Supreme Court of India',
+  'High Court (State Jurisdiction)',
+  'District & Sessions Court',
+  'Commercial Court / NCLT',
+  'Consumer Disputes Redressal Commission',
+  'Magistrate Court / Debt Recovery Tribunal'
+];
 
 export default function StrategyEngineWorkspace() {
   const navigate = useNavigate();
@@ -447,52 +468,52 @@ export default function StrategyEngineWorkspace() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 font-sans pb-16">
       
-      {/* HEADER BAR */}
-      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3.5 sm:py-4 sticky top-0 z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+      {/* HEADER BAR — 1 SINGLE ROW ON MOBILE & DESKTOP */}
+      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 px-2.5 sm:px-6 py-2 sm:py-3.5 sticky top-0 z-30 shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
             <button
               onClick={() => navigate('/dashboard/tools')}
-              className="p-2 sm:p-2.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-600 dark:text-slate-300 hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 text-xs font-bold shadow-sm shrink-0"
+              className="p-1.5 sm:p-2.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-600 dark:text-slate-300 hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 text-xs font-bold shadow-xs shrink-0"
               title="Back to AI Tools Suite"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back to AI Tools</span>
+              <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden md:inline">Back to AI Tools</span>
             </button>
-            <div className="w-10 h-10 rounded-2xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D] shrink-0 aspect-square">
-              <Brain className="w-5 h-5" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D] shrink-0">
+              <Brain className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-base sm:text-xl font-black tracking-tight text-slate-900 dark:text-white whitespace-nowrap">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h1 className="text-xs sm:text-xl font-black tracking-tight text-slate-900 dark:text-white truncate">
                   Strategy Engine
                 </h1>
-                <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider whitespace-nowrap border border-[#C8A34D]/30">
+                <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider shrink-0 hidden md:inline-block">
                   Litigation & Risk Engine
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1 sm:line-clamp-none">
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 hidden md:block">
                 Tactical litigation roadmap, opponent strategy prediction, evidence matrix, BSA compliance & risk mitigation.
               </p>
             </div>
           </div>
 
           {/* Header Controls */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none shrink-0 w-full sm:w-auto justify-end">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={handleOpenSavedModal}
-              className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 text-[#C8A34D] text-xs font-bold hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 text-[#C8A34D] text-[10.5px] sm:text-xs font-bold hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer flex items-center gap-1.5 shadow-xs shrink-0 whitespace-nowrap"
               title="View Saved Strategies"
             >
-              <HardDrive className="w-3.5 h-3.5" /> Saved Strategies
+              <HardDrive className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Saved Strategies</span><span className="sm:hidden">Saved</span>
             </button>
 
             {step !== 'INPUT_SELECT' && (
               <button
                 onClick={() => { setStep('INPUT_SELECT'); setUploadedFiles([]); }}
-                className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold hover:bg-slate-200 dark:hover:bg-[#242F42] transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
+                className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-[10.5px] sm:text-xs font-bold hover:bg-slate-200 dark:hover:bg-[#242F42] transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap"
               >
-                <RefreshCw className="w-3.5 h-3.5" /> Start New Strategy
+                <RefreshCw className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Start New Strategy</span><span className="sm:hidden">New</span>
               </button>
             )}
           </div>
@@ -830,60 +851,60 @@ export default function StrategyEngineWorkspace() {
             </div>
 
             {/* EXECUTIVE TOP METRICS (4 METRICS) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
               
               {/* 1. Case Readiness Score */}
-              <div className="p-5 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-2 text-center shadow-sm">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1.5 text-center shadow-xs">
+                <span className="text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">
                   CASE READINESS SCORE
                 </span>
-                <span className="text-3xl font-black text-emerald-500 block">
+                <span className="text-2xl sm:text-3xl font-black text-emerald-500 block">
                   {strategyData.readinessScore} / 100
                 </span>
-                <span className="px-2.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500 text-[10px] font-bold inline-block">
+                <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 text-[9.5px] sm:text-[10px] font-bold inline-block">
                   Strong Foundation
                 </span>
               </div>
 
               {/* 2. Litigation Stage */}
-              <div className="p-5 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-2 text-center shadow-sm">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1.5 text-center shadow-xs">
+                <span className="text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">
                   CURRENT LITIGATION STAGE
                 </span>
-                <span className="text-base font-black text-slate-900 dark:text-white block truncate">
+                <span className="text-sm sm:text-base font-black text-slate-900 dark:text-white block truncate">
                   {strategyData.litigationStage}
                 </span>
-                <span className="text-[10px] text-slate-500 block">Procedural Position</span>
+                <span className="text-[9.5px] sm:text-[10px] text-slate-500 block">Procedural Position</span>
               </div>
 
               {/* 3. Strategy Risk Rating */}
-              <div className="p-5 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-2 text-center shadow-sm">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1.5 text-center shadow-xs">
+                <span className="text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">
                   STRATEGY RISK RATING
                 </span>
-                <span className="text-base font-black text-amber-500 block truncate">
+                <span className="text-sm sm:text-base font-black text-amber-500 block truncate">
                   {strategyData.riskLevel}
                 </span>
-                <span className="px-2.5 py-0.5 rounded bg-amber-500/15 text-amber-500 text-[10px] font-bold inline-block">
+                <span className="px-2 py-0.5 rounded bg-amber-500/15 text-amber-500 text-[9.5px] sm:text-[10px] font-bold inline-block">
                   {strategyData.exposurePct}
                 </span>
               </div>
 
               {/* 4. Governing Statutory Codes */}
-              <div className="p-5 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-2 text-center shadow-sm">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              <div className="p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1.5 text-center shadow-xs">
+                <span className="text-[8.5px] sm:text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">
                   GOVERNING STATUTORY CODES
                 </span>
-                <span className="text-xs font-black text-[#C8A34D] block truncate">
+                <span className="text-[11px] sm:text-xs font-black text-[#C8A34D] block truncate min-w-0">
                   {strategyData.governingCodes}
                 </span>
-                <span className="text-[10px] text-slate-500 block">Procedural Framework</span>
+                <span className="text-[9.5px] sm:text-[10px] text-slate-500 block truncate">Procedural Framework</span>
               </div>
 
             </div>
 
-            {/* 7 TACTICAL STRATEGY TABS SWITCHER */}
-            <div className="p-1.5 rounded-2xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 flex flex-wrap gap-1 shadow-sm">
+            {/* 7 TACTICAL STRATEGY TABS SWITCHER — HORIZONTAL TOUCH SCROLL ON MOBILE */}
+            <div className="p-1.5 rounded-2xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 overflow-x-auto scrollbar-none max-w-full pb-1 shadow-xs">
               {[
                 { id: 'overview', label: '1. Executive Strategy Overview' },
                 { id: 'opponent', label: '2. Opponent Strategy' },
@@ -896,10 +917,10 @@ export default function StrategyEngineWorkspace() {
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+                  className={`px-3 sm:px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
                     activeTab === t.id
-                      ? 'bg-[#C8A34D] text-[#111111] shadow-sm'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1A2333]'
+                      ? 'bg-[#C8A34D] text-[#111111] shadow-xs'
+                      : 'bg-slate-50/60 dark:bg-[#1A2333]/60 hover:bg-slate-100 dark:hover:bg-[#1A2333] text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-800/50'
                   }`}
                 >
                   {t.label}
@@ -909,19 +930,19 @@ export default function StrategyEngineWorkspace() {
 
             {/* TAB 1: EXECUTIVE STRATEGY OVERVIEW */}
             {activeTab === 'overview' && (
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-6 shadow-sm">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-5 shadow-xs">
                 <div>
                   <h3 className="text-xs font-black uppercase tracking-wider text-[#C8A34D] flex items-center gap-2">
                     <Scale className="w-4 h-4" /> Executive Strategy Summary & Readiness
                   </h3>
-                  <p className="text-sm font-bold text-slate-900 dark:text-white leading-relaxed mt-2">
+                  <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-relaxed mt-2">
                     {strategyData.executiveOverview.readiness}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                   {/* Primary Strengths */}
-                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-2 text-xs">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-2 text-xs">
                     <span className="font-black text-emerald-500 uppercase tracking-wider text-[10px] block">
                       PRIMARY LEGAL STRENGTHS
                     </span>
@@ -929,14 +950,14 @@ export default function StrategyEngineWorkspace() {
                       {strategyData.executiveOverview.strengths.map((s, idx) => (
                         <li key={idx} className="flex items-start gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                          <span>{s}</span>
+                          <span className="leading-snug text-[11px] sm:text-xs">{s}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
                   {/* Procedural Prerequisites */}
-                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2 text-xs">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2 text-xs">
                     <span className="font-black text-amber-500 uppercase tracking-wider text-[10px] block">
                       PROCEDURAL PREREQUISITES PENDING
                     </span>
@@ -944,7 +965,7 @@ export default function StrategyEngineWorkspace() {
                       {strategyData.executiveOverview.prerequisites.map((p, idx) => (
                         <li key={idx} className="flex items-start gap-2">
                           <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                          <span>{p}</span>
+                          <span className="leading-snug text-[11px] sm:text-xs">{p}</span>
                         </li>
                       ))}
                     </ul>
@@ -956,17 +977,19 @@ export default function StrategyEngineWorkspace() {
                   <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
                     <Clock className="w-4 h-4 text-[#C8A34D]" /> Immediate 14-Day Prioritized Action Plan
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {strategyData.executiveOverview.actionPlan14Days.map((ap, idx) => (
-                      <div key={idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
-                        <div className="space-y-0.5">
-                          <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded bg-[#C8A34D]/20 text-[#C8A34D] font-extrabold text-[10px]">{ap.priority} PRIORITY</span>
-                            <h5 className="font-bold text-slate-900 dark:text-white">{ap.action}</h5>
+                      <div key={idx} className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-4 text-xs">
+                        <div className="space-y-1 min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="px-2 py-0.5 rounded bg-[#C8A34D]/20 text-[#C8A34D] font-extrabold text-[9.5px] sm:text-[10px] whitespace-nowrap shrink-0">
+                              {ap.priority} PRIORITY
+                            </span>
+                            <h5 className="font-bold text-slate-900 dark:text-white leading-snug">{ap.action}</h5>
                           </div>
-                          <p className="text-slate-500 text-[11px]">Reason: {ap.reason}</p>
+                          <p className="text-slate-500 text-[11px] leading-snug">Reason: {ap.reason}</p>
                         </div>
-                        <span className="px-3 py-1 rounded-xl bg-slate-200 dark:bg-[#242F42] text-slate-700 dark:text-slate-300 font-bold text-[11px] shrink-0">
+                        <span className="px-2.5 py-1 rounded-xl bg-slate-200 dark:bg-[#242F42] text-slate-700 dark:text-slate-300 font-bold text-[10.5px] whitespace-nowrap shrink-0 self-end sm:self-auto">
                           {ap.timeframe}
                         </span>
                       </div>
@@ -978,30 +1001,30 @@ export default function StrategyEngineWorkspace() {
 
             {/* TAB 2: OPPONENT STRATEGY */}
             {activeTab === 'opponent' && (
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">
                 <h3 className="text-xs font-black uppercase tracking-wider text-rose-500 flex items-center gap-2">
                   <Swords className="w-4 h-4" /> Opponent Strategy & Counter-Pleadings ({strategyData.opponentStrategy.length})
                 </h3>
 
-                <div className="space-y-4">
+                <div className="space-y-3.5">
                   {strategyData.opponentStrategy.map(opp => (
-                    <div key={opp.id} className="p-5 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 space-y-3 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-black text-rose-500 uppercase">{opp.argument}</span>
-                        <span className="px-2.5 py-0.5 rounded bg-rose-500/20 text-rose-500 font-extrabold text-[10px]">{opp.likelihood}</span>
+                    <div key={opp.id} className="p-3.5 sm:p-5 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 space-y-3 text-xs">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
+                        <span className="font-black text-rose-500 uppercase leading-snug">{opp.argument}</span>
+                        <span className="px-2.5 py-0.5 rounded bg-rose-500/20 text-rose-500 font-extrabold text-[10px] whitespace-nowrap shrink-0 self-start sm:self-auto">{opp.likelihood}</span>
                       </div>
-                      <p className="text-slate-700 dark:text-slate-300 text-[11px]">{opp.basis}</p>
+                      <p className="text-slate-700 dark:text-slate-300 text-[11px] leading-relaxed">{opp.basis}</p>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-200 dark:border-slate-800 text-[11px]">
-                        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 pt-2 border-t border-slate-200 dark:border-slate-800 text-[11px]">
+                        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 leading-snug">
                           <strong>Opponent Weakness:</strong> {opp.weakness}
                         </div>
-                        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 leading-snug">
                           <strong>Recommended Rebuttal:</strong> {opp.rebuttal}
                         </div>
                       </div>
 
-                      <div className="p-3 rounded-xl bg-white dark:bg-[#111622] border border-[#C8A34D]/30 font-bold text-[#C8A34D] text-[11px]">
+                      <div className="p-3 rounded-xl bg-white dark:bg-[#111622] border border-[#C8A34D]/30 font-bold text-[#C8A34D] text-[11px] leading-relaxed">
                         📝 Counter-Pleading Action: {opp.pleadingAction}
                       </div>
                     </div>
@@ -1012,23 +1035,23 @@ export default function StrategyEngineWorkspace() {
 
             {/* TAB 3: EVIDENCE MATRIX & BSA COMPLIANCE */}
             {activeTab === 'evidence' && (
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">
                 <h3 className="text-xs font-black uppercase tracking-wider text-[#C8A34D] flex items-center gap-2">
                   <FileCheck className="w-4 h-4" /> Evidence Matrix & BSA Compliance Audit
                 </h3>
 
                 <div className="space-y-3">
                   {strategyData.evidenceMatrix.map(ev => (
-                    <div key={ev.id} className="p-4 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 text-xs">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded bg-[#C8A34D]/20 text-[#C8A34D] font-extrabold text-[10px]">{ev.type}</span>
-                          <h4 className="font-extrabold text-slate-900 dark:text-white">{ev.name}</h4>
+                    <div key={ev.id} className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-4 text-xs">
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="px-2 py-0.5 rounded bg-[#C8A34D]/20 text-[#C8A34D] font-extrabold text-[10px] whitespace-nowrap shrink-0">{ev.type}</span>
+                          <h4 className="font-extrabold text-slate-900 dark:text-white leading-snug">{ev.name}</h4>
                         </div>
-                        <p className="text-slate-500 text-[11px]">BSA Audit: {ev.bsaStatus}</p>
-                        <p className="text-emerald-500 font-bold text-[11px]">Recommended Action: {ev.action}</p>
+                        <p className="text-slate-500 text-[11px] leading-snug">BSA Audit: {ev.bsaStatus}</p>
+                        <p className="text-emerald-500 font-bold text-[11px] leading-snug">Recommended Action: {ev.action}</p>
                       </div>
-                      <span className="px-3 py-1 rounded-xl bg-emerald-500/15 text-emerald-500 font-black text-xs shrink-0">
+                      <span className="px-3 py-1 rounded-xl bg-emerald-500/15 text-emerald-500 font-black text-xs whitespace-nowrap shrink-0 self-end sm:self-auto">
                         {ev.strength}
                       </span>
                     </div>
@@ -1039,25 +1062,25 @@ export default function StrategyEngineWorkspace() {
 
             {/* TAB 4: MAIN LEGAL ARGUMENTS */}
             {activeTab === 'arguments' && (
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">
                 <h3 className="text-xs font-black uppercase tracking-wider text-emerald-500 flex items-center gap-2">
                   <Gavel className="w-4 h-4" /> Main Legal Arguments & Binding Ratios ({strategyData.legalArguments.length})
                 </h3>
 
-                <div className="space-y-4">
+                <div className="space-y-3.5">
                   {strategyData.legalArguments.map(arg => (
-                    <div key={arg.id} className="p-5 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 space-y-3 text-xs">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-black text-slate-900 dark:text-white text-xs">{arg.proposition}</h4>
-                        <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-500 font-extrabold text-[10px]">{arg.statutoryBasis}</span>
+                    <div key={arg.id} className="p-3.5 sm:p-5 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 space-y-3 text-xs">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
+                        <h4 className="font-black text-slate-900 dark:text-white text-xs leading-snug">{arg.proposition}</h4>
+                        <span className="px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-500 font-extrabold text-[10px] whitespace-nowrap shrink-0 self-start sm:self-auto">{arg.statutoryBasis}</span>
                       </div>
-                      <p className="text-slate-600 dark:text-slate-300 text-[11px]">{arg.facts}</p>
+                      <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">{arg.facts}</p>
                       
-                      <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">
+                      <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold text-[11px] leading-relaxed">
                         ⚖️ Binding Precedent Ratio: {arg.precedent}
                       </div>
 
-                      <div className="p-3 rounded-xl bg-slate-100 dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-[11px]">
+                      <div className="p-3 rounded-xl bg-slate-100 dark:bg-[#111622] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-[11px] leading-relaxed">
                         <strong>Burden Shift:</strong> {arg.burdenShift}
                       </div>
                     </div>
@@ -1068,20 +1091,20 @@ export default function StrategyEngineWorkspace() {
 
             {/* TAB 5: RISK & MITIGATION */}
             {activeTab === 'risk' && (
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">
                 <h3 className="text-xs font-black uppercase tracking-wider text-rose-500 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" /> Strategic Risk & Mitigation Matrix ({strategyData.riskMatrix.length})
                 </h3>
 
-                <div className="space-y-4">
+                <div className="space-y-3.5">
                   {strategyData.riskMatrix.map(r => (
-                    <div key={r.id} className="p-5 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-2 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-black text-rose-500 uppercase">{r.risk}</span>
-                        <span className="px-2.5 py-0.5 rounded bg-rose-500/20 text-rose-500 font-black text-[10px]">{r.exposure}</span>
+                    <div key={r.id} className="p-3.5 sm:p-5 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-2 text-xs">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
+                        <span className="font-black text-rose-500 uppercase leading-snug">{r.risk}</span>
+                        <span className="px-2.5 py-0.5 rounded bg-rose-500/20 text-rose-500 font-black text-[10px] whitespace-nowrap shrink-0 self-start sm:self-auto">{r.exposure}</span>
                       </div>
-                      <p className="text-slate-700 dark:text-slate-300 text-[11px]">{r.impact}</p>
-                      <div className="p-3 rounded-xl bg-white dark:bg-[#111622] border border-rose-500/20 font-bold text-[#C8A34D] text-[11px]">
+                      <p className="text-slate-700 dark:text-slate-300 text-[11px] leading-relaxed">{r.impact}</p>
+                      <div className="p-3 rounded-xl bg-white dark:bg-[#111622] border border-rose-500/20 font-bold text-[#C8A34D] text-[11px] leading-relaxed">
                         💡 Mitigation Plan: {r.mitigation}
                       </div>
                     </div>
@@ -1092,19 +1115,19 @@ export default function StrategyEngineWorkspace() {
 
             {/* TAB 6: LITIGATION ROADMAP */}
             {activeTab === 'roadmap' && (
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
                   <Clock className="w-4 h-4 text-[#C8A34D]" /> Litigation Stage Progression Roadmap
                 </h3>
 
                 <div className="space-y-3">
                   {strategyData.roadmapStages.map((stg, idx) => (
-                    <div key={idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
-                      <div>
-                        <h4 className="font-extrabold text-slate-900 dark:text-white">{stg.stage}</h4>
-                        <p className="text-slate-500 text-[11px] mt-0.5">{stg.detail}</p>
+                    <div key={idx} className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-4 text-xs">
+                      <div className="min-w-0 flex-1 space-y-0.5">
+                        <h4 className="font-extrabold text-slate-900 dark:text-white leading-snug">{stg.stage}</h4>
+                        <p className="text-slate-500 text-[11px] leading-snug">{stg.detail}</p>
                       </div>
-                      <span className="px-3 py-1 rounded-xl bg-[#C8A34D]/20 text-[#C8A34D] font-bold text-[10px]">
+                      <span className="px-3 py-1 rounded-xl bg-[#C8A34D]/20 text-[#C8A34D] font-bold text-[10px] whitespace-nowrap shrink-0 self-end sm:self-auto">
                         {stg.status}
                       </span>
                     </div>

@@ -81,6 +81,11 @@ export const POLICY_DOCUMENTS_MOBILE = [
         content: 'We enforce a strict data protection policy: we NEVER sell, trade, rent, or monetize your personal files, evidence briefs, or workspace logs to advertising networks, brokers, or third parties. Data is processed exclusively inside encrypted cloud services required to execute the platform features.'
       },
       {
+        id: 'ai_processing',
+        title: '4. AI Data Processing & Third-Party AI Services',
+        content: 'AI LEGAL™ utilizes secure enterprise AI API providers (such as Google Gemini) to process user queries for legal research, drafting, and analysis. Data transmitted to AI processing infrastructure is encrypted via HTTPS and strictly used to return immediate real-time outputs requested by the user. User input data is never sold, shared with unauthorized third parties, or utilized to train public AI models.'
+      },
+      {
         id: 'transfers',
         title: '4. International Data Transfers',
         content: 'AI LEGAL™ serves global legal workspaces. Your data may be processed in secure database regions closest to your selected jurisdiction. Any transfers across international borders are protected under standard contractual clauses, ensuring uniform data security guidelines.'

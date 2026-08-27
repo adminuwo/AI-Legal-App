@@ -263,7 +263,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen w-full bg-[#F8FAFC] dark:bg-[#0F172A] flex flex-col justify-between items-center relative overflow-hidden select-none font-sans text-slate-900 dark:text-white transition-colors">
-      
+
       {/* Background Aura Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-slate-200/50 dark:bg-slate-800/40 blur-3xl pointer-events-none" />
 
@@ -299,16 +299,16 @@ export default function OnboardingPage() {
 
       {/* ─── Center Mascot Character Section ─── */}
       <main className="flex-1 w-full max-w-4xl flex flex-col items-center justify-center relative z-10 px-4">
-        
+
         {/* Mascot Wrapper & Background Halo */}
         <div className="relative flex flex-col items-center justify-center my-6">
-          
+
           {/* Background Circular Halo (Matching Mobile App) */}
           <div className="w-80 h-80 rounded-full bg-slate-200/50 dark:bg-slate-800/40 border border-slate-300/30 dark:border-slate-700/30 absolute -top-10 z-0 pointer-events-none" />
 
           {/* ─── Slender Chibi Character Composition (100% 1-to-1 Pixel Parity with Mobile App) ─── */}
           <div className="relative w-[140px] h-[180px] flex justify-center items-center z-10 transition-transform hover:scale-105">
-            
+
             {/* Waist Shadow */}
             <div className="absolute -bottom-2.5 w-[90px] h-[16px] rounded-[8px] bg-slate-900/10 dark:bg-slate-900/40 blur-[2px] transform scale-x-85 z-1" />
 
@@ -317,7 +317,7 @@ export default function OnboardingPage() {
 
             {/* Torso Composition */}
             <div className="absolute bottom-0 w-[82px] h-[80px] flex flex-col items-center z-10">
-              
+
               {/* White Crossover Shirt Collar */}
               <div className="absolute -top-[2px] w-[24px] h-[14px] flex z-15">
                 <div className="flex-1 bg-white rounded-bl-[10px] transform rotate-[30deg] border-r-[2px] border-b-[2px] border-[#0F172A]" />
@@ -352,14 +352,14 @@ export default function OnboardingPage() {
 
             {/* Chibi Head Composition (100% Exact 1-to-1 Parity with Mobile App onboarding.tsx) */}
             <div className="absolute bottom-[74px] w-[60px] h-[64px] flex flex-col items-center z-22">
-              
+
               {/* Side Ears */}
               <div className="absolute left-[2px] top-[26px] w-[8px] h-[12px] bg-[#FCD5BE] border-[2px] border-[#0F172A] rounded-tl-[5px] rounded-bl-[5px] z-19" />
               <div className="absolute right-[2px] top-[26px] w-[8px] h-[12px] bg-[#FCD5BE] border-[2px] border-[#0F172A] rounded-tr-[5px] rounded-br-[5px] z-19" />
 
               {/* Face Panel */}
               <div className="w-[50px] h-[52px] bg-[#FCD5BE] border-[2px] border-[#0F172A] rounded-[24px] relative flex flex-col items-center justify-center z-22">
-                
+
                 {/* Nose */}
                 <div className="absolute top-[26px] w-[2.2px] h-[4px] bg-[#EAA882] rounded-[1px] z-34" />
 
@@ -410,7 +410,7 @@ export default function OnboardingPage() {
 
         {/* ─── Interactive Message Card Container ─── */}
         <div className="w-full max-w-xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-7 shadow-xl space-y-5 z-20 relative">
-          
+
           {/* Card Topic Badge */}
           <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#111111] dark:text-[#C8A34D]">
             <SlideIcon className="w-4 h-4 text-[#C8A34D]" />
@@ -429,17 +429,16 @@ export default function OnboardingPage() {
 
           {/* Controls Footer Row: Progress Dots + Next/Skip Typing CTA */}
           <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            
+
             {/* 7 Progress Indicator Dots */}
             <div className="flex items-center gap-1.5">
               {slides.map((_, sIdx) => (
                 <div
                   key={sIdx}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    sIdx === currentSlide
+                  className={`h-2 rounded-full transition-all duration-300 ${sIdx === currentSlide
                       ? 'w-6 bg-[#C8A34D]'
                       : 'w-2 bg-slate-200 dark:bg-slate-700'
-                  }`}
+                    }`}
                 />
               ))}
             </div>

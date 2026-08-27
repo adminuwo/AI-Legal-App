@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSetRecoilState } from 'recoil';
 import { motion } from 'framer-motion';
 import {
-  Plus, Edit2, Trash2, Archive, ChevronRight, ArrowLeft, Search, LayoutGrid, List,
+  Plus, Edit2, Trash2, Archive, ChevronRight, ArrowLeft, Menu, Search, LayoutGrid, List,
   Calendar, FileText, ShieldCheck, Gavel, CheckSquare, Sparkles, FolderOpen, MoreVertical, AlertTriangle,
-  UserPlus, Building2, Users, CreditCard, X, Menu as MenuIcon
+  UserPlus, Building2, Users, CreditCard, X
 } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
 import { apiService } from '../../../services/apiService';
 import toast from 'react-hot-toast';
 import { useSubscription } from '../../../context/SubscriptionContext';
-import { toggleState } from '../../../userStore/userData';
 import CaseOperationsHubModal from './CaseOperationsHubModal';
 import InviteTeamMemberModal from './InviteTeamMemberModal';
+import FirmTeamDirectoryModal from './FirmTeamDirectoryModal';
 
 const LegalDashboard = ({
   legalCases = [],
@@ -55,9 +53,11 @@ const LegalDashboard = ({
     }
   }, []);
 
-  // Law Firm Invite Member State
+  // Law Firm Invite Member & Directory State
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isCaseOperationsHubOpen, setIsCaseOperationsHubOpen] = useState(false);
+  const [isTeamDirectoryOpen, setIsTeamDirectoryOpen] = useState(false);
+  const [directoryTab, setDirectoryTab] = useState('all');
   const [inviteForm, setInviteForm] = useState({ name: '', email: '', role: 'Associate Advocate' });
 
   const handleSendInvite = async (e) => {
@@ -78,13 +78,14 @@ const LegalDashboard = ({
           role: inviteForm.role
         }
       });
+      const data = res?.data || res;
 
-      if (res && res.success) {
+      if (data && data.success) {
         toast.success(`Invitation sent to ${inviteForm.email}!`, { id: tid });
         setInviteForm({ name: '', email: '', role: 'Associate Advocate' });
         setIsInviteModalOpen(false);
       } else {
-        toast.error(res?.error || 'Failed to send invitation.', { id: tid });
+        toast.error(data?.error || 'Failed to send invitation.', { id: tid });
       }
     } catch (err) {
       toast.error(err?.response?.data?.error || 'Failed to send invitation.');
@@ -327,38 +328,40 @@ const LegalDashboard = ({
     }
   };
 
-  const navigate = useNavigate();
-  const setTglState = useSetRecoilState(toggleState);
-
   return (
     <div className="flex-1 flex flex-col w-full min-h-0 overflow-hidden bg-[#FFFFFF] dark:bg-[#0F172A] relative font-sans text-[#111827] dark:text-white">
-      {/* 1. Main Header Area */}
-      <div className="w-full px-3.5 sm:px-8 py-3.5 sm:py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 shrink-0 border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#1E293B]">
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+      {/* 1. Header — Title & Create Button */}
+      <div className="w-full px-4 sm:px-10 pt-5 sm:pt-7 pb-4 sm:pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0 border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#1E293B]">
+        <div className="flex items-center gap-3">
+          {/* Hamburger button on mobile phone view; Back button on desktop if onBack is passed */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              if (onBack) onBack();
-              else navigate(-1);
+              if (window.innerWidth < 1024) {
+                window.dispatchEvent(new CustomEvent('open_sidebar'));
+              } else if (onBack) {
+                onBack();
+              }
             }}
-            className="p-2 sm:p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors cursor-pointer shrink-0"
-            title="Go Back"
+            className={`p-2 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors cursor-pointer text-[#C8A34D] ${!onBack ? 'lg:hidden' : ''}`}
+            title="Navigation Menu"
           >
-            <ArrowLeft size={16} className="text-slate-600 dark:text-slate-300" />
+            <Menu className="w-5 h-5 stroke-[2.5] lg:hidden text-[#C8A34D]" />
+            {onBack && <ArrowLeft size={18} className="hidden lg:block text-slate-600 dark:text-slate-300" />}
           </motion.button>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-base sm:text-2xl font-black tracking-tight text-[#111111] dark:text-white truncate">
+          <div>
+            <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white flex items-center gap-2 sm:gap-3 flex-wrap">
+              <span>
                 {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm'
                   ? 'FIRM WORKSPACE'
                   : (localStorage.getItem('user_selected_role') || 'advocate') === 'student'
                   ? 'MY ACADEMIC MATTERS & MOOTS'
                   : 'MY MATTERS'}
-              </h1>
+              </span>
               {renderCasesLimitBadge()}
-            </div>
-            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 line-clamp-1 sm:line-clamp-none">
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
               {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm'
                 ? "Your firm's litigation repository and legal workspaces."
                 : (localStorage.getItem('user_selected_role') || 'advocate') === 'student'
@@ -368,35 +371,35 @@ const LegalDashboard = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-3">
           <button
             onClick={handleCreateCaseClick}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 whitespace-nowrap cursor-pointer"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 whitespace-nowrap cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Create Matter</span>
+            <span>+ Create</span>
           </button>
         </div>
       </div>
 
       {/* 2. Control Bar — Search, Filters & Sorting */}
-      <div className="w-full px-3.5 sm:px-8 py-3 border-b border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0F172A] flex flex-col lg:flex-row gap-2.5 justify-between items-stretch lg:items-center shrink-0">
+      <div className="w-full px-4 sm:px-10 py-3 sm:py-4 border-b border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0F172A] flex flex-col lg:flex-row gap-3 justify-between items-stretch lg:items-center shrink-0">
         {/* Search Input */}
-        <div className="relative flex-1 max-w-full lg:max-w-xl">
-          <Search className="w-4 h-4 text-[#C8A34D] absolute left-3 top-2.5" />
+        <div className="relative flex-1 max-w-2xl">
+          <Search className="w-4 h-4 text-[#C8A34D] absolute left-3.5 top-3" />
           <input
             type="text"
             placeholder="Search by case name, client, opponent, court, case number..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs font-semibold placeholder-slate-400 focus:outline-none focus:border-[#C8A34D] focus:ring-1 focus:ring-[#C8A34D] bg-white dark:bg-[#1E293B] text-[#111111] dark:text-white transition-all shadow-2xs"
+            className="w-full pl-10 pr-4 py-2 border border-slate-200/80 dark:border-slate-800 rounded-xl text-xs font-semibold placeholder-slate-400 focus:outline-none focus:border-[#C8A34D] focus:ring-1 focus:ring-[#C8A34D] bg-white dark:bg-[#1E293B] text-[#111111] dark:text-white transition-all shadow-xs"
           />
         </div>
 
-        {/* Filters and Controls */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 max-w-full shrink-0">
+        {/* Filters and Controls Strip (Scrollable on mobile) */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 lg:pb-0 shrink-0">
           {/* Status Filter */}
-          <div className="shrink-0 flex items-center gap-1 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status:</span>
             <select
               value={statusFilter}
@@ -412,7 +415,7 @@ const LegalDashboard = ({
           </div>
 
           {/* Priority Filter */}
-          <div className="shrink-0 flex items-center gap-1 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Priority:</span>
             <select
               value={priorityFilter}
@@ -428,12 +431,12 @@ const LegalDashboard = ({
           </div>
 
           {/* Court Filter */}
-          <div className="shrink-0 flex items-center gap-1 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Court:</span>
             <select
               value={courtFilter}
               onChange={(e) => setCourtFilter(e.target.value)}
-              className="bg-transparent border-none outline-none font-bold text-[#111111] dark:text-white text-xs cursor-pointer max-w-[120px] truncate"
+              className="bg-transparent border-none outline-none font-bold text-[#111111] dark:text-white text-xs cursor-pointer max-w-[130px] truncate"
             >
               <option value="All">All Courts</option>
               {courts.map(court => (
@@ -443,12 +446,12 @@ const LegalDashboard = ({
           </div>
 
           {/* Case Type Filter */}
-          <div className="shrink-0 flex items-center gap-1 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Type:</span>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="bg-transparent border-none outline-none font-bold text-[#111111] dark:text-white text-xs cursor-pointer max-w-[120px] truncate"
+              className="bg-transparent border-none outline-none font-bold text-[#111111] dark:text-white text-xs cursor-pointer max-w-[130px] truncate"
             >
               <option value="All">All Types</option>
               {caseTypes.map(ct => (
@@ -458,7 +461,7 @@ const LegalDashboard = ({
           </div>
 
           {/* Sorting Option */}
-          <div className="shrink-0 flex items-center gap-1 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs text-xs font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl px-3 py-1.5 shadow-xs text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sort:</span>
             <select
               value={sortOption}
@@ -472,27 +475,27 @@ const LegalDashboard = ({
           </div>
 
           {/* Grid/List Toggle */}
-          <div className="shrink-0 flex items-center border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#1E293B] rounded-xl p-1 shadow-2xs gap-0.5">
+          <div className="flex items-center border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#1E293B] rounded-xl p-1 shadow-xs gap-0.5 shrink-0">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${viewMode === 'grid' ? 'bg-[#111111] dark:bg-[#333333] text-[#C8A34D]' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#111111] dark:bg-[#333333] text-[#C8A34D]' : 'text-slate-400 hover:text-slate-600'}`}
               title="Grid View"
             >
-              <LayoutGrid size={14} />
+              <LayoutGrid size={15} />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${viewMode === 'list' ? 'bg-[#111111] dark:bg-[#333333] text-[#C8A34D]' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-[#111111] dark:bg-[#333333] text-[#C8A34D]' : 'text-slate-400 hover:text-slate-600'}`}
               title="List View"
             >
-              <List size={14} />
+              <List size={15} />
             </button>
           </div>
         </div>
       </div>
 
       {/* 3. Case Listing Container */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar px-3.5 sm:px-8 py-4 sm:py-6 bg-slate-50/30 dark:bg-[#0F172A]">
+      <div className="flex-1 overflow-y-auto custom-scrollbar px-4 sm:px-10 py-4 sm:py-6 bg-slate-50/30 dark:bg-[#0F172A]">
         {sortedCases.length > 0 ? (
           viewMode === 'grid' ? (
             /* 3A. Premium Grid View — Rich Case Dossier Cards */
@@ -503,97 +506,108 @@ const LegalDashboard = ({
                 return (
                   <div
                     key={c._id || c.id}
-                    className="relative bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs hover:border-[#C8A34D] hover:shadow-md transition-all flex flex-col justify-between group"
+                    className="relative bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-xl p-4 shadow-xs hover:border-[#C8A34D] hover:shadow-md transition-all flex flex-col justify-between group"
                   >
                     <div className="space-y-3">
-                      {/* Top Row: Case Type & Priority */}
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="px-2.5 py-0.5 rounded-md bg-[#C8A34D]/10 text-[#C8A34D] text-[10px] font-black uppercase tracking-wider border border-[#C8A34D]/25">
-                          {c.caseType || 'General Litigation'}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          {renderPriorityPill(c.priority)}
-                          <div className="relative">
-                            <button
-                              onClick={(e) => handleMenuToggle(e, c._id || c.id)}
-                              className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
-                              title="Case Options"
-                            >
-                              <MoreVertical size={14} />
-                            </button>
-                            {activeMenuCaseId === (c._id || c.id) && (
-                              <>
-                                <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setActiveMenuCaseId(null); }} />
-                                <div 
-                                  className="fixed w-40 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-1 z-50 text-left" 
-                                  style={{ top: `${menuPos.top}px`, left: `${menuPos.left}px` }}
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <button
-                                    onClick={() => {
-                                      handleOpenEditModal(c);
-                                      setActiveMenuCaseId(null);
-                                    }}
-                                    className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
-                                  >
-                                    <Edit2 size={13} />
-                                    Edit Case
-                                  </button>
-                                  <button
-                                    onClick={(e) => {
-                                      handleToggleArchive(e, c);
-                                      setActiveMenuCaseId(null);
-                                    }}
-                                    className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
-                                  >
-                                    <Archive size={13} />
-                                    {c.status === 'Archived' ? 'Restore Case' : 'Archive Case'}
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      handleDeleteCase(c._id || c.id);
-                                      setActiveMenuCaseId(null);
-                                    }}
-                                    className="w-full px-3 py-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-2 transition-colors border-t border-slate-100 dark:border-slate-800 cursor-pointer"
-                                  >
-                                    <Trash2 size={13} />
-                                    Delete Case
-                                  </button>
-                                </div>
-                              </>
-                            )}
+                      {/* Card Header: Icon + Case Name + 3-Dot Menu */}
+                      <div className="flex items-start justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="p-1.5 rounded-lg bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25 shrink-0">
+                            <FolderOpen className="w-4 h-4" />
                           </div>
+                          <h3 
+                            onClick={() => handleOpenCase(c)}
+                            className="text-sm font-extrabold text-[#111111] dark:text-white hover:text-[#C8A34D] transition-colors cursor-pointer truncate"
+                            title={c.name}
+                          >
+                            {c.name}
+                          </h3>
+                        </div>
+
+                        {/* 3-Dot Action Dropdown */}
+                        <div className="relative shrink-0">
+                          <button
+                            onClick={(e) => handleMenuToggle(e, c._id || c.id)}
+                            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                            title="Actions"
+                          >
+                            <MoreVertical size={15} />
+                          </button>
+                          {activeMenuCaseId === (c._id || c.id) && (
+                            <>
+                              <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); setActiveMenuCaseId(null); }} />
+                              <div 
+                                className="fixed w-40 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-1 z-50 text-left" 
+                                style={{ top: `${menuPos.top}px`, left: `${menuPos.left}px` }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <button
+                                  onClick={() => {
+                                    handleOpenEditModal(c);
+                                    setActiveMenuCaseId(null);
+                                  }}
+                                  className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
+                                >
+                                  <Edit2 size={13} />
+                                  Edit Case
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    handleToggleArchive(e, c);
+                                    setActiveMenuCaseId(null);
+                                  }}
+                                  className="w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
+                                >
+                                  <Archive size={13} />
+                                  {c.status === 'Archived' ? 'Restore Case' : 'Archive Case'}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    handleDeleteCase(c._id || c.id);
+                                    setActiveMenuCaseId(null);
+                                  }}
+                                  className="w-full px-3 py-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-xs font-semibold text-rose-600 dark:text-rose-400 flex items-center gap-2 transition-colors border-t border-slate-100 dark:border-slate-800 cursor-pointer"
+                                >
+                                  <Trash2 size={13} />
+                                  Delete Case
+                                </button>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
 
-                      {/* Case Title */}
-                      <div>
-                        <h3 
-                          onClick={() => handleOpenCase(c)}
-                          className="font-extrabold text-sm sm:text-base text-[#111111] dark:text-white line-clamp-2 hover:text-[#C8A34D] transition-colors cursor-pointer"
-                        >
-                          {c.name}
-                        </h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold mt-1 flex items-center gap-1.5">
-                          <span>{c.clientName || 'Not Set'}</span>
-                          <span className="text-[#C8A34D] font-black text-[10px]">vs</span>
-                          <span>{c.opponentName || c.accused || 'Not Set'}</span>
-                        </p>
+                      {/* Status & Priority Pills */}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {renderStatusPill(c.status)}
+                        {renderPriorityPill(c.priority)}
                       </div>
 
-                      {/* Details Box */}
-                      <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800 space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-slate-400">Court:</span>
-                          <span className="font-semibold truncate max-w-[150px]">{c.courtName || 'District Court'}</span>
+                      {/* Parties: Client vs Opponent */}
+                      <div className="p-2 bg-slate-50/70 dark:bg-[#0F172A] border border-slate-100 dark:border-slate-800/80 rounded-lg text-xs">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Parties:</div>
+                        <div className="font-extrabold text-[#111111] dark:text-white truncate">
+                          {c.clientName || 'Not set'} <span className="text-[#C8A34D] font-black text-[10px]">vs</span> {c.opponentName || c.accused || 'Not set'}
                         </div>
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-slate-400">Next Hearing:</span>
-                          <span className="font-bold text-[#C8A34D]">{hearingDate}</span>
+                      </div>
+
+                      {/* Case Metadata Grid: Type, Court, Next Hearing, Stage */}
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Type</span>
+                          <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">{c.caseType || 'Civil'}</span>
                         </div>
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-slate-400">Status:</span>
-                          <span>{renderStatusPill(c.status)}</span>
+                        <div>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Court</span>
+                          <span className="font-bold text-slate-700 dark:text-slate-300 truncate block">{c.courtName || 'District Court'}</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Next Hearing</span>
+                          <span className="font-bold text-[#C8A34D] truncate block">{hearingDate}</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase block">Stage</span>
+                          <span className="font-semibold text-slate-500 dark:text-slate-400 truncate block">{c.stage || 'Pre-litigation'}</span>
                         </div>
                       </div>
                     </div>
@@ -615,20 +629,20 @@ const LegalDashboard = ({
           ) : (
             /* 3B. Professional Table — List View */
             <div className="w-full bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
-              <div className="overflow-x-auto custom-scrollbar w-full">
-                <table className="w-full min-w-[850px] border-collapse text-left text-xs whitespace-nowrap">
-                  <thead className="bg-slate-50 dark:bg-[#0F172A] text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-200/80 dark:border-slate-800 whitespace-nowrap">
+              <div className="overflow-x-auto custom-scrollbar">
+                <table className="min-w-[850px] w-full border-collapse text-left text-xs whitespace-nowrap">
+                  <thead className="bg-slate-50 dark:bg-[#0F172A] text-[10px] font-extrabold uppercase tracking-wider text-slate-400 border-b border-slate-200/80 dark:border-slate-800">
                     <tr>
-                      <th className="px-4 py-3 whitespace-nowrap">Case Name</th>
-                      <th className="px-4 py-3 whitespace-nowrap">Parties</th>
-                      <th className="px-4 py-3 whitespace-nowrap">Type</th>
-                      <th className="px-4 py-3 whitespace-nowrap">Court</th>
-                      <th className="px-4 py-3 whitespace-nowrap">Next Hearing</th>
-                      <th className="px-4 py-3 whitespace-nowrap">Stage</th>
-                      <th className="px-4 py-3 whitespace-nowrap">Status</th>
-                      <th className="px-4 py-3 whitespace-nowrap">Priority</th>
-                      <th className="px-4 py-3 text-center whitespace-nowrap">Actions</th>
-                      <th className="px-4 py-3 text-right whitespace-nowrap">Open Workspace</th>
+                      <th className="px-4 py-3">Case Name</th>
+                      <th className="px-4 py-3">Parties</th>
+                      <th className="px-4 py-3">Type</th>
+                      <th className="px-4 py-3">Court</th>
+                      <th className="px-4 py-3">Next Hearing</th>
+                      <th className="px-4 py-3">Stage</th>
+                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3">Priority</th>
+                      <th className="px-4 py-3 text-center">Actions</th>
+                      <th className="px-4 py-3 text-right">Open Workspace</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80 bg-white dark:bg-[#1E293B]">
@@ -636,7 +650,7 @@ const LegalDashboard = ({
                       const hearingDate = getNextHearingDate(c);
                       return (
                         <tr key={c._id || c.id} className="hover:bg-slate-50/50 dark:hover:bg-[#0F172A]/50 transition-colors">
-                          <td className="px-4 py-3.5 font-extrabold text-[#111111] dark:text-white whitespace-nowrap">
+                          <td className="px-4 py-3.5 font-extrabold text-[#111111] dark:text-white">
                             <div className="flex items-center gap-2">
                               <FolderOpen className="w-4 h-4 text-[#C8A34D] shrink-0" />
                               <span 
@@ -647,16 +661,16 @@ const LegalDashboard = ({
                               </span>
                             </div>
                           </td>
-                          <td className="px-4 py-3.5 font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                          <td className="px-4 py-3.5 font-semibold text-slate-700 dark:text-slate-300">
                             <div>{c.clientName || 'Not set'} <span className="text-[#C8A34D] font-black text-[10px]">vs</span> {c.opponentName || c.accused || 'Not set'}</div>
                           </td>
-                          <td className="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-400 whitespace-nowrap">{c.caseType || 'Civil'}</td>
-                          <td className="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-400 whitespace-nowrap">{c.courtName || 'District Court'}</td>
-                          <td className="px-4 py-3.5 font-bold text-[#C8A34D] whitespace-nowrap">{hearingDate}</td>
-                          <td className="px-4 py-3.5 font-semibold text-slate-500 whitespace-nowrap">{c.stage || 'Pre-litigation'}</td>
-                          <td className="px-4 py-3.5 whitespace-nowrap">{renderStatusPill(c.status)}</td>
-                          <td className="px-4 py-3.5 whitespace-nowrap">{renderPriorityPill(c.priority)}</td>
-                          <td className="px-4 py-3.5 text-center relative whitespace-nowrap">
+                          <td className="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-400">{c.caseType || 'Civil'}</td>
+                          <td className="px-4 py-3.5 font-semibold text-slate-600 dark:text-slate-400">{c.courtName || 'District Court'}</td>
+                          <td className="px-4 py-3.5 font-bold text-[#C8A34D]">{hearingDate}</td>
+                          <td className="px-4 py-3.5 font-semibold text-slate-500">{c.stage || 'Pre-litigation'}</td>
+                          <td className="px-4 py-3.5">{renderStatusPill(c.status)}</td>
+                          <td className="px-4 py-3.5">{renderPriorityPill(c.priority)}</td>
+                          <td className="px-4 py-3.5 text-center relative">
                             <button
                               onClick={(e) => handleMenuToggle(e, c._id || c.id)}
                               className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
@@ -706,7 +720,7 @@ const LegalDashboard = ({
                               </>
                             )}
                           </td>
-                          <td className="px-4 py-3.5 text-right font-bold whitespace-nowrap">
+                          <td className="px-4 py-3.5 text-right font-bold">
                             <button
                               onClick={() => handleOpenCase(c)}
                               className="text-[#C8A34D] hover:text-[#b08d3b] text-xs font-black inline-flex items-center gap-1 transition-colors cursor-pointer"
@@ -746,24 +760,21 @@ const LegalDashboard = ({
             <div className="p-4 rounded-2xl bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/25">
               <FolderOpen className="w-10 h-10" />
             </div>
-            <div className="space-y-1">
-              <h3 className="text-lg font-extrabold text-[#111111] dark:text-white">
-                {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm'
-                  ? 'No Firm Litigation Matters Yet'
-                  : (localStorage.getItem('user_selected_role') || 'advocate') === 'student'
-                  ? 'No Student Moot Cases Yet'
-                  : 'No Matters Created Yet'}
+            <div className="space-y-2">
+              <h3 className="text-xl font-extrabold text-[#111111] dark:text-white">
+                {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm' ? 'No Firm Cases Found' : 'No Matters Found'}
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium max-w-sm">
-                Create your first case matter to organize filings, court hearings, evidence, notes, and AI legal copilots.
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-sm mx-auto">
+                {(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm' 
+                  ? 'Create your first firm case workspace to organize pleadings, documents, evidence, hearings and team strategy.' 
+                  : 'Create your first litigation folder to start leveraging AI-powered legal assists.'}
               </p>
             </div>
             <button
               onClick={handleCreateCaseClick}
-              className="px-6 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              className="px-6 py-3.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-2xl text-xs transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer uppercase tracking-wider"
             >
-              <Plus className="w-4 h-4" />
-              <span>Create First Matter</span>
+              <span>{(localStorage.getItem('user_selected_role') || 'advocate') === 'law_firm' ? 'CREATE FIRM CASE' : 'CREATE CASE FOLDER'}</span>
             </button>
           </div>
         )}
@@ -778,12 +789,25 @@ const LegalDashboard = ({
         }}
       />
 
+      {/* Firm Team Directory Modal */}
+      <FirmTeamDirectoryModal
+        isOpen={isTeamDirectoryOpen}
+        onClose={() => setIsTeamDirectoryOpen(false)}
+        onOpenInviteModal={() => setIsInviteModalOpen(true)}
+        initialTab={directoryTab}
+      />
+
       {/* Case Operations Hub Modal */}
       <CaseOperationsHubModal
         isOpen={isCaseOperationsHubOpen}
         onClose={() => setIsCaseOperationsHubOpen(false)}
         onLaunchCreateCase={handleLaunchCreateCaseFromHub}
         onLaunchInviteTeam={() => setIsInviteModalOpen(true)}
+        onLaunchViewDirectory={(tab) => {
+          setIsCaseOperationsHubOpen(false);
+          setDirectoryTab(tab || 'all');
+          setIsTeamDirectoryOpen(true);
+        }}
         cases={legalCases}
       />
     </div>

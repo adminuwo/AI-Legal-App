@@ -13,6 +13,7 @@ export const CaseOperationsHubModal = ({
   onClose,
   onLaunchCreateCase,
   onLaunchInviteTeam,
+  onLaunchViewDirectory,
   cases = []
 }) => {
   const navigate = useNavigate();
@@ -22,30 +23,47 @@ export const CaseOperationsHubModal = ({
 
   const activeWsId = localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID') || 'firm_abc_workspace';
 
-  // Fetch firm members stats
+  const [pendingInvitesCount, setPendingInvitesCount] = useState(0);
+
+  // Fetch firm members stats & pending invitations
   useEffect(() => {
     if (isOpen) {
-      const fetchMembers = async () => {
+      const fetchMembersAndInvites = async () => {
         setIsLoadingMembers(true);
         try {
-          const res = await apiService.get(`/workspaces/${activeWsId}/members`);
-          const membersList = res?.data?.members || res?.members || res?.data || [];
+          const [membersRes, invitesRes] = await Promise.allSettled([
+            apiService.get(`/workspaces/${activeWsId}/members`),
+            apiService.get(`/workspaces/${activeWsId}/invitations`)
+          ]);
+
+          const membersData = membersRes.status === 'fulfilled' ? (membersRes.value?.data || membersRes.value) : null;
+          const invitesData = invitesRes.status === 'fulfilled' ? (invitesRes.value?.data || invitesRes.value) : null;
+
+          const membersList = membersData?.members || [];
           if (Array.isArray(membersList)) {
             setTeamMembers(membersList);
           }
+
+          const invitesList = Array.isArray(invitesData?.invitations) ? invitesData.invitations : [];
+          const pendingFromStats = membersData?.stats?.pendingInvitations;
+          const count = typeof pendingFromStats === 'number' && pendingFromStats > 0
+            ? Math.max(pendingFromStats, invitesList.length)
+            : invitesList.length;
+          
+          setPendingInvitesCount(count);
         } catch (err) {
-          console.warn('[CaseOperationsHubModal] Failed to fetch team members:', err);
+          console.warn('[CaseOperationsHubModal] Failed to fetch team members & invites:', err);
         } finally {
           setIsLoadingMembers(false);
         }
       };
-      fetchMembers();
+      fetchMembersAndInvites();
     }
   }, [isOpen, activeWsId]);
 
-  const totalMembers = teamMembers.length || 2;
-  const activeMembers = teamMembers.filter(m => (m.status === 'Active' || m.status === 'Accepted' || !m.status)).length || totalMembers;
-  const pendingInvites = teamMembers.filter(m => m.status === 'Pending' || m.status === 'Pending Invite').length || 0;
+  const totalMembers = teamMembers.length + pendingInvitesCount;
+  const activeMembers = teamMembers.filter(m => (m.status === 'Active' || m.status === 'Accepted' || !m.status)).length;
+  const pendingInvites = pendingInvitesCount;
 
   const filteredCases = cases.filter(c => {
     if (!searchQuery.trim()) return true;
@@ -111,7 +129,11 @@ export const CaseOperationsHubModal = ({
                 <button
                   onClick={() => {
                     onClose();
-                    onLaunchInviteTeam();
+                    if (onLaunchViewDirectory) {
+                      onLaunchViewDirectory('all');
+                    } else if (onLaunchInviteTeam) {
+                      onLaunchInviteTeam();
+                    }
                   }}
                   className="px-3 py-1 rounded-full bg-[#C8A34D]/15 hover:bg-[#C8A34D]/25 text-[#C8A34D] text-xs font-black transition-all cursor-pointer border border-[#C8A34D]/30"
                 >
@@ -120,32 +142,53 @@ export const CaseOperationsHubModal = ({
               </div>
 
               <div className="flex items-center justify-between pt-3 border-t border-[#C8A34D]/20 text-center">
-                <div className="flex-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    if (onLaunchViewDirectory) onLaunchViewDirectory('all');
+                  }}
+                  className="flex-1 hover:bg-[#C8A34D]/10 py-1 rounded-xl transition-all cursor-pointer"
+                >
                   <div className="text-xl font-black text-slate-900 dark:text-white">
                     {isLoadingMembers ? '...' : totalMembers}
                   </div>
                   <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
                     Total Members
                   </div>
-                </div>
+                </button>
                 <div className="w-[1px] h-7 bg-[#C8A34D]/20" />
-                <div className="flex-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    if (onLaunchViewDirectory) onLaunchViewDirectory('active');
+                  }}
+                  className="flex-1 hover:bg-emerald-500/10 py-1 rounded-xl transition-all cursor-pointer"
+                >
                   <div className="text-xl font-black text-emerald-500">
                     {isLoadingMembers ? '...' : activeMembers}
                   </div>
                   <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
                     Active
                   </div>
-                </div>
+                </button>
                 <div className="w-[1px] h-7 bg-[#C8A34D]/20" />
-                <div className="flex-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    if (onLaunchViewDirectory) onLaunchViewDirectory('pending');
+                  }}
+                  className="flex-1 hover:bg-amber-500/10 py-1 rounded-xl transition-all cursor-pointer"
+                >
                   <div className="text-xl font-black text-amber-500">
                     {isLoadingMembers ? '...' : pendingInvites}
                   </div>
                   <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
                     Pending Invites
                   </div>
-                </div>
+                </button>
               </div>
             </div>
 

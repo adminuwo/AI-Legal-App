@@ -4,11 +4,32 @@ import {
   TrendingUp, Upload, Sparkles, Copy, Download, ShieldAlert, CheckCircle2, 
   AlertTriangle, ShieldCheck, ArrowRight, ArrowLeft, RefreshCw, FileCheck, Layers,
   HardDrive, Gavel, Eye, Search, Edit3, User, Calendar, Clock, DollarSign,
-  AlertCircle, Scale, MessageSquare, ChevronRight, Zap, Check, Lock, BookOpen, GitFork, Trophy
+  AlertCircle, Scale, MessageSquare, ChevronRight, Zap, Check, Lock, BookOpen, GitFork, Trophy, Menu
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import apiService from '../services/apiService';
 import { useSubscription } from '../context/SubscriptionContext';
+
+const CASE_TYPES = [
+  'Cheque Bounce (Sec 138 NI Act)',
+  'Consumer Complaint (COPRA 2019)',
+  'Commercial Rent & Property Dispute',
+  'Bail Application (CrPC / BNS)',
+  'Arbitration & Contractual Breach',
+  'Civil Suit for Recovery & Damages',
+  'Family & Matrimonial Matter',
+  'Criminal Proceeding / FIR Quashing',
+  'Constitutional Writ Petition'
+];
+
+const COURT_LEVELS = [
+  'Supreme Court of India',
+  'High Court (State Jurisdiction)',
+  'District & Sessions Court',
+  'Commercial Court / NCLT',
+  'Consumer Disputes Redressal Commission',
+  'Magistrate Court / Debt Recovery Tribunal'
+];
 
 export default function CasePredictorWorkspace() {
   const navigate = useNavigate();
@@ -401,52 +422,52 @@ export default function CasePredictorWorkspace() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-slate-900 dark:text-slate-100 font-sans pb-16">
       
-      {/* HEADER BAR */}
-      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 py-3.5 sm:py-4 sticky top-0 z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+      {/* HEADER BAR — 1 SINGLE ROW ON MOBILE & DESKTOP */}
+      <div className="bg-white dark:bg-[#111622] border-b border-slate-200 dark:border-slate-800 px-2.5 sm:px-6 py-2 sm:py-3.5 sticky top-0 z-30 shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
             <button
               onClick={() => navigate('/dashboard/tools')}
-              className="p-2 sm:p-2.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-600 dark:text-slate-300 hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 text-xs font-bold shadow-sm shrink-0"
+              className="p-1.5 sm:p-2.5 rounded-xl bg-slate-100 dark:bg-[#1A2333] text-slate-600 dark:text-slate-300 hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 text-xs font-bold shadow-xs shrink-0"
               title="Back to AI Tools Suite"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back to AI Tools</span>
+              <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden md:inline">Back to AI Tools</span>
             </button>
-            <div className="w-10 h-10 rounded-2xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D] shrink-0 aspect-square">
-              <TrendingUp className="w-5 h-5" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 flex items-center justify-center text-[#C8A34D] shrink-0">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-base sm:text-xl font-black tracking-tight text-slate-900 dark:text-white whitespace-nowrap">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h1 className="text-xs sm:text-xl font-black tracking-tight text-slate-900 dark:text-white truncate">
                   Case Predictor
                 </h1>
-                <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider whitespace-nowrap border border-[#C8A34D]/30">
-                  Outcome Probability Engine
+                <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-[#C8A34D]/15 text-[#C8A34D] text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider shrink-0 hidden md:inline-block">
+                  Probability Engine
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-1 sm:line-clamp-none">
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 hidden md:block">
                 Statistical success probability dial, judicial trend analysis, litigation duration forecast & settlement value range.
               </p>
             </div>
           </div>
 
           {/* Action Header Controls */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none shrink-0 w-full sm:w-auto justify-end">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={handleOpenSavedModal}
-              className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 text-[#C8A34D] text-xs font-bold hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer flex items-center gap-1.5 shadow-sm whitespace-nowrap"
+              className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/40 text-[#C8A34D] text-[10.5px] sm:text-xs font-bold hover:bg-[#C8A34D] hover:text-[#111111] transition-all cursor-pointer flex items-center gap-1.5 shadow-xs shrink-0 whitespace-nowrap"
               title="View Saved Predictions"
             >
-              <HardDrive className="w-3.5 h-3.5" /> Saved Predictions
+              <HardDrive className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Saved Predictions</span><span className="sm:hidden">Saved</span>
             </button>
 
             {step !== 'INPUT_SELECT' && (
               <button
                 onClick={() => { setStep('INPUT_SELECT'); setUploadedFiles([]); }}
-                className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-xs font-bold hover:bg-slate-200 dark:hover:bg-[#242F42] transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
+                className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 text-[10.5px] sm:text-xs font-bold hover:bg-slate-200 dark:hover:bg-[#242F42] transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap"
               >
-                <RefreshCw className="w-3.5 h-3.5" /> Start New Prediction
+                <RefreshCw className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Start New Prediction</span><span className="sm:hidden">New</span>
               </button>
             )}
           </div>
@@ -788,80 +809,80 @@ export default function CasePredictorWorkspace() {
             </div>
 
             {/* EXECUTIVE TOP METRICS (6 METRICS) */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
               
               {/* 1. Win Probability Gauge */}
-              <div className="p-4 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1.5 text-center shadow-sm">
-                <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              <div className="p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1 sm:space-y-1.5 text-center shadow-xs">
+                <span className="text-[8.5px] sm:text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">
                   WIN PROBABILITY
                 </span>
-                <span className="text-2xl font-black text-emerald-500 block">
+                <span className="text-xl sm:text-2xl font-black text-emerald-500 block">
                   {predictionData.winProbability}%
                 </span>
-                <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 text-[10px] font-bold inline-block">
+                <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 text-[9.5px] sm:text-[10px] font-bold inline-block">
                   {predictionData.caseStrength}
                 </span>
               </div>
 
               {/* 2. Court Confidence */}
-              <div className="p-4 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1.5 text-center shadow-sm">
-                <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              <div className="p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1 sm:space-y-1.5 text-center shadow-xs">
+                <span className="text-[8.5px] sm:text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">
                   COURT CONFIDENCE
                 </span>
-                <span className="text-2xl font-black text-slate-900 dark:text-white block">
+                <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white block">
                   {predictionData.courtConfidence}
                 </span>
-                <span className="text-[10px] text-slate-500 block">Judicial Rating</span>
+                <span className="text-[9.5px] sm:text-[10px] text-slate-500 block">Judicial Rating</span>
               </div>
 
               {/* 3. Appeal Risk */}
-              <div className="p-4 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1.5 text-center shadow-sm">
-                <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              <div className="p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1 sm:space-y-1.5 text-center shadow-xs">
+                <span className="text-[8.5px] sm:text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">
                   APPEAL RISK
                 </span>
-                <span className="text-2xl font-black text-amber-500 block">
+                <span className="text-xl sm:text-2xl font-black text-amber-500 block">
                   {predictionData.appealRisk}
                 </span>
-                <span className="text-[10px] text-slate-500 block">Low Vulnerability</span>
+                <span className="text-[9.5px] sm:text-[10px] text-slate-500 block">Low Vulnerability</span>
               </div>
 
               {/* 4. Settlement Chance */}
-              <div className="p-4 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1.5 text-center shadow-sm">
-                <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              <div className="p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1 sm:space-y-1.5 text-center shadow-xs">
+                <span className="text-[8.5px] sm:text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">
                   SETTLEMENT CHANCE
                 </span>
-                <span className="text-2xl font-black text-sky-500 block">
+                <span className="text-xl sm:text-2xl font-black text-sky-500 block">
                   {predictionData.settlementLikelihood}
                 </span>
-                <span className="text-[10px] text-slate-500 block">Pre-Trial Chance</span>
+                <span className="text-[9.5px] sm:text-[10px] text-slate-500 block">Pre-Trial Chance</span>
               </div>
 
               {/* 5. Settlement Value Range */}
-              <div className="p-4 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1.5 text-center shadow-sm">
-                <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              <div className="p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1 sm:space-y-1.5 text-center shadow-xs">
+                <span className="text-[8.5px] sm:text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">
                   EST. SETTLEMENT RANGE
                 </span>
-                <span className="text-xs font-black text-[#C8A34D] block truncate">
+                <span className="text-[11px] sm:text-xs font-black text-[#C8A34D] block truncate min-w-0">
                   {predictionData.settlementRange}
                 </span>
-                <span className="text-[10px] text-slate-500 block">Damodar S. Prabhu</span>
+                <span className="text-[9.5px] sm:text-[10px] text-slate-500 block truncate">Damodar S. Prabhu</span>
               </div>
 
               {/* 6. Trial Duration */}
-              <div className="p-4 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1.5 text-center shadow-sm">
-                <span className="text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block">
+              <div className="p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-1 sm:space-y-1.5 text-center shadow-xs">
+                <span className="text-[8.5px] sm:text-[9px] font-extrabold uppercase tracking-wider text-slate-400 block truncate">
                   EST. TRIAL DURATION
                 </span>
-                <span className="text-xs font-black text-slate-900 dark:text-white block truncate">
+                <span className="text-[11px] sm:text-xs font-black text-slate-900 dark:text-white block truncate min-w-0">
                   {predictionData.estimatedDuration}
                 </span>
-                <span className="text-[10px] text-slate-500 block">Target Timeline</span>
+                <span className="text-[9.5px] sm:text-[10px] text-slate-500 block truncate">Target Timeline</span>
               </div>
 
             </div>
 
-            {/* 7 INTELLIGENCE TABS SWITCHER */}
-            <div className="p-1.5 rounded-2xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 flex flex-wrap gap-1 shadow-sm">
+            {/* 7 INTELLIGENCE TABS SWITCHER — HORIZONTAL TOUCH SCROLL ON MOBILE */}
+            <div className="p-1.5 rounded-2xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 overflow-x-auto scrollbar-none max-w-full pb-1 shadow-xs">
               {[
                 { id: 'overview', label: '1. Prediction Overview' },
                 { id: 'winning', label: '2. Winning Factors' },
@@ -874,10 +895,10 @@ export default function CasePredictorWorkspace() {
                 <button
                   key={t.id}
                   onClick={() => setActiveTab(t.id)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+                  className={`px-3 sm:px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
                     activeTab === t.id
-                      ? 'bg-[#C8A34D] text-[#111111] shadow-sm'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1A2333]'
+                      ? 'bg-[#C8A34D] text-[#111111] shadow-xs'
+                      : 'bg-slate-50/60 dark:bg-[#1A2333]/60 hover:bg-slate-100 dark:hover:bg-[#1A2333] text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-800/50'
                   }`}
                 >
                   {t.label}
@@ -887,37 +908,48 @@ export default function CasePredictorWorkspace() {
 
             {/* TAB 1: PREDICTION OVERVIEW */}
             {activeTab === 'overview' && (
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
-                <h3 className="text-xs font-black uppercase tracking-wider text-[#C8A34D] flex items-center gap-2">
-                  <Scale className="w-4 h-4" /> Executive Prediction Overview & Legal Rationale
-                </h3>
-                <p className="text-sm font-bold text-slate-900 dark:text-white leading-relaxed">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-[#C8A34D] flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" /> AI Predictive Case Analysis Summary
+                  </h3>
+                  <span className="text-[10px] font-mono text-slate-400 font-bold">10-Stage Model</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                   {predictionData.executiveSummary}
                 </p>
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-                  <span className="font-extrabold text-slate-400 uppercase tracking-wider text-[10px] block">
-                    CORE BINDING RATIONALE & PRECEDENT GROUNDING
-                  </span>
-                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
-                    {predictionData.coreRationale}
-                  </p>
+
+                {/* Key Drivers Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-1 text-xs">
+                    <span className="font-extrabold text-emerald-500 uppercase block">✅ Top Prosecution Strengths:</span>
+                    <p className="text-slate-700 dark:text-slate-300 leading-snug">
+                      Signature admission triggers statutory Section 139 presumption. High documentary evidentiary alignment.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-1 text-xs">
+                    <span className="font-extrabold text-rose-500 uppercase block">⚠️ Primary Defense Challenge:</span>
+                    <p className="text-slate-700 dark:text-slate-300 leading-snug">
+                      11-day delay in demand notice dispatch requires Condonation Application under Sec 142(1)(b).
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
 
             {/* TAB 2: WINNING FACTORS */}
             {activeTab === 'winning' && (
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">
                 <h3 className="text-xs font-black uppercase tracking-wider text-emerald-500 flex items-center gap-2">
-                  <Trophy className="w-4 h-4" /> Key Winning Drivers ({predictionData.winningFactors.length})
+                  <Trophy className="w-4 h-4" /> Key Winning Factors ({predictionData.winningFactors.length})
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {predictionData.winningFactors.map(wf => (
-                    <div key={wf.id} className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-2 text-xs">
+                    <div key={wf.id} className="p-4 rounded-2xl bg-slate-50 dark:bg-[#1A2333] border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
                       <div className="flex items-center justify-between">
                         <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-500 font-extrabold text-[10px]">{wf.impact}</span>
-                        <span className="font-bold text-emerald-500">{wf.confidence} Confidence</span>
+                        <span className="font-bold text-emerald-500 text-[11px]">{wf.confidence} Confidence</span>
                       </div>
                       <h4 className="font-black text-slate-900 dark:text-white text-xs">{wf.title}</h4>
                       <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">{wf.desc}</p>
@@ -929,20 +961,20 @@ export default function CasePredictorWorkspace() {
 
             {/* TAB 3: WEAKNESSES & RISKS */}
             {activeTab === 'weakness' && (
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+              <div className="p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#111622] border border-slate-200 dark:border-slate-800 space-y-4 shadow-xs">
                 <h3 className="text-xs font-black uppercase tracking-wider text-rose-500 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" /> Weaknesses & Risk Vulnerabilities ({predictionData.weaknesses.length})
                 </h3>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {predictionData.weaknesses.map(w => (
-                    <div key={w.id} className="p-5 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-2 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-extrabold text-rose-500 uppercase">{w.title}</span>
-                        <span className="px-2.5 py-0.5 rounded bg-rose-500/20 text-rose-500 font-black text-[10px]">{w.penalty}</span>
+                    <div key={w.id} className="p-4 sm:p-5 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-2 text-xs">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2">
+                        <span className="font-extrabold text-rose-500 uppercase leading-snug">{w.title}</span>
+                        <span className="px-2.5 py-0.5 rounded bg-rose-500/20 text-rose-500 font-black text-[10px] whitespace-nowrap shrink-0 self-start sm:self-auto">{w.penalty}</span>
                       </div>
-                      <p className="text-slate-700 dark:text-slate-300 text-[11px]">{w.desc}</p>
-                      <div className="p-3 rounded-xl bg-white dark:bg-[#111622] border border-rose-500/20 font-bold text-[#C8A34D] text-[11px]">
+                      <p className="text-slate-700 dark:text-slate-300 text-[11px] leading-relaxed">{w.desc}</p>
+                      <div className="p-3 rounded-xl bg-white dark:bg-[#111622] border border-rose-500/20 font-bold text-[#C8A34D] text-[11px] leading-relaxed">
                         💡 Mitigation Plan: {w.mitigation}
                       </div>
                     </div>

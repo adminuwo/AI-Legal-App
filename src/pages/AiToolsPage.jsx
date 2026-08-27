@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '../context/SubscriptionContext';
+import toast from 'react-hot-toast';
 
 const ALL_TOOLS = [
   // Core Litigation & Drafting
@@ -290,6 +291,35 @@ export default function AiToolsPage() {
   const activeCatalog = selectedRole === 'law_firm' ? FIRM_TOOLS_CATALOG : selectedRole === 'student' ? STUDENT_TOOLS_CATALOG : ALL_TOOLS;
 
   const getToolUsageStatus = (toolId) => {
+    // 1. Check Institutional Feature Access Policy for Linked Students / Enterprise Accounts
+    const enterpriseRulesStr = localStorage.getItem('enterpriseFeatureAccessRules');
+    if (enterpriseRulesStr) {
+      try {
+        const rules = JSON.parse(enterpriseRulesStr);
+        const featureKeyMap = {
+          'draft-maker': 'draftMaker',
+          'argument-builder': 'strategyEngine',
+          'legal-precedents': 'legalResearch',
+          'evidence-analyst': 'evidenceAnalyst',
+          'contract-analyzer': 'contractAnalyzer',
+          'case-predictor': 'casePredictor',
+          'strategy-engine': 'strategyEngine',
+          'mock-courtroom': 'mockCourtroom',
+          'quiz-practice': 'quizPractice',
+          'notes-maker': 'aiNotes',
+          'ai-notes-maker': 'aiNotes'
+        };
+        const entKey = featureKeyMap[toolId];
+        if (entKey && rules[entKey] === false) {
+          return {
+            status: 'INSTITUTION_DISABLED',
+            text: '🔒 Institution Disabled',
+            badgeClass: 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400 font-bold border-slate-300 dark:border-slate-700'
+          };
+        }
+      } catch (e) {}
+    }
+
     const keyMap = {
       'draft-maker': 'draft_maker',
       'argument-builder': 'court_prep',
@@ -343,6 +373,10 @@ export default function AiToolsPage() {
 
   const handleLaunchTool = (tool) => {
     const usage = getToolUsageStatus(tool.id);
+    if (usage.status === 'INSTITUTION_DISABLED') {
+      toast.error(`🔒 Access to "${tool.title}" has been disabled by your Law College / University Administrator.`);
+      return;
+    }
     if (usage.status === 'LOCKED BY PLAN' || usage.status === 'LIMIT REACHED') {
       triggerUpgradeModal({
         title: usage.status === 'LOCKED BY PLAN' ? 'Feature Locked by Plan' : 'Limit Reached',
@@ -408,9 +442,13 @@ export default function AiToolsPage() {
           return (
             <motion.div
               key={t.id}
-              whileHover={{ y: -3 }}
+              whileHover={usage.status === 'INSTITUTION_DISABLED' ? {} : { y: -3 }}
               onClick={() => handleLaunchTool(t)}
-              className="group p-3.5 sm:p-5 rounded-xl bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-800 hover:border-[#C8A34D]/60 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between w-full min-w-0 overflow-hidden"
+              className={`group p-3.5 sm:p-5 rounded-xl bg-white dark:bg-[#1E293B] border transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md flex flex-col justify-between w-full min-w-0 overflow-hidden ${
+                usage.status === 'INSTITUTION_DISABLED'
+                  ? 'opacity-50 grayscale-[40%] border-slate-300 dark:border-slate-800'
+                  : 'border-slate-200 dark:border-slate-800 hover:border-[#C8A34D]/60'
+              }`}
             >
               <div className="min-w-0">
                 <div className="flex items-start justify-between gap-2 mb-2.5 min-w-0">

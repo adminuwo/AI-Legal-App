@@ -2188,7 +2188,7 @@ const LegalWorkspace = () => {
       setIsSearchingStocks(true);
       try {
         const user = getUserData();
-        const baseURL = window._env_?.VITE_AISA_BACKEND_API || import.meta.env.VITE_AISA_BACKEND_API || "http://localhost:8080/api";
+        const baseURL = window._env_?.VITE_AISA_BACKEND_API || import.meta.env.VITE_AISA_BACKEND_API || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? "http://localhost:8080/api" : (typeof window !== 'undefined' ? `${window.location.origin}/api` : "http://localhost:8080/api"));
         const response = await axios.get(`${baseURL}/cashflow/search`, {
           params: { keywords: inputValue },
           headers: { Authorization: `Bearer ${user.token}` }
@@ -3459,7 +3459,7 @@ const LegalWorkspace = () => {
       }
 
       try {
-        const baseURL = window._env_?.VITE_AISA_BACKEND_API || import.meta.env.VITE_AISA_BACKEND_API || "http://localhost:8080/api";
+        const baseURL = window._env_?.VITE_AISA_BACKEND_API || import.meta.env.VITE_AISA_BACKEND_API || (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? "http://localhost:8080/api" : (typeof window !== 'undefined' ? `${window.location.origin}/api` : "http://localhost:8080/api"));
         const response = await axios.post(`${baseURL}/cashflow/analyze`, {
           symbol: stock.symbol,
           name: stock.name
@@ -9226,9 +9226,9 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
             <div
               ref={chatContainerRef}
               onScroll={handleScroll}
-              className={`relative flex-1 aisa-scalable-text chatgpt-container z-20 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent no-top-padding ${(((legalView === 'DASHBOARD' || legalView === 'PRECEDENTS') && currentMode === 'LEGAL_TOOLKIT') || location.pathname === '/dashboard/cases')
+              className={`relative flex-1 aisa-scalable-text chatgpt-container z-20 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent ${((currentMode === 'LEGAL_TOOLKIT' && !showFloatingNavbar) || location.pathname === '/dashboard/cases') ? 'no-top-padding' : ''} ${(((legalView === 'DASHBOARD' || legalView === 'PRECEDENTS') && currentMode === 'LEGAL_TOOLKIT') || location.pathname === '/dashboard/cases')
                 ? 'z-[30] h-full w-full overflow-hidden flex flex-col bg-slate-50 min-h-0'
-                : `overflow-y-auto ${messages.length === 0 ? 'pt-0' : 'pt-2 sm:pt-4'} pb-6`
+                : 'overflow-y-auto pt-4 pb-6'
                 }`}
               style={{
                 overflowY: (((legalView === 'DASHBOARD' || legalView === 'PRECEDENTS') && currentMode === 'LEGAL_TOOLKIT') || location.pathname === '/dashboard/cases') ? 'hidden' : 'auto',
@@ -10366,88 +10366,69 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                       const activeColor = 'from-[#C8A34D]/20 to-[#C8A34D]/10 text-[#C8A34D] border-[#C8A34D]/30';
 
                       return (
-                        <div className="flex-1 flex flex-col w-full h-full min-h-0 relative">
-                          {/* ─── Sleek Top Bar (Empty State) ─── */}
-                          <header className="w-full flex items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-3 z-30 select-none shrink-0 bg-transparent">
-                            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                              <motion.button
-                                whileTap={{ scale: 0.9 }}
-                                onClick={() => setTglState(prev => ({ ...prev, sidebarOpen: true }))}
-                                className="lg:hidden w-9 h-9 flex items-center justify-center bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 rounded-xl border border-slate-200/80 dark:border-zinc-700 shadow-2xs hover:text-[#C8A34D] transition-colors cursor-pointer shrink-0"
-                                title="Open Sidebar"
+                        <>
+                          {messages.length === 0 && !isHistoryOpen && !activeCaseId && (
+                            <div className="absolute top-4 left-4 z-30 select-none">
+                              <button
+                                type="button"
+                                onClick={() => setIsHistoryOpen(true)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 rounded-xl text-xs font-bold transition-all shadow-xs border border-slate-200/60 dark:border-zinc-700/40 hover:bg-slate-50 dark:hover:bg-zinc-800/80 cursor-pointer"
+                                title="Open AI History"
                               >
-                                <MenuIcon className="w-5 h-5 stroke-[2.2]" />
-                              </motion.button>
-
-                              <div className="flex items-center gap-1.5 px-3 py-1 bg-white/80 dark:bg-zinc-800/80 border border-slate-200/80 dark:border-zinc-700 rounded-full text-xs font-bold text-slate-800 dark:text-zinc-200 shadow-2xs backdrop-blur-xs min-w-0">
-                                <span className="text-sm shrink-0">{details.emoji}</span>
-                                <span className="truncate max-w-[130px] sm:max-w-none">{details.title}</span>
-                              </div>
+                                <History className="w-4 h-4 text-[#C8A34D]" />
+                                <span>History</span>
+                              </button>
                             </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                              {!isHistoryOpen && !activeCaseId && (
-                                <button
-                                  type="button"
-                                  onClick={() => setIsHistoryOpen(true)}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 rounded-xl text-xs font-bold transition-all shadow-xs border border-slate-200/80 dark:border-zinc-700 hover:border-[#C8A34D]/40 hover:text-[#C8A34D] cursor-pointer"
-                                  title="Open AI History"
-                                >
-                                  <History className="w-3.5 h-3.5 text-[#C8A34D]" />
-                                  <span className="hidden xs:inline">History</span>
-                                </button>
-                              )}
-                            </div>
-                          </header>
-
-                          {/* ─── Center Hero & Input Section ─── */}
+                          )}
                           <motion.div
                             key={activeToolId || 'general'}
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                            className="flex-1 flex flex-col items-center justify-center text-center py-2 sm:py-6 md:py-8 px-3 sm:px-6 w-full max-w-2xl mx-auto space-y-4 sm:space-y-6 md:space-y-7 select-text min-h-0 my-auto"
+                            className="flex-1 flex flex-col items-center justify-center text-center py-6 sm:py-12 px-3 sm:px-6 w-full max-w-2xl mx-auto space-y-5 sm:space-y-8 select-text min-h-[60vh]"
                           >
-                            {/* Hero Branding */}
-                            <div className="flex flex-col items-center space-y-2 sm:space-y-3">
+                            {/* Hero Section */}
+                            <div className="flex flex-col items-center space-y-3 sm:space-y-4">
                               {isGeneralCopilot ? (
                                 <motion.div
                                   whileHover={{ scale: 1.05 }}
-                                  className="flex items-center justify-center -mb-1"
+                                  className="flex items-center justify-center -mb-2"
                                 >
-                                  <img src="/logo/logo_transparent.png" className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain drop-shadow-sm" alt="AI Legal Logo" />
+                                  <img src="/logo/logo_transparent.png" className="w-20 h-20 sm:w-28 sm:h-28 object-contain drop-shadow-sm" alt="AI Legal Logo" />
                                 </motion.div>
                               ) : (
                                 <motion.div
                                   whileHover={{ scale: 1.05, rotate: 2 }}
-                                  className="w-12 h-12 sm:w-16 sm:h-16 bg-white dark:bg-zinc-800 rounded-2xl flex items-center justify-center border border-slate-200/90 dark:border-zinc-700 shadow-sm relative overflow-hidden p-2"
+                                  className="w-14 h-14 sm:w-16 sm:h-16 bg-white dark:bg-zinc-800 rounded-2xl flex items-center justify-center border border-slate-200/90 dark:border-zinc-700 shadow-sm relative overflow-hidden p-2"
                                 >
-                                  <IconComponent className="w-7 h-7 sm:w-10 sm:h-10 text-[#C8A34D] relative z-10" strokeWidth={2.2} />
+                                  <IconComponent className="w-8 h-8 sm:w-10 sm:h-10 text-[#C8A34D] relative z-10" strokeWidth={2.2} />
                                 </motion.div>
                               )}
 
-                              <div className="text-center space-y-1 sm:space-y-1.5 select-text px-2">
-                                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#111827] dark:text-zinc-100 tracking-tight leading-tight">
-                                  {details.title}
-                                </h1>
-                                <p className="text-xs sm:text-sm text-[#6B7280] dark:text-zinc-400 font-medium max-w-xs sm:max-w-md mx-auto leading-relaxed">
+                              <div className="text-center space-y-1.5 sm:space-y-2 select-text">
+                                <div className="flex items-center justify-center gap-3">
+                                  <h1 className="text-2xl sm:text-4xl font-extrabold text-[#111827] dark:text-zinc-100 tracking-tight">
+                                    {details.title}
+                                  </h1>
+                                </div>
+                                <p className="text-xs sm:text-sm text-[#6B7280] dark:text-zinc-400 font-medium max-w-md mx-auto leading-relaxed px-2">
                                   {details.desc}
                                 </p>
                               </div>
                             </div>
 
-                            {/* Centered Chat Input Card */}
-                            <div className="w-full pointer-events-auto px-1 sm:px-0">
+                            {/* Centered Chat Input Card - Shifted slightly down for better mobile ergonomics */}
+                            <div className="w-full pointer-events-auto mt-3 sm:mt-5">
                               {renderInputForm()}
                             </div>
 
-                            {/* Intelligent Suggestion Chips */}
+                            {/* Intelligent Suggestion Chips - Clean Mobile Responsive UI */}
                             {activeToolId !== 'legal_precedents' && quickSuggestions.length > 0 && (
                               <motion.div
                                 variants={chipsContainerVariants}
                                 initial="hidden"
                                 animate="visible"
-                                className="w-full flex flex-wrap gap-1.5 sm:gap-2 justify-center items-center mt-1 select-none pointer-events-auto max-w-2xl px-1"
+                                className="w-full flex flex-wrap gap-2 sm:gap-2.5 justify-center items-center mt-2.5 sm:mt-4 select-none pointer-events-auto max-w-2xl px-2 sm:px-4"
                               >
                                 {(() => {
                                   const visibleChips = isSuggestionsExpanded
@@ -10459,7 +10440,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                       {visibleChips.map((action, idx) => {
                                         const isSurprise = action.prompt === "SURPRISE_ME";
                                         return (
-                                          <motion.div key={idx} variants={chipItemVariants}>
+                                          <motion.div key={idx} variants={chipItemVariants} className="max-w-full">
                                             <motion.button
                                               type="button"
                                               whileHover={{ scale: 1.03, y: -0.5 }}
@@ -10471,12 +10452,12 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                                   handleSuggestionClick(action.prompt);
                                                 }
                                               }}
-                                              className={`min-h-[32px] sm:min-h-[34px] px-3 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-[12px] md:text-[13px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs cursor-pointer select-none border ${isSurprise
-                                                  ? "bg-[#C8A34D]/15 text-[#C8A34D] border-[#C8A34D]/30 hover:bg-[#C8A34D]/25 font-bold"
-                                                  : "bg-white dark:bg-zinc-800/60 text-slate-700 dark:text-zinc-200 border-slate-200/70 dark:border-zinc-700/60 hover:border-[#C8A34D]/50 hover:text-[#C8A34D] hover:bg-[#C8A34D]/5"
+                                              className={`min-h-[34px] sm:h-[34px] py-1.5 px-3.5 rounded-full text-[11px] sm:text-[13px] font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 shadow-2xs hover:shadow-xs cursor-pointer select-none border max-w-full text-center leading-tight ${isSurprise
+                                                  ? "bg-[#C8A34D]/15 text-[#C8A34D] border-[#C8A34D]/40 hover:bg-[#C8A34D]/25 font-bold"
+                                                  : "bg-white dark:bg-zinc-800/50 text-slate-700 dark:text-zinc-200 border-slate-200/80 dark:border-zinc-700 hover:border-[#C8A34D]/50 hover:text-[#C8A34D] hover:bg-[#C8A34D]/5"
                                                 }`}
                                             >
-                                              {action.label}
+                                              <span className="truncate max-w-full">{action.label}</span>
                                             </motion.button>
                                           </motion.div>
                                         );
@@ -10489,7 +10470,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                                             whileHover={{ scale: 1.03, y: -0.5 }}
                                             whileTap={{ scale: 0.97 }}
                                             onClick={() => setIsSuggestionsExpanded(!isSuggestionsExpanded)}
-                                            className="min-h-[32px] sm:min-h-[34px] px-3 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-[12px] md:text-[13px] font-bold shadow-2xs hover:shadow-xs cursor-pointer select-none border border-[#C8A34D]/30 bg-[#C8A34D]/15 text-[#C8A34D] hover:bg-[#C8A34D]/25 transition-all duration-200 flex items-center justify-center"
+                                            className="min-h-[34px] sm:h-[34px] py-1.5 px-3.5 rounded-full text-[11px] sm:text-[13px] font-bold shadow-2xs hover:shadow-xs cursor-pointer select-none border border-[#C8A34D]/40 bg-[#C8A34D]/15 text-[#C8A34D] hover:bg-[#C8A34D]/25 transition-all duration-200 flex items-center justify-center"
                                           >
                                             {isSuggestionsExpanded ? "Less -" : "More +"}
                                           </motion.button>
@@ -10501,7 +10482,7 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                               </motion.div>
                             )}
                           </motion.div>
-                        </div>
+                        </>
                       );
                     })()}
 
@@ -10546,31 +10527,20 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                   const activeToolId = selectedLegalTool?.id || new URLSearchParams(window.location.search).get('tool');
                   const details = getToolDetails(activeToolId, selectedRole);
                   return (
-                    <div className="w-full border-b border-slate-200/60 dark:border-zinc-800/60 bg-white/95 dark:bg-[#0d0e16]/95 backdrop-blur-md shrink-0 select-none z-30 shadow-2xs">
-                      <div className="flex items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-3 w-full gap-2 sm:gap-3">
+                    <div className="w-full border-b border-slate-200/60 dark:border-zinc-800/60 bg-white dark:bg-[#0d0e16] shrink-0 select-none z-30 shadow-2xs">
+                      <div className="flex items-center justify-between px-4 sm:px-6 py-3 w-full gap-3">
                         
-                        {/* LEFT: Mobile Menu + Assistant Title & History */}
-                        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                          <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => setTglState(prev => ({ ...prev, sidebarOpen: true }))}
-                            className="lg:hidden w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center bg-slate-50 dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 rounded-xl border border-slate-200/80 dark:border-zinc-700 shadow-2xs hover:text-[#C8A34D] transition-colors cursor-pointer shrink-0"
-                            title="Open Sidebar"
-                          >
-                            <MenuIcon className="w-4.5 h-4.5 stroke-[2.2]" />
-                          </motion.button>
-
-                          <div className="flex items-center gap-1.5 min-w-0">
-                            <span className="text-base shrink-0">{details.emoji}</span>
-                            <span className="text-xs sm:text-sm font-black text-slate-800 dark:text-zinc-100 truncate">
-                              {details.title}
-                            </span>
-                          </div>
+                        {/* LEFT: Assistant Title & History */}
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <span className="text-xs sm:text-sm font-black text-slate-800 dark:text-zinc-100 flex items-center gap-1.5">
+                            <span className="text-base">{details.emoji}</span>
+                            <span>{details.title}</span>
+                          </span>
 
                           <button
                             type="button"
                             onClick={() => setIsHistoryOpen(true)}
-                            className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-[#C8A34D] hover:bg-[#C8A34D]/10 rounded-lg transition-colors border border-[#C8A34D]/30 cursor-pointer shrink-0"
+                            className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold text-[#C8A34D] hover:bg-[#C8A34D]/10 rounded-lg transition-colors border border-[#C8A34D]/30 cursor-pointer"
                             title="Open AI History"
                           >
                             <History className="w-3.5 h-3.5" />
@@ -10579,7 +10549,8 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
                         </div>
 
                         {/* RIGHT: New Chat Button */}
-                        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          {/* New Chat Button */}
                           <button
                             type="button"
                             onClick={() => {
@@ -10607,9 +10578,36 @@ If the user asks for an image (e.g., "generate", "create", "draw", "show me a pi
           );
         })()}
 
-        {/* Unified Chat Input Container */}
+        {/* Welcome Screen - Integrated Hub */}
+        <AnimatePresence>
+          {false && (
+            <motion.div
+              key="welcome-screen"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="absolute inset-0 z-[50] pointer-events-none flex flex-col items-center justify-start sm:justify-start overflow-hidden sm:overflow-y-auto sm:overflow-x-hidden sm:pb-32 md:pb-48 scrollbar-hide pt-20 sm:pt-6 aisa-welcome-screen-overlay"
+            >
+              <div className="relative z-10 flex flex-col items-center w-full max-w-7xl mx-auto px-3 sm:px-6 h-max mt-0 sm:mt-0 pointer-events-auto">
+                <ModernDashboard
+                  userName={user?.name || user?.email?.split('@')[0]}
+                  inputValue={inputValue}
+                  setInputValue={setInputValue}
+                  handleSendMessage={handleSendMessage}
+                  legalCases={legalCases}
+                  sessions={sessions}
+                  setSessions={setSessions}
+                  currentProjectId={currentProjectId}
+                  handleDeleteSession={handleDeleteSession}
+                  activateTool={activateToolWithTypingEffect}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>        {/* Unified Chat Input Container */}
         {location.pathname !== '/dashboard/cases' && location.pathname !== '/dashboard' && legalView !== 'DASHBOARD' && legalView !== 'PRECEDENTS' && !activeCaseId && messages.length > 0 && (
-          <div className={`w-full shrink-0 bg-white/95 dark:bg-[#0d0e16]/95 backdrop-blur-md border-t border-slate-200/60 dark:border-zinc-800/60 px-2.5 sm:px-4 py-2 sm:py-3.5 pb-[max(12px,calc(env(safe-area-inset-bottom)+8px))] relative z-[1001] ${(tglState.sidebarOpen && window.innerWidth < 1024) ? 'hidden' : ''}`}>
+          <div className={`w-full shrink-0 bg-slate-50 sm:bg-white border-t border-slate-100 px-4 py-4 relative z-[1001] ${(tglState.sidebarOpen && window.innerWidth < 1024) ? 'hidden' : ''}`}>
             <div className="max-w-4xl mx-auto w-full">
               {renderInputForm()}
             </div>

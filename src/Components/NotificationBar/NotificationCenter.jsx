@@ -101,7 +101,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
         }
     }, [isOpen]);
 
-    // Merge context notifications and live case notifications
+    // Merge context notifications, live case notifications, and institutional announcements
     const allNotifications = useMemo(() => {
         const combined = [...(contextNotifications || [])];
         
@@ -112,12 +112,35 @@ const NotificationCenter = ({ isOpen, onClose }) => {
             }
         });
 
+        // Add institutional enterprise announcements
+        const annStr = localStorage.getItem('enterpriseAnnouncementsList');
+        if (annStr) {
+            try {
+                const anns = JSON.parse(annStr);
+                anns.forEach(a => {
+                    const annId = `announcement-${a._id}`;
+                    if (!combined.some(n => n.id === annId)) {
+                        combined.push({
+                            id: annId,
+                            title: `📢 ${a.title}`,
+                            desc: a.message,
+                            time: a.createdAt,
+                            type: 'info',
+                            category: 'System',
+                            priority: a.isPinned ? 'High' : 'Medium',
+                            isRead: false
+                        });
+                    }
+                });
+            } catch (e) {}
+        }
+
         // Filter by Tab
         return combined.filter(notif => {
             const matchesTab = activeTab === 'All' ? true : 
                                activeTab === 'Hearings' ? (notif.category === 'Hearings' || notif.title?.includes('Hearing')) :
                                activeTab === 'Cases' ? (notif.category === 'Cases' || notif.title?.includes('Case') || notif.title?.includes('Evidence')) :
-                               activeTab === 'System' ? (notif.category === 'System' || notif.type === 'system') : true;
+                               activeTab === 'System' ? (notif.category === 'System' || notif.type === 'system' || notif.title?.includes('📢')) : true;
 
             const matchesQuery = !searchQuery.trim() ? true : 
                                  (notif.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 

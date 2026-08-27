@@ -363,7 +363,7 @@ Language: ${outputLanguage}
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F17] text-slate-900 dark:text-white flex flex-col font-sans">
       {/* APP WORKSPACE HEADER - 1 SINGLE ROW ON MOBILE & DESKTOP */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#111622]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 pl-14 pr-2.5 sm:px-8 py-2 sm:py-3.5 flex flex-row items-center justify-between gap-2">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#111622]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800/80 px-2.5 sm:px-8 py-2 sm:py-3.5 flex flex-row items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
           <button 
             onClick={() => navigate('/dashboard/tools')}

@@ -579,17 +579,27 @@ body {
   background: rgba(99, 102, 241, 0.45);
 }
 
-.no-scrollbar::-webkit-scrollbar,
-.scrollbar-hide::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-.no-scrollbar,
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
 .scrollbar-hide {
-  -ms-overflow-style: none !important;
-  scrollbar-width: none !important;
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
 }
 
 /* Chat Container - Ensures scrollability in all modes */
@@ -1660,9 +1670,9 @@ html.lenis body {
     padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
   }
 
-  /* Prevent overlapping of fixed navbar — only apply when not handling own integrated header */
-  .chatgpt-container.has-global-nav {
-    padding-top: 64px !important;
+  /* Prevent overlapping of fixed navbar — 76px clears the 64px mobile header */
+  .chatgpt-container:not(.no-top-padding) {
+    padding-top: 76px !important;
   }
 }
 
@@ -2112,8 +2122,8 @@ body.modal-open-hide-navbar {
   }
 }
 
-/* ── 6. Main flex area — allow scroll when overflow-y-auto is set ──
-   Scoped to #aisa-app-root to avoid breaking public page main containers */
+/* ── 6. Main flex area — allow touch scrolling on mobile ──
+   Scoped to #aisa-app-root to ensure proper touch scrolling on mobile pages */
 @media (max-width: 1023px) {
   #aisa-app-root main {
     display: flex !important;
@@ -2125,7 +2135,6 @@ body.modal-open-hide-navbar {
   #aisa-app-root main.overflow-y-auto {
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    overscroll-behavior-y: contain !important;
   }
 
   #aisa-app-root main.overflow-hidden {
@@ -2302,4 +2311,53 @@ body.modal-open-hide-navbar {
     -webkit-overflow-scrolling: touch !important;
   }
 }
+
+/* 18. HTML Native Select & Option Dark Theme Styling */
+select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.dark select option,
+html.dark select option,
+[data-theme="dark"] select option {
+  background-color: #1E293B !important;
+  color: #ffffff !important;
+}
+
+/* 19. Custom Scrollbar Styling (Horizontal & Vertical) */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #C8A34D #E2E8F0;
+}
+
+.dark .custom-scrollbar {
+  scrollbar-color: #C8A34D #1E293B;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  display: block !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.8);
+  border-radius: 9999px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.8);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(200, 163, 77, 0.7);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(200, 163, 77, 1);
+}
+
+
 

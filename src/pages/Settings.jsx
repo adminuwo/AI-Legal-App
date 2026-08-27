@@ -4,9 +4,9 @@ import {
   Settings2, Palette, Sparkles, Bell, Shield, Database, HelpCircle, 
   Search, Sliders, Moon, Sun, Monitor, Type, Info, Key, LogOut, Trash2, 
   ShieldAlert, Cloud, FileText, Check, AlertTriangle, 
-  ChevronRight, Volume2, Globe, Calendar, Clock, Laptop, Eye, Heart, Download,
+  ChevronRight, ChevronLeft, Volume2, Globe, Calendar, Clock, Laptop, Eye, Heart, Download,
   Bug, MessageSquare, BookOpen, Star, Send, Paperclip, CheckCircle2, MessageCircle,
-  Award, ShieldCheck, ChevronDown, RefreshCw, Smartphone, Lock, Mail, Menu
+  Award, ShieldCheck, ChevronDown, RefreshCw, Smartphone, Lock, Mail, Menu, ArrowLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePersonalization } from '../context/PersonalizationContext';
@@ -148,18 +148,128 @@ const SettingsPage = () => {
   const [expandedFaqIndex, setExpandedFaqIndex] = useState(null);
   const [faqSearch, setFaqSearch] = useState('');
 
-  // Bug Report Form
-  const [bugForm, setBugForm] = useState({ title: '', description: '', tool: 'General App', screenshot: null });
+  // Mobile Parity Bug Report State
+  const [isBugModalOpen, setIsBugModalOpen] = useState(false);
+  const [bugForm, setBugForm] = useState({
+    title: '',
+    screenName: 'AI Chat',
+    severity: 'Low',
+    description: '',
+    steps: '',
+    includeLogs: true,
+    attachments: []
+  });
   const [submittingBug, setSubmittingBug] = useState(false);
+  const [bugSuccess, setBugSuccess] = useState(false);
+  const [bugRefId, setBugRefId] = useState('');
 
-  // Feature Request Form
-  const [featureForm, setFeatureForm] = useState({ title: '', category: 'AI Assistant', description: '', benefit: '' });
+  // Mobile Parity Feature Request State
+  const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false);
+  const [featureForm, setFeatureForm] = useState({
+    title: '',
+    category: 'New AI Feature',
+    whoBenefit: 'Advocates',
+    priority: 'Nice to Have',
+    description: '',
+    whyNeeded: '',
+    attachments: []
+  });
   const [submittingFeature, setSubmittingFeature] = useState(false);
+  const [featureSuccess, setFeatureSuccess] = useState(false);
+  const [featureRefId, setFeatureRefId] = useState('');
 
   // Security Form States
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [twoFactor, setTwoFactor] = useState(false);
+
+const POLICY_DOCUMENTS = {
+  privacy: {
+    id: 'privacy',
+    title: 'Privacy Policy',
+    lastUpdated: 'July 17, 2026',
+    version: 'v1.5.0',
+    intro: 'AI LEGAL™ takes client confidentiality and data security with absolute seriousness. This Privacy Policy details how we compile, process, safeguard, and delete your professional case information.',
+    sections: [
+      { id: '1', title: '1. Information We Collect', content: 'To provide secure AI processing, we collect: (a) Account Information: name, email address, phone number, and billing logs; (b) Workspace Data: legal documents, PDF case files, evidence images, and chat logs; (c) Telemetry Data: device identification, crash details, OS versions, and application performance metrics.' },
+      { id: '2', title: '2. How We Use Data', content: 'Data is processed strictly to execute requested features: (a) Optical Character Recognition (OCR) text extraction; (b) Semantic indexing of precedent files and contract risk audits; (c) Personalizing response language preferences; (d) Platform security, billing compliance, and active threat detection.' },
+      { id: '3', title: '3. Data Sharing & Non-Sale Policy', content: 'We enforce a strict data protection policy: we NEVER sell, trade, rent, or monetize your personal files, evidence briefs, or workspace logs to advertising networks, brokers, or third parties. Data is processed exclusively inside encrypted cloud services required to execute the platform features.' },
+      { id: '4', title: '4. AI Data Processing & Third-Party AI Services', content: 'AI LEGAL™ utilizes secure enterprise AI API providers (such as Google Gemini) to process user queries for legal research, drafting, and analysis. Data transmitted to AI processing infrastructure is encrypted via HTTPS and strictly used to return immediate real-time outputs requested by the user. User input data is never sold, shared with unauthorized third parties, or utilized to train public AI models.' },
+      { id: '5', title: '5. International Data Transfers', content: 'AI LEGAL™ serves global legal workspaces. Your data may be processed in secure database regions closest to your selected jurisdiction. Any transfers across international borders are protected under standard contractual clauses, ensuring uniform data security guidelines.' },
+      { id: '6', title: '6. Security & Encryption Standards', content: 'We apply top-tier security controls: (a) End-to-end TLS 1.3 encryption for all data in transit; (b) AES-256 block encryption at rest for databases and file servers; (c) Isolated tenant sandboxing to prevent cross-account leaks; (d) Continuous intrusion monitoring and vulnerability scans.' },
+      { id: '7', title: '7. Data Retention & Permanent Deletion', content: 'Case files and chat transcripts are stored only for as long as you maintain your account. Toggling deletion on a file immediately flags it for purge. Permanent account deletions remove all corresponding database collections, document buffers, and billing logs from active nodes within 48 hours.' },
+      { id: '8', title: '8. User Rights & Data Portability', content: 'You maintain absolute ownership of your data. You have the right to inspect, download a copy of your chat history and case metadata, correct account information, restrict processing, or permanently delete your entire profile directly from the Settings panel.' },
+      { id: '9', title: '9. Privacy Policy Updates', content: 'We may modify this document as technology or compliance mandates evolve. For significant updates, we notify users via in-app alerts or email registered accounts at least 15 days before amendments take effect.' }
+    ]
+  },
+  terms: {
+    id: 'terms',
+    title: 'Terms of Service & Conditions',
+    lastUpdated: 'July 17, 2026',
+    version: 'v1.5.0',
+    intro: 'Welcome to AI LEGAL™. These Terms of Service govern your license, account setup, and legal responsibilities when accessing our AI legal analytics application, web portal, and cloud strategy services.',
+    sections: [
+      { id: '1', title: '1. Acceptance of Terms', content: 'By accessing or using the AI LEGAL™ platform, creating an account, or purchasing subscription plans, you agree to be bound by these Terms of Service. If you do not agree to these terms, you are prohibited from using the platform and must immediately delete your account and uninstall the mobile application.' },
+      { id: '2', title: '2. User Eligibility', content: 'AI LEGAL™ is built for registered advocates, legal firms, corporate legal departments, and individual litigants. By registering, you warrant that you possess the legal authority to enter into this agreement and will comply with all local, state, and international bar associations, judicial orders, and code ordinances.' },
+      { id: '3', title: '3. Account Security & Registration', content: 'You must provide accurate, verified information during signup, including your preferred jurisdiction. You are solely responsible for maintaining the confidentiality of your credentials and restrict access to unauthorized parties. Any security breaches or suspect activity must be reported to support immediately.' },
+      { id: '4', title: '4. AI Legal Services & Limitations', content: 'AI LEGAL™ utilizes advanced natural language processing, machine learning models, and document intelligence tools to offer case summaries, precedent research, contract analysis, and litigation strategies. You acknowledge that AI is a tool designed to assist human lawyers, not replace them. AI outputs may contain errors, incomplete precedents, or structural anomalies.' },
+      { id: '5', title: '5. No Attorney-Client Relationship', content: 'Your use of AI LEGAL™ does not establish an attorney-client relationship between you and AI LEGAL™, its developers, or its parent entity. The platform is not a licensed law firm, does not practice law, and does not provide legal representation. All materials generated are for informational and educational workflow assistance.' },
+      { id: '6', title: '6. User Content & Uploaded Documents', content: 'You retain all ownership and intellectual property rights in the documents, pleading briefs, and evidence matrices you upload to the platform. You grant AI LEGAL™ a limited, non-exclusive, secure license to host and process these files solely to generate the requested analysis. No uploaded documents are used for training public open-source models.' },
+      { id: '7', title: '7. Subscriptions, Renewals, & Billing', content: 'Access to premium features requires a paid subscription (monthly or yearly cycles). Subscriptions automatically renew at the end of the billing period using the payment method on file. You may cancel your subscription at any time; however, cancellations will only apply to the subsequent billing cycle.' },
+      { id: '8', title: '8. Prohibited Activities', content: 'You agree not to: (a) reverse-engineer or attempt to extract the source code of the platform or the underlying AI weights; (b) upload state-restricted, highly classified, or illegally compiled materials; (c) use the AI to generate documents for illegal tax evasion, harassment, or extortion; (d) deploy automated scraping bots that degrade system performance.' },
+      { id: '9', title: '9. Limitation of Liability', content: 'To the maximum extent permitted by applicable law, AI LEGAL™ and its parent operators, affiliates, and developers shall not be liable for any direct, indirect, incidental, or consequential damages, legal malpractice claims, professional sanctions, or lost cases resulting from your reliance on AI-generated suggestions. Practicing advocates are solely responsible for verifying all filings.' },
+      { id: '10', title: '10. Governing Law & Jurisdiction', content: 'These Terms of Service shall be governed by and construed in accordance with the laws of India. Any litigation, dispute, or claim arising out of these terms shall be subject to the exclusive jurisdiction of the competent courts of New Delhi, India. If any provision is found invalid, the remaining terms shall continue in full force.' }
+    ]
+  },
+  disclaimer: {
+    id: 'disclaimer',
+    title: 'AI Legal Disclaimer',
+    lastUpdated: 'July 17, 2026',
+    version: 'v1.5.0',
+    intro: 'This AI Legal Disclaimer clarifies the operational scope, algorithmic limits, and professional exclusions of the AI LEGAL™ platform.',
+    sections: [
+      { id: '1', title: '1. Automated Advisory Status', content: 'AI LEGAL™ is a software application leveraging artificial intelligence, natural language models, and semantic databases. All case predictors, citation reviews, roadmap strategies, and drafting advice are generated algorithmically. The software does not think like a human practitioner and does not hold a license to practice law.' },
+      { id: '2', title: '2. Informational Purpose Only', content: 'The information and suggestions provided by the AI are for informational and educational research purposes. They must not be construed as official legal opinions, binding representations, or licensed legal advice. The platform serves to accelerate case preparations, not replace professional legal assessment.' },
+      { id: '3', title: '3. Precedent Citation Warning', content: 'AI models can occasionally hallucinate or output out-of-date, overruled, or incorrect case precedent links. Advocates are under an absolute professional duty under local bar regulations to manually cross-verify all case names, citations, and statutory acts before referencing them in active courts.' },
+      { id: '4', title: '4. Assumption of Risk & Liability', content: 'By using this app, you assume all risk. Neither AI LEGAL™ nor its developers assume liability for legal errors, dismissed claims, missed filing deadlines, or professional malpractice complaints resulting from reliance on AI suggestions. Advocates are solely responsible for their final filings.' }
+    ]
+  }
+};
+
+  // Policy Modal Viewer State
+  const [activePolicyKey, setActivePolicyKey] = useState(null); // 'privacy' | 'terms' | 'disclaimer' | null
+
+  // Tab navigation scroll ref & drag scroll handlers
+  const tabsNavRef = useRef(null);
+  const [isTabDragging, setIsTabDragging] = useState(false);
+  const [tabStartX, setTabStartX] = useState(0);
+  const [tabScrollLeft, setTabScrollLeft] = useState(0);
+
+  const scrollTabs = (direction) => {
+    if (tabsNavRef.current) {
+      const scrollAmount = direction === 'left' ? -220 : 220;
+      tabsNavRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const handleTabMouseDown = (e) => {
+    if (!tabsNavRef.current) return;
+    setIsTabDragging(true);
+    setTabStartX(e.pageX - tabsNavRef.current.offsetLeft);
+    setTabScrollLeft(tabsNavRef.current.scrollLeft);
+  };
+
+  const handleTabMouseLeaveOrUp = () => {
+    setIsTabDragging(false);
+  };
+
+  const handleTabMouseMove = (e) => {
+    if (!isTabDragging || !tabsNavRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - tabsNavRef.current.offsetLeft;
+    const walk = (x - tabStartX) * 2.5;
+    tabsNavRef.current.scrollLeft = tabScrollLeft - walk;
+  };
 
   // Dialog State
   const [dialogConfig, setDialogConfig] = useState({ show: false, type: '', title: '', desc: '', action: null });
@@ -276,818 +386,650 @@ const SettingsPage = () => {
     }, 600);
   };
 
+  const generateRefId = (prefix) => {
+    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = `${prefix}-`;
+    for (let i = 0; i < 8; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
   const handleBugSubmit = (e) => {
     e.preventDefault();
-    if (!bugForm.title || !bugForm.description) {
-      toast.error('Please provide a title and description.');
+    if (!bugForm.title.trim()) {
+      toast.error('Bug Title is required.');
+      return;
+    }
+    if (!bugForm.description.trim()) {
+      toast.error('Please describe the bug issue.');
       return;
     }
     setSubmittingBug(true);
     setTimeout(() => {
-      toast.success('Bug report submitted! Our engineering team will review it. 🐞');
-      setBugForm({ title: '', description: '', tool: 'General App', screenshot: null });
+      const ref = generateRefId('BUG');
+      setBugRefId(ref);
       setSubmittingBug(false);
-    }, 800);
+      setBugSuccess(true);
+      toast.success('Bug report submitted! 🐞');
+    }, 700);
   };
 
   const handleFeatureSubmit = (e) => {
     e.preventDefault();
-    if (!featureForm.title || !featureForm.description) {
-      toast.error('Please complete the feature request fields.');
+    if (!featureForm.title.trim()) {
+      toast.error('Feature Title is required.');
+      return;
+    }
+    if (!featureForm.description.trim()) {
+      toast.error('Please describe your proposed feature.');
       return;
     }
     setSubmittingFeature(true);
     setTimeout(() => {
-      toast.success('Feature request submitted! Thank you for helping shape AI LEGAL. 💡');
-      setFeatureForm({ title: '', category: 'AI Assistant', description: '', benefit: '' });
+      const ref = generateRefId('FR');
+      setFeatureRefId(ref);
       setSubmittingFeature(false);
-    }, 800);
+      setFeatureSuccess(true);
+      toast.success('Feature request submitted! 💡');
+    }, 700);
   };
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A] flex flex-col font-sans select-text p-4 sm:p-6 lg:p-8 text-slate-900 dark:text-white transition-colors duration-200">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A] flex flex-col font-sans select-text p-3.5 sm:p-6 lg:p-8 text-slate-900 dark:text-white transition-colors duration-200 max-w-6xl mx-auto space-y-4 sm:space-y-6">
       
-      {/* Settings Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800 shrink-0">
+      {/* Header Bar matching Mobile App Screenshots 1-5 */}
+      <div className="flex items-center gap-2.5 sm:gap-3 pb-2 sm:pb-3 border-b border-slate-200 dark:border-slate-800">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="p-1.5 sm:p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-all shrink-0"
+          title="Back to Dashboard"
+        >
+          <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+        </button>
         <div>
-          <div className="flex items-center gap-2 font-black">
-            <div className="w-8 h-8 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/30 flex items-center justify-center text-[#C8A34D] shrink-0">
-              <Settings2 size={18} />
-            </div>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate">AI LEGAL System Settings</h1>
-          </div>
-          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Configure workspace parameters, app guide, security, and appearance settings.</p>
-        </div>
-        <div className="relative w-full sm:w-80">
-          <Search className="absolute left-3.5 top-3 w-4 h-4 text-[#C8A34D]" />
-          <input
-            type="text"
-            placeholder="Search settings category..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold bg-white dark:bg-[#1E293B] focus:outline-none focus:border-[#C8A34D] transition-all placeholder-slate-400 text-slate-900 dark:text-white shadow-xs"
-          />
+          <h1 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">System Settings</h1>
+          <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400">ADVOCATE SETTINGS CONSOLE</p>
         </div>
       </div>
 
-      {/* Main Grid */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-8 pt-8 items-start">
-        
-        {/* Left Sidebar Categories */}
-        <div className={`lg:col-span-1 space-y-2 transition-all ${isSidebarCollapsed ? 'hidden lg:block lg:w-16' : 'w-full'}`}>
-          <div className="flex items-center justify-between px-2 mb-2 lg:mb-3">
-            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Settings Console</span>
-            <button 
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="hidden lg:block text-[9px] font-extrabold text-[#C8A34D] hover:underline cursor-pointer"
-            >
-              {isSidebarCollapsed ? 'Expand' : 'Collapse'}
-            </button>
-          </div>
-          {filteredCategories.map(cat => {
+      {/* Top Horizontal Scrollable Pill Navigation Bar matching Mobile Screenshots 1-5 */}
+      <div className="relative flex items-center w-full min-w-0 gap-1.5 sm:gap-2">
+        <button
+          onClick={() => scrollTabs('left')}
+          className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 shrink-0 cursor-pointer transition-all shadow-xs"
+          title="Scroll tabs left"
+        >
+          <ChevronLeft size={16} />
+        </button>
+
+        <div
+          ref={tabsNavRef}
+          onMouseDown={handleTabMouseDown}
+          onMouseLeave={handleTabMouseLeaveOrUp}
+          onMouseUp={handleTabMouseLeaveOrUp}
+          onMouseMove={handleTabMouseMove}
+          onWheel={(e) => {
+            if (e.deltaY) {
+              e.currentTarget.scrollLeft += e.deltaY;
+            }
+          }}
+          className={`bg-slate-100/90 dark:bg-slate-900/90 p-2 sm:p-2.5 rounded-2xl border border-slate-200/90 dark:border-slate-800 overflow-x-auto scroll-smooth flex items-center gap-2 sm:gap-3 custom-scrollbar pb-3 pt-2 px-2 flex-1 min-w-0 touch-pan-x select-none ${isTabDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        >
+          {[
+            { id: 'general', label: 'General Settings', icon: Sliders },
+            { id: 'appearance', label: 'Appearance Settings', icon: Palette },
+            { id: 'notifications', label: 'Notification Preferences', icon: Bell },
+            { id: 'security', label: 'Security Settings', icon: Shield },
+            { id: 'help', label: 'Help & Support', icon: HelpCircle }
+          ].map(cat => {
             const Icon = cat.icon;
             const isActive = activeCategory === cat.id;
             return (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left transition-all cursor-pointer ${
-                  isActive 
-                    ? 'bg-[#C8A34D]/15 text-[#B48A35] dark:text-[#C8A34D] font-extrabold border border-[#C8A34D]/40 shadow-xs'
-                    : 'bg-white dark:bg-[#1E293B] text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-800 font-semibold'
+                className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 sm:gap-2 shadow-xs min-h-[38px] ${
+                  isActive
+                    ? 'bg-white dark:bg-[#1E293B] border-2 border-[#C8A34D] text-[#C8A34D] shadow-sm ring-2 ring-[#C8A34D]/20'
+                    : 'bg-white/90 dark:bg-[#1E293B]/90 border border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:border-[#C8A34D]/50 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#C8A34D]' : 'text-slate-400 dark:text-slate-500'}`} />
-                {!isSidebarCollapsed && (
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs truncate leading-none font-bold">{cat.label}</p>
-                  </div>
-                )}
+                <Icon size={15} className={isActive ? 'text-[#C8A34D]' : 'text-slate-400'} />
+                <span>{cat.label}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Right Content Panel */}
-        <div className="lg:col-span-3 bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-none space-y-8 min-h-[520px]">
-          
-          {/* CATEGORY 1: GENERAL SETTINGS */}
-          {activeCategory === 'general' && (
-            <div className="space-y-6 animate-fade-in">
-              <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-[#C8A34D] border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center gap-2">
-                  <Sliders size={14} /> General Settings & Jurisdiction
-                </h3>
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-2">Adjust core application defaults, languages, and time preferences.</p>
+        <button
+          onClick={() => scrollTabs('right')}
+          className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700 shrink-0 cursor-pointer transition-all shadow-xs"
+          title="Scroll tabs right"
+        >
+          <ChevronRight size={16} />
+        </button>
+      </div>
+
+      {/* Content Body for Active Tab */}
+      <div className="space-y-4 sm:space-y-6">
+        
+        {/* CATEGORY 1: GENERAL SETTINGS (Screenshot 1 Parity) */}
+        {activeCategory === 'general' && (
+          <div className="space-y-4 sm:space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xs">
+            <div>
+              <h3 className="text-base font-black text-slate-900 dark:text-white">General Settings</h3>
+              <p className="text-xs font-semibold text-slate-400 mt-0.5">Configure basic navigation and locales.</p>
+            </div>
+
+            <div className="space-y-3 sm:space-y-4 pt-1 sm:pt-2">
+              {/* DEFAULT WORKSPACE */}
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">DEFAULT WORKSPACE</label>
+                <select
+                  value={generalSettings.defaultDashboard || '/dashboard'}
+                  onChange={(e) => handleSelectChange('general', 'defaultDashboard', e.target.value)}
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                >
+                  <option value="/dashboard" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Main Dashboard</option>
+                  <option value="/dashboard/chat/new" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">AI Legal Assistant</option>
+                  <option value="/dashboard/cases" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">My Matters / Case Files</option>
+                  <option value="/dashboard/tools" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">AI Litigation Tools</option>
+                </select>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                {/* Default Dashboard */}
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest block mb-1.5">Default Workspace View</label>
-                  <select
-                    value={generalSettings.defaultDashboard || '/dashboard'}
-                    onChange={(e) => handleSelectChange('general', 'defaultDashboard', e.target.value)}
-                    className="w-full bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-[#C8A34D] transition-all cursor-pointer"
-                  >
-                    <option value="/dashboard">Main Dashboard</option>
-                    <option value="/dashboard/chat/new">AI Legal Assistant</option>
-                    <option value="/dashboard/cases">My Matters / Case Files</option>
-                    <option value="/dashboard/tools">AI Litigation Tools</option>
-                  </select>
-                </div>
-
-                {/* Primary Language */}
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest block mb-1.5">Language Preference</label>
-                  <select
-                    value={generalSettings.language || 'English'}
-                    onChange={(e) => handleSelectChange('general', 'language', e.target.value)}
-                    className="w-full bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-[#C8A34D] transition-all cursor-pointer"
-                  >
-                    <option value="English">English</option>
-                    <option value="Hindi">Hindi (हिंदी)</option>
-                    <option value="Bilingual">Bilingual (English & Hindi)</option>
-                    <option value="Marathi">Marathi (मराठी)</option>
-                    <option value="Gujarati">Gujarati (ગુજરાતી)</option>
-                    <option value="Bengali">Bengali (বাংলা)</option>
-                  </select>
-                </div>
-
-                {/* Default Court Jurisdiction */}
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest block mb-1.5">Default Court Jurisdiction</label>
-                  <select
-                    value={generalSettings.jurisdiction || 'Supreme Court of India'}
-                    onChange={(e) => handleSelectChange('general', 'jurisdiction', e.target.value)}
-                    className="w-full bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-[#C8A34D] transition-all cursor-pointer"
-                  >
-                    <option value="Supreme Court of India">Supreme Court of India</option>
-                    <option value="High Court of Delhi">High Court of Delhi</option>
-                    <option value="High Court of Bombay">High Court of Bombay</option>
-                    <option value="High Court of Judicature at Allahabad">High Court of Judicature at Allahabad</option>
-                    <option value="District & Sessions Courts">District & Sessions Courts</option>
-                  </select>
-                </div>
-
-                {/* Time Zone */}
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest block mb-1.5">Time Zone</label>
-                  <select
-                    value={generalSettings.timeZone || 'IST'}
-                    onChange={(e) => handleSelectChange('general', 'timeZone', e.target.value)}
-                    className="w-full bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-[#C8A34D] transition-all cursor-pointer"
-                  >
-                    <option value="IST">India Standard Time (IST) - GMT+5:30</option>
-                    <option value="UTC">Coordinated Universal Time (UTC)</option>
-                  </select>
-                </div>
-
-                {/* Date Format */}
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest block mb-1.5">Date Format</label>
-                  <select
-                    value={generalSettings.dateFormat || 'DD/MM/YYYY'}
-                    onChange={(e) => handleSelectChange('general', 'dateFormat', e.target.value)}
-                    className="w-full bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-[#C8A34D] transition-all cursor-pointer"
-                  >
-                    <option value="DD/MM/YYYY">DD / MM / YYYY (e.g. 14/08/2026)</option>
-                    <option value="MM/DD/YYYY">MM / DD / YYYY (e.g. 08/14/2026)</option>
-                    <option value="YYYY-MM-DD">YYYY - MM - DD (e.g. 2026-08-14)</option>
-                  </select>
-                </div>
-
-                {/* Auto Save Toggle */}
-                <div className="flex items-center justify-between p-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-[#0F172A]">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-white">Auto-Save Drafts</h4>
-                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">Automatically save legal notices & notes every 30 seconds.</p>
-                  </div>
-                  <button 
-                    onClick={() => handleToggle('general', 'autoSave', generalSettings.autoSave !== false)}
-                    className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 ${generalSettings.autoSave !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
-                  >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${generalSettings.autoSave !== false ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </button>
-                </div>
+              {/* LEGAL JURISDICTION */}
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">LEGAL JURISDICTION</label>
+                <select
+                  value={generalSettings.jurisdiction || 'India'}
+                  onChange={(e) => handleSelectChange('general', 'jurisdiction', e.target.value)}
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                >
+                  <option value="India" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">🇮🇳 India</option>
+                  <option value="Supreme Court of India" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Supreme Court of India</option>
+                  <option value="High Court of Delhi" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">High Court of Delhi</option>
+                  <option value="High Court of Bombay" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">High Court of Bombay</option>
+                </select>
               </div>
 
-              {/* Reset Section */}
-              <div className="border-t border-slate-100 dark:border-slate-800 pt-6 flex items-center justify-between flex-wrap gap-4">
-                <div>
-                  <h4 className="text-xs font-bold text-rose-500">Restore Default Settings</h4>
-                  <p className="text-[10px] font-semibold text-slate-400 mt-0.5">Reset all general, theme, and notification configurations back to default.</p>
+              {/* LANGUAGE SELECTION */}
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">LANGUAGE SELECTION</label>
+                <select
+                  value={generalSettings.language || 'English'}
+                  onChange={(e) => handleSelectChange('general', 'language', e.target.value)}
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                >
+                  <option value="English" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">English</option>
+                  <option value="Hindi" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Hindi (हिंदी)</option>
+                  <option value="Bilingual" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Bilingual (English & Hindi)</option>
+                </select>
+              </div>
+
+              {/* TIME ZONE */}
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">TIME ZONE</label>
+                <select
+                  value={generalSettings.timeZone || 'IST'}
+                  onChange={(e) => handleSelectChange('general', 'timeZone', e.target.value)}
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                >
+                  <option value="IST" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">IST</option>
+                  <option value="UTC" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">UTC</option>
+                </select>
+              </div>
+
+              {/* DATE FORMAT */}
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">DATE FORMAT</label>
+                <select
+                  value={generalSettings.dateFormat || 'DD/MM/YYYY'}
+                  onChange={(e) => handleSelectChange('general', 'dateFormat', e.target.value)}
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                >
+                  <option value="DD/MM/YYYY" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">DD/MM/YYYY</option>
+                  <option value="MM/DD/YYYY" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">MM/DD/YYYY</option>
+                  <option value="YYYY-MM-DD" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">YYYY-MM-DD</option>
+                </select>
+              </div>
+
+              {/* TIME FORMAT */}
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">TIME FORMAT</label>
+                <select
+                  value={generalSettings.timeFormat || '12 Hour (AM/PM)'}
+                  onChange={(e) => handleSelectChange('general', 'timeFormat', e.target.value)}
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                >
+                  <option value="12 Hour (AM/PM)" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">12 Hour (AM/PM)</option>
+                  <option value="24 Hour" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">24 Hour</option>
+                </select>
+              </div>
+
+              {/* Show Product Guide Tips Again */}
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 border-t border-slate-100 dark:border-slate-800 pt-4 sm:pt-5">
+                <div className="flex-1 min-w-0 pr-2">
+                  <h4 className="text-xs font-black text-slate-900 dark:text-white">Show Product Guide Tips Again</h4>
+                  <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Enable this to show the onboarding guide on your dashboard again</p>
+                </div>
+                <button 
+                  onClick={() => handleToggle('general', 'showGuideTips', generalSettings.showGuideTips !== false)}
+                  className={`w-11 h-6 rounded-full p-0.5 shrink-0 transition-all duration-300 ${generalSettings.showGuideTips !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                >
+                  <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 ${generalSettings.showGuideTips !== false ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+
+              {/* Reset Preferences */}
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 border-t border-slate-100 dark:border-slate-800 pt-4 sm:pt-5">
+                <div className="flex-1 min-w-0 pr-2">
+                  <h4 className="text-xs font-black text-slate-900 dark:text-white">Reset Preferences</h4>
+                  <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Restore clean preferences without deleting case documents</p>
                 </div>
                 <button
-                  onClick={() => triggerConfirm('reset', 'Reset All Settings', 'Are you sure you want to restore all general, appearance, and notifications configurations to default?', handleResetAll)}
-                  className="px-4 py-2 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-black uppercase tracking-wider border border-rose-100 dark:border-rose-900/50 transition-colors cursor-pointer"
+                  onClick={() => triggerConfirm('reset', 'Reset Preferences', 'Restore clean preferences without deleting case documents?', handleResetAll)}
+                  className="px-4 sm:px-5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-900 dark:text-white font-black text-xs transition-colors cursor-pointer border border-slate-200/80 dark:border-slate-700 shrink-0"
                 >
-                  Restore Defaults
+                  Reset
                 </button>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* CATEGORY 2: APPEARANCE SETTINGS */}
-          {activeCategory === 'appearance' && (
-            <div className="space-y-6 animate-fade-in">
-              <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-[#C8A34D] border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center gap-2">
-                  <Palette size={14} /> Appearance & Layout Customization
-                </h3>
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-2">Personalize workspace themes, font sizing, and visual density.</p>
+        {/* CATEGORY 2: APPEARANCE SETTINGS (Screenshot 2 Parity) */}
+        {activeCategory === 'appearance' && (
+          <div className="space-y-4 sm:space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xs">
+            <div>
+              <h3 className="text-base font-black text-slate-900 dark:text-white">Appearance Settings</h3>
+              <p className="text-xs font-semibold text-slate-400 mt-0.5">Personalize accent branding and content scaling overrides.</p>
+            </div>
+
+            <div className="space-y-3 sm:space-y-4 pt-1 sm:pt-2">
+              {/* THEME PREFERENCE */}
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">THEME PREFERENCE</label>
+                <select
+                  value={theme}
+                  onChange={(e) => {
+                    setTheme(e.target.value);
+                    handleSelectChange('general', 'theme', e.target.value);
+                  }}
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                >
+                  <option value="light" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">light</option>
+                  <option value="dark" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">dark</option>
+                  <option value="system" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">system</option>
+                </select>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                {/* Theme Mode */}
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest block mb-1.5">Theme Mode</label>
-                  <select
-                    value={theme}
-                    onChange={(e) => {
-                      setTheme(e.target.value);
-                      handleSelectChange('general', 'theme', e.target.value);
-                    }}
-                    className="w-full bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-[#C8A34D] transition-all cursor-pointer"
-                  >
-                    <option value="light">☀️ Light Mode</option>
-                    <option value="dark">🌙 Dark Mode (Luxury Dark)</option>
-                    <option value="system">🖥️ System Default</option>
-                  </select>
-                </div>
-
-                {/* Font Size */}
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest block mb-1.5">Font Scale</label>
-                  <select
-                    value={personalizationPrefs.fontSize || 'Medium'}
-                    onChange={(e) => handleSelectChange('personalization', 'fontSize', e.target.value)}
-                    className="w-full bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-[#C8A34D] transition-all cursor-pointer"
-                  >
-                    <option value="Small">Small (Compact Legal Text)</option>
-                    <option value="Medium">Medium (Standard Court Standard)</option>
-                    <option value="Large">Large (High Contrast)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Toggles */}
-              <div className="border-t border-slate-100 dark:border-slate-800 pt-6 space-y-4">
-                {/* Compact Mode */}
-                <div className="flex items-center justify-between py-1">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-white">Compact Layout Mode</h4>
-                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">Reduces list item padding to fit more case records on screen.</p>
-                  </div>
-                  <button 
-                    onClick={() => handleToggle('general', 'compactMode', generalSettings.compactMode === true)}
-                    className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 ${generalSettings.compactMode === true ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
-                  >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${generalSettings.compactMode === true ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Accent Color Display */}
-              <div className="border-t border-slate-100 dark:border-slate-800 pt-6">
-                <label className="text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest block mb-3">Accent Brand Theme</label>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#C8A34D] border border-[#C8A34D]/30 shadow-xs flex items-center justify-center text-[#111111] font-black text-xs">✓</div>
-                  <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">AI LEGAL Premium Gold theme is active across all advocate toolbars and counsel widgets.</p>
-                </div>
+              {/* FONT SIZE SCALE */}
+              <div className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900/90 rounded-xl sm:rounded-2xl space-y-1">
+                <label className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-400 block">FONT SIZE SCALE</label>
+                <select
+                  value={personalizationPrefs.fontSize || 'Medium'}
+                  onChange={(e) => handleSelectChange('personalization', 'fontSize', e.target.value)}
+                  className="w-full bg-transparent text-slate-900 dark:text-white text-xs sm:text-sm font-black focus:outline-none cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                >
+                  <option value="Small" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Small</option>
+                  <option value="Medium" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Medium</option>
+                  <option value="Large" className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">Large</option>
+                </select>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* CATEGORY 3: NOTIFICATIONS SETTINGS */}
-          {activeCategory === 'notifications' && (
-            <div className="space-y-6 animate-fade-in">
+        {/* CATEGORY 3: NOTIFICATIONS SETTINGS */}
+        {activeCategory === 'notifications' && (
+          <div className="space-y-4 sm:space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xs">
+            <div>
+              <h3 className="text-base font-black text-slate-900 dark:text-white">Notification Preferences</h3>
+              <p className="text-xs font-semibold text-slate-400 mt-0.5">Manage hearing alerts, daily cause lists, and AI updates.</p>
+            </div>
+
+            <div className="space-y-3 sm:space-y-4 pt-1 sm:pt-2">
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex-1 min-w-0 pr-2">
+                  <h4 className="text-xs font-black text-slate-900 dark:text-white">Hearing Reminders</h4>
+                  <p className="text-[11px] font-semibold text-slate-400">Receive alerts 24 hours prior to court hearings</p>
+                </div>
+                <button 
+                  onClick={() => handleToggle('notifications', 'hearingReminder', notifPrefs.hearingReminder !== false)}
+                  className={`w-11 h-6 rounded-full p-0.5 shrink-0 transition-all duration-300 ${notifPrefs.hearingReminder !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                >
+                  <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 ${notifPrefs.hearingReminder !== false ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex-1 min-w-0 pr-2">
+                  <h4 className="text-xs font-black text-slate-900 dark:text-white">Daily Cause List Updates</h4>
+                  <p className="text-[11px] font-semibold text-slate-400">Daily cause list notification digest</p>
+                </div>
+                <button 
+                  onClick={() => handleToggle('notifications', 'pushNotif', notifPrefs.pushNotif !== false)}
+                  className={`w-11 h-6 rounded-full p-0.5 shrink-0 transition-all duration-300 ${notifPrefs.pushNotif !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                >
+                  <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 ${notifPrefs.pushNotif !== false ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex-1 min-w-0 pr-2">
+                  <h4 className="text-xs font-black text-slate-900 dark:text-white">AI Research Complete Alerts</h4>
+                  <p className="text-[11px] font-semibold text-slate-400">Notify when background AI draft or analysis completes</p>
+                </div>
+                <button 
+                  onClick={() => handleToggle('notifications', 'draftCompleted', notifPrefs.draftCompleted !== false)}
+                  className={`w-11 h-6 rounded-full p-0.5 shrink-0 transition-all duration-300 ${notifPrefs.draftCompleted !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                >
+                  <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 ${notifPrefs.draftCompleted !== false ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4">
+                <div className="flex-1 min-w-0 pr-2">
+                  <h4 className="text-xs font-black text-slate-900 dark:text-white">Email Notifications</h4>
+                  <p className="text-[11px] font-semibold text-slate-400">Receive schedule digests via email</p>
+                </div>
+                <button 
+                  onClick={() => handleToggle('notifications', 'emailNotif', notifPrefs.emailNotif !== false)}
+                  className={`w-11 h-6 rounded-full p-0.5 shrink-0 transition-all duration-300 ${notifPrefs.emailNotif !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                >
+                  <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 ${notifPrefs.emailNotif !== false ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* CATEGORY 4: SECURITY SETTINGS (Screenshots 3 & 4 Parity) */}
+        {activeCategory === 'security' && (
+          <div className="space-y-4 sm:space-y-6 animate-fade-in">
+            {/* Password & Authentication Card */}
+            <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 space-y-4 shadow-xs">
               <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-[#C8A34D] border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center gap-2">
-                  <Bell size={14} /> Notification & Alert Preferences
-                </h3>
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-2">Manage court hearing alerts, daily cause list reminders, and AI generation completion notifications.</p>
+                <h3 className="text-base font-black text-slate-900 dark:text-white">Password & Authentication</h3>
+                <p className="text-xs font-semibold text-slate-400 mt-0.5">Update your master passphrase and secure your account access.</p>
+              </div>
+
+              <form onSubmit={handleUpdatePassword} className="space-y-3 pt-2">
+                <span className="text-xs font-black text-slate-800 dark:text-slate-200 block">Change Password</span>
+                <input
+                  type="password"
+                  placeholder="Current Password"
+                  value={passwordForm.currentPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                  className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border-none rounded-xl sm:rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#C8A34D]"
+                />
+                <input
+                  type="password"
+                  placeholder="New Password"
+                  value={passwordForm.newPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                  className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border-none rounded-xl sm:rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#C8A34D]"
+                />
+                <input
+                  type="password"
+                  placeholder="Confirm New Password"
+                  value={passwordForm.confirmPassword}
+                  onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                  className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border-none rounded-xl sm:rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#C8A34D]"
+                />
+
+                <button
+                  type="submit"
+                  className="w-full py-3.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl sm:rounded-2xl text-xs shadow-xs transition-all cursor-pointer mt-2"
+                >
+                  Update Password
+                </button>
+              </form>
+            </div>
+
+            {/* Active Login Sessions Card */}
+            <div className="bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 space-y-4 shadow-xs">
+              <div>
+                <h3 className="text-base font-black text-slate-900 dark:text-white">Active Login Sessions</h3>
+                <p className="text-xs font-semibold text-slate-400 mt-0.5">Devices currently logged into your advocate portal database.</p>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <div className="p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 border-2 border-slate-400 rounded-xs flex items-center justify-center text-[10px] font-black shrink-0">💻</div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="text-xs font-black text-slate-900 dark:text-white">Browser Client</h4>
+                        <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-black rounded-md">Current Device</span>
+                      </div>
+                      <p className="text-[11px] font-semibold text-slate-400">Chrome • Unknown Location • Active: Today - 12:11 pm</p>
+                    </div>
+                  </div>
+                  <button onClick={() => toast.success("Session logged out.")} className="px-3.5 py-1.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-black cursor-pointer self-start sm:self-center shrink-0">Logout</button>
+                </div>
+
+                <div className="p-3.5 sm:p-4 border border-slate-200/80 dark:border-slate-800 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 border-2 border-slate-400 rounded-xs flex items-center justify-center text-[10px] font-black shrink-0">📱</div>
+                    <div>
+                      <h4 className="text-xs font-black text-slate-900 dark:text-white">Browser Client</h4>
+                      <p className="text-[11px] font-semibold text-slate-400">Other • Unknown Location • Active: Today - 11:53 am</p>
+                    </div>
+                  </div>
+                  <button onClick={() => toast.success("Session logged out.")} className="px-3.5 py-1.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-black cursor-pointer self-start sm:self-center shrink-0">Logout</button>
+                </div>
+
+                <button
+                  onClick={() => toast.success("Logged out from all other devices!")}
+                  className="w-full py-3 rounded-xl sm:rounded-2xl border border-rose-300 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-xs font-black cursor-pointer transition-all mt-2"
+                >
+                  Logout From All Other Devices
+                </button>
+              </div>
+            </div>
+
+            {/* Delete Account Card (Red outline) */}
+            <div className="bg-white dark:bg-[#1E293B] border-2 border-rose-500/40 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 space-y-4 shadow-xs">
+              <div>
+                <h3 className="text-base font-black text-rose-600 dark:text-rose-400">Delete Account</h3>
+                <p className="text-xs font-semibold text-slate-400 mt-0.5">Configure temporary deactivation or complete profile clearance.</p>
               </div>
 
               <div className="space-y-4 pt-2">
-                {/* Push Notifications */}
-                <div className="flex items-center justify-between py-1">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-white">Push Notifications</h4>
-                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">Receive alert notifications inside the browser workspace.</p>
-                  </div>
-                  <button 
-                    onClick={() => handleToggle('notifications', 'pushNotif', notifPrefs.pushNotif !== false)}
-                    className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 ${notifPrefs.pushNotif !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
-                  >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${notifPrefs.pushNotif !== false ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </button>
-                </div>
-
-                {/* Email Notifications */}
-                <div className="flex items-center justify-between py-1">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-white">Email Notifications</h4>
-                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">Receive daily hearing schedules sent directly to your email inbox.</p>
-                  </div>
-                  <button 
-                    onClick={() => handleToggle('notifications', 'emailNotif', notifPrefs.emailNotif !== false)}
-                    className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 ${notifPrefs.emailNotif !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
-                  >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${notifPrefs.emailNotif !== false ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </button>
-                </div>
-
-                {/* Court Hearing Reminders */}
-                <div className="flex items-center justify-between py-1 border-t border-slate-100 dark:border-slate-800 pt-4">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-white">24-Hour Court Hearing Reminder</h4>
-                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">Remind me 24 hours prior to scheduled Court Diary hearings.</p>
-                  </div>
-                  <button 
-                    onClick={() => handleToggle('notifications', 'hearingReminder', notifPrefs.hearingReminder !== false)}
-                    className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 ${notifPrefs.hearingReminder !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
-                  >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${notifPrefs.hearingReminder !== false ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </button>
-                </div>
-
-                {/* Draft Completed */}
-                <div className="flex items-center justify-between py-1">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-white">AI Draft Completion Alerts</h4>
-                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">Notify me when background legal document generation completes.</p>
-                  </div>
-                  <button 
-                    onClick={() => handleToggle('notifications', 'draftCompleted', notifPrefs.draftCompleted !== false)}
-                    className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 ${notifPrefs.draftCompleted !== false ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
-                  >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${notifPrefs.draftCompleted !== false ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* CATEGORY 4: SECURITY SETTINGS */}
-          {activeCategory === 'security' && (
-            <div className="space-y-8 animate-fade-in">
-              <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-[#C8A34D] border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center gap-2">
-                  <Shield size={14} /> Security & Account Access
-                </h3>
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-2">Manage verification credentials, passwords, and trusted devices.</p>
-              </div>
-
-              {/* Password change form */}
-              <form onSubmit={handleUpdatePassword} className="space-y-4 bg-slate-50/50 dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6">
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#C8A34D] block mb-2">Change Account Password</span>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="text-[9px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest block mb-1">Current Password</label>
-                    <input
-                      type="password"
-                      placeholder="••••••••"
-                      value={passwordForm.currentPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                      className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:border-[#C8A34D]"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[9px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest block mb-1">New Password</label>
-                    <input
-                      type="password"
-                      placeholder="••••••••"
-                      value={passwordForm.newPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                      className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:border-[#C8A34D]"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[9px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest block mb-1">Confirm New Password</label>
-                    <input
-                      type="password"
-                      placeholder="••••••••"
-                      value={passwordForm.confirmPassword}
-                      onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                      className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:border-[#C8A34D]"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end pt-2">
+                <div className="space-y-2">
+                  <h4 className="text-xs font-black text-slate-900 dark:text-white">Temporarily Deactivate Account</h4>
+                  <p className="text-[11px] font-semibold text-slate-400">Your account becomes inaccessible. All cases, chats, documents and AI history remain safe. You can restore everything simply by logging in again.</p>
                   <button
-                    type="submit"
-                    className="px-5 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-xs uppercase tracking-wider transition-colors shadow-md cursor-pointer"
+                    onClick={() => triggerConfirm('deactivate', 'Deactivate Account', 'Temporarily deactivate your advocate account?', () => toast.success("Account temporarily deactivated."))}
+                    className="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-100 font-black text-xs cursor-pointer"
                   >
-                    Update Password
-                  </button>
-                </div>
-              </form>
-
-              {/* Toggles */}
-              <div className="space-y-4">
-                {/* 2FA */}
-                <div className="flex items-center justify-between py-1">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-white">Two-Factor Authentication (2FA)</h4>
-                    <p className="text-[10px] font-semibold text-slate-400 mt-0.5">Require an authentication code when logging in from new browsers.</p>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      const next = !twoFactor;
-                      setTwoFactor(next);
-                      updatePersonalization('security', { twoFactor: next });
-                      toast.success(next ? 'Two-Factor Authentication Enabled!' : 'Two-Factor Authentication Disabled.');
-                    }}
-                    className={`w-10 h-5 rounded-full p-0.5 transition-all duration-300 ${twoFactor ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
-                  >
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${twoFactor ? 'translate-x-5' : 'translate-x-0'}`} />
+                    Deactivate
                   </button>
                 </div>
 
-                {/* Sessions */}
-                <div className="border-t border-slate-100 dark:border-slate-800 pt-6 space-y-4">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#C8A34D] block">Active Sessions & Trusted Devices</span>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-[#0F172A] flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Laptop className="w-5 h-5 text-[#C8A34D]" />
-                        <div>
-                          <p className="text-xs font-bold text-slate-800 dark:text-white">Web App Terminal</p>
-                          <p className="text-[10px] font-semibold text-slate-400">Active Now • Current Session</p>
-                        </div>
-                      </div>
-                      <span className="px-2.5 py-0.5 bg-[#C8A34D]/15 border border-[#C8A34D]/30 text-[#B48A35] dark:text-[#C8A34D] rounded-md text-[9px] font-black uppercase tracking-widest">Active</span>
-                    </div>
-
-                    <div className="p-4 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-[#0F172A] flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Smartphone className="w-5 h-5 text-slate-400" />
-                        <div>
-                          <p className="text-xs font-bold text-slate-800 dark:text-white">Android / iOS Mobile Terminal</p>
-                          <p className="text-[10px] font-semibold text-slate-400">Mobile App Active</p>
-                        </div>
-                      </div>
-                      <button onClick={() => toast.success('Signed out of mobile app session.')} className="text-[9px] font-black text-rose-500 uppercase tracking-wider hover:underline">Revoke</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* CATEGORY 5: HELP & APP GUIDE (MOBILE ANALYZED INTEGRATION) */}
-          {activeCategory === 'help' && (
-            <div className="space-y-6 animate-fade-in">
-              <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-[#C8A34D] border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center gap-2">
-                  <HelpCircle size={14} /> Help, Support & Interactive App Guide
-                </h3>
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mt-2">Explore the interactive App Guide, view FAQs, report bugs, or contact customer support.</p>
-              </div>
-
-              {/* Sub-Navigation Tabs */}
-              <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 overflow-x-auto custom-scrollbar">
-                {[
-                  { id: 'guide', label: '📖 App Guide AI', icon: BookOpen },
-                  { id: 'faqs', label: '❓ FAQs & Knowledge Base', icon: HelpCircle },
-                  { id: 'bug', label: '🐞 Report a Bug', icon: Bug },
-                  { id: 'feature', label: '💡 Request Feature', icon: Sparkles },
-                  { id: 'contact', label: '📞 Contact Support', icon: MessageSquare }
-                ].map(tab => (
+                <div className="space-y-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <h4 className="text-xs font-black text-rose-600 dark:text-rose-400">Permanently Delete Account</h4>
+                  <p className="text-[11px] font-semibold text-slate-400">This action permanently deletes cases, documents, evidence, AI chats, bookmarks, knowledge notes, and settings. This cannot be undone.</p>
                   <button
-                    key={tab.id}
-                    onClick={() => setHelpSubTab(tab.id)}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer border ${
-                      helpSubTab === tab.id
-                        ? 'bg-[#C8A34D] border-[#C8A34D] text-[#111111] font-black shadow-xs'
-                        : 'bg-slate-50 dark:bg-[#0F172A] border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                    }`}
+                    onClick={() => triggerConfirm('delete', 'Permanently Delete Account', 'Are you sure you want to permanently delete your account? This action cannot be undone!', () => toast.success("Account deletion request submitted."))}
+                    className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs cursor-pointer shadow-xs"
                   >
-                    {tab.label}
+                    Permanently Delete
                   </button>
-                ))}
-              </div>
-
-              {/* SUB-TAB 1: APP GUIDE AI */}
-              {helpSubTab === 'guide' && (
-                <div className="space-y-6 animate-fade-in">
-                  
-                  {/* Interactive Quick Guide Topics */}
-                  <div className="space-y-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-400 block">Featured Feature Guides</span>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {GUIDE_TOPICS.map(topic => {
-                        const Icon = topic.icon;
-                        const isSelected = selectedGuideTopic.id === topic.id;
-                        return (
-                          <div
-                            key={topic.id}
-                            onClick={() => setSelectedGuideTopic(topic)}
-                            className={`p-4 rounded-2xl border transition-all cursor-pointer ${
-                              isSelected 
-                                ? 'bg-[#C8A34D]/10 border-[#C8A34D] dark:bg-[#C8A34D]/15'
-                                : 'bg-slate-50/50 dark:bg-[#0F172A] border-slate-200/70 dark:border-slate-800 hover:border-[#C8A34D]/50'
-                            }`}
-                          >
-                            <div className="flex items-center gap-3 mb-2">
-                              <div className="w-8 h-8 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/30 flex items-center justify-center text-[#C8A34D]">
-                                <Icon size={16} />
-                              </div>
-                              <h4 className="text-xs font-black text-slate-800 dark:text-white">{topic.title}</h4>
-                            </div>
-                            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{topic.summary}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Selected Topic Walkthrough */}
-                  <div className="bg-slate-50/70 dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 space-y-4">
-                    <div className="flex items-center gap-2 text-[#C8A34D]">
-                      <BookOpen size={16} />
-                      <h4 className="text-xs font-black uppercase tracking-widest">{selectedGuideTopic.title} Walkthrough</h4>
-                    </div>
-                    <ol className="space-y-2.5">
-                      {selectedGuideTopic.steps.map((step, idx) => (
-                        <li key={idx} className="flex items-start gap-3 text-xs font-medium text-slate-700 dark:text-slate-300">
-                          <span className="w-5 h-5 rounded-full bg-[#C8A34D]/20 text-[#B48A35] dark:text-[#C8A34D] font-black text-[10px] flex items-center justify-center shrink-0 mt-0.5">{idx + 1}</span>
-                          <span>{step}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-
-                  {/* Interactive App Guide AI Assistant Box */}
-                  <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-6 bg-white dark:bg-[#1E293B] space-y-4">
-                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                      <div className="flex items-center gap-2 text-[#C8A34D]">
-                        <Sparkles size={16} />
-                        <span className="text-xs font-black uppercase tracking-widest">Ask App Guide AI Assistant</span>
-                      </div>
-                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Interactive Assistance</span>
-                    </div>
-
-                    {/* Chat Messages */}
-                    <div className="space-y-3 max-h-56 overflow-y-auto custom-scrollbar p-2">
-                      {guideChat.map((msg, i) => (
-                        <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs font-medium ${
-                            msg.sender === 'user'
-                              ? 'bg-[#C8A34D] text-[#111111] font-bold'
-                              : 'bg-slate-100 dark:bg-[#0F172A] text-slate-800 dark:text-slate-200 border border-slate-200/60 dark:border-slate-800'
-                          }`}>
-                            {msg.text}
-                          </div>
-                        </div>
-                      ))}
-                      {isGuideThinking && (
-                        <div className="flex justify-start">
-                          <div className="bg-slate-100 dark:bg-[#0F172A] text-slate-400 px-4 py-2 rounded-2xl text-xs italic animate-pulse">
-                            App Guide AI is formulating instructions...
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Quick Chip Triggers */}
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      {[
-                        'How to draft a legal notice?',
-                        'How to analyze evidence OCR?',
-                        'How to set up hearing reminders?',
-                        'How to switch to dark mode?'
-                      ].map(chip => (
-                        <button
-                          key={chip}
-                          onClick={() => handleSendGuideMessage(chip)}
-                          className="px-3 py-1 rounded-full bg-slate-100 dark:bg-[#0F172A] hover:bg-[#C8A34D]/20 text-[10px] font-bold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
-                        >
-                          {chip}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Chat Input */}
-                    <div className="flex items-center gap-2 pt-2">
-                      <input
-                        type="text"
-                        value={guideQuery}
-                        onChange={(e) => setGuideQuery(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSendGuideMessage()}
-                        placeholder="Type how to use any feature in AI LEGAL..."
-                        className="flex-1 bg-slate-50 dark:bg-[#0F172A] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-xs font-medium focus:outline-none focus:border-[#C8A34D]"
-                      />
-                      <button
-                        onClick={() => handleSendGuideMessage()}
-                        className="px-4 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
-                      >
-                        <Send size={14} /> Send
-                      </button>
-                    </div>
-                  </div>
                 </div>
-              )}
-
-              {/* SUB-TAB 2: FAQS */}
-              {helpSubTab === 'faqs' && (
-                <div className="space-y-4 animate-fade-in">
-                  <div className="relative">
-                    <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
-                    <input
-                      type="text"
-                      placeholder="Search FAQs..."
-                      value={faqSearch}
-                      onChange={(e) => setFaqSearch(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold bg-slate-50/50 dark:bg-[#0F172A] focus:outline-none focus:border-[#C8A34D]"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    {filteredFaqs.map((faq, index) => {
-                      const isExpanded = expandedFaqIndex === index;
-                      return (
-                        <div
-                          key={index}
-                          className="border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-slate-50/30 dark:bg-[#0F172A] overflow-hidden transition-colors"
-                        >
-                          <button
-                            onClick={() => setExpandedFaqIndex(isExpanded ? null : index)}
-                            className="w-full p-4 flex items-center justify-between text-left cursor-pointer"
-                          >
-                            <div className="space-y-0.5">
-                              <span className="text-[9px] font-black uppercase tracking-widest text-[#C8A34D] block">{faq.category}</span>
-                              <h4 className="text-xs font-bold text-slate-800 dark:text-white">{faq.question}</h4>
-                            </div>
-                            <ChevronDown size={16} className={`text-slate-400 transition-transform ${isExpanded ? 'rotate-180 text-[#C8A34D]' : ''}`} />
-                          </button>
-                          {isExpanded && (
-                            <div className="px-4 pb-4 pt-1 text-xs font-medium text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800/60 leading-relaxed">
-                              {faq.answer}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* SUB-TAB 3: REPORT A BUG */}
-              {helpSubTab === 'bug' && (
-                <form onSubmit={handleBugSubmit} className="space-y-5 animate-fade-in bg-slate-50/50 dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6">
-                  <div className="flex items-center gap-2 text-rose-500">
-                    <Bug size={16} />
-                    <h4 className="text-xs font-black uppercase tracking-widest">Report an Issue / Bug</h4>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Issue Title</label>
-                      <input
-                        type="text"
-                        value={bugForm.title}
-                        onChange={(e) => setBugForm({ ...bugForm, title: e.target.value })}
-                        placeholder="Brief summary of the issue..."
-                        className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-[#C8A34D]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Affected Tool / Page</label>
-                      <select
-                        value={bugForm.tool}
-                        onChange={(e) => setBugForm({ ...bugForm, tool: e.target.value })}
-                        className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-[#C8A34D] cursor-pointer"
-                      >
-                        <option value="General App">General App / Workspace</option>
-                        <option value="AI Assistant">AI Assistant Chat</option>
-                        <option value="Draft Drafter">Legal Notice & Drafter</option>
-                        <option value="Evidence Analyst">Evidence Analyst & OCR</option>
-                        <option value="Court Diary">Court Diary & Hearings</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Detailed Description</label>
-                      <textarea
-                        rows={4}
-                        value={bugForm.description}
-                        onChange={(e) => setBugForm({ ...bugForm, description: e.target.value })}
-                        placeholder="Describe what happened, error message, or steps to reproduce..."
-                        className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-xs font-medium focus:outline-none focus:border-[#C8A34D] resize-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end pt-2">
-                    <button
-                      type="submit"
-                      disabled={submittingBug}
-                      className="px-6 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-colors shadow-md cursor-pointer disabled:opacity-50"
-                    >
-                      {submittingBug ? 'Submitting...' : 'Submit Bug Report'}
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {/* SUB-TAB 4: FEATURE REQUEST */}
-              {helpSubTab === 'feature' && (
-                <form onSubmit={handleFeatureSubmit} className="space-y-5 animate-fade-in bg-slate-50/50 dark:bg-[#0F172A] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6">
-                  <div className="flex items-center gap-2 text-[#C8A34D]">
-                    <Sparkles size={16} />
-                    <h4 className="text-xs font-black uppercase tracking-widest">Submit Feature Idea</h4>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Feature Title</label>
-                      <input
-                        type="text"
-                        value={featureForm.title}
-                        onChange={(e) => setFeatureForm({ ...featureForm, title: e.target.value })}
-                        placeholder="Name of requested feature..."
-                        className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:border-[#C8A34D]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Feature Description</label>
-                      <textarea
-                        rows={3}
-                        value={featureForm.description}
-                        onChange={(e) => setFeatureForm({ ...featureForm, description: e.target.value })}
-                        placeholder="Describe the functionality you'd like to see..."
-                        className="w-full bg-white dark:bg-[#1E293B] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 text-xs font-medium focus:outline-none focus:border-[#C8A34D] resize-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end pt-2">
-                    <button
-                      type="submit"
-                      disabled={submittingFeature}
-                      className="px-6 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] rounded-xl text-xs font-black uppercase tracking-wider transition-colors shadow-md cursor-pointer disabled:opacity-50"
-                    >
-                      {submittingFeature ? 'Sending...' : 'Submit Idea'}
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {/* SUB-TAB 5: CONTACT SUPPORT */}
-              {helpSubTab === 'contact' && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <a
-                      href="mailto:support@ai-legal.in"
-                      className="p-6 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-[#0F172A] hover:border-[#C8A34D] transition-colors group"
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-xl bg-[#C8A34D]/15 border border-[#C8A34D]/30 flex items-center justify-center text-[#C8A34D]">
-                          <Mail size={20} />
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-black text-slate-800 dark:text-white">Email Advocate Support</h4>
-                          <span className="text-[10px] font-extrabold text-[#C8A34D]">support@ai-legal.in</span>
-                        </div>
-                      </div>
-                      <p className="text-[11px] font-semibold text-slate-400">Direct technical & billing query line. Guaranteed response within 1 hour.</p>
-                    </a>
-
-                    <a
-                      href="https://wa.me/919876543210"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-6 border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-[#0F172A] hover:border-emerald-500 transition-colors group"
-                    >
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-500">
-                          <MessageCircle size={20} />
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-black text-slate-800 dark:text-white">WhatsApp Helpline</h4>
-                          <span className="text-[10px] font-extrabold text-emerald-500">+91 98765 43210</span>
-                        </div>
-                      </div>
-                      <p className="text-[11px] font-semibold text-slate-400">Instant WhatsApp support desk for practicing Advocates and Law Firms.</p>
-                    </a>
-                  </div>
-                </div>
-              )}
-
-              {/* Version Footer */}
-              <div className="border-t border-slate-100 dark:border-slate-800 pt-6 flex justify-between items-center text-[10px] font-bold text-slate-400">
-                <span>AI Legal™ Platform Version v1.2.0</span>
-                <span>Licensed for Advocates & Judiciary</span>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-        </div>
+        {/* CATEGORY 5: HELP & SUPPORT (Screenshot 5 Parity) */}
+        {activeCategory === 'help' && (
+          <div className="space-y-4 sm:space-y-6 animate-fade-in bg-white dark:bg-[#1E293B] border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xs">
+            <div>
+              <h3 className="text-base font-black text-slate-900 dark:text-white">Help & Support</h3>
+              <p className="text-xs font-semibold text-slate-400 mt-0.5">Connect with helpdesk agents or view compliance policies.</p>
+            </div>
+
+            {/* 2 Top Grid Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1 sm:pt-2">
+              <button
+                onClick={() => navigate('/dashboard/guide')}
+                className="p-4 sm:p-5 bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl text-center space-y-2 hover:border-[#C8A34D] border border-transparent transition-all cursor-pointer group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-[#C8A34D]/10 text-[#C8A34D] flex items-center justify-center mx-auto text-lg group-hover:scale-110 transition-transform">
+                  ✨
+                </div>
+                <h4 className="text-xs font-black text-slate-900 dark:text-white">AI App Guide</h4>
+              </button>
+
+              <button
+                onClick={() => setIsFeatureModalOpen(true)}
+                className="p-4 sm:p-5 bg-slate-100 dark:bg-slate-900 rounded-2xl text-center space-y-2 hover:border-[#C8A34D] border border-transparent transition-all cursor-pointer group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto text-lg group-hover:scale-110 transition-transform">
+                  💡
+                </div>
+                <h4 className="text-xs font-black text-slate-900 dark:text-white">Feature Request</h4>
+              </button>
+            </div>
+
+            {/* List Options */}
+            <div className="space-y-3 pt-2">
+              <div
+                onClick={() => setIsBugModalOpen(true)}
+                className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-between gap-3 cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 shrink-0">🐛</div>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-xs font-black text-slate-900 dark:text-white">Report Bug</h4>
+                    <p className="text-[11px] font-semibold text-slate-400 truncate sm:whitespace-normal">Attach device diagnostic logs and submit error tickets to support</p>
+                  </div>
+                </div>
+                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors shrink-0" />
+              </div>
+
+              <div
+                onClick={() => navigate('/privacy-policy')}
+                className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-between gap-3 cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500 shrink-0">🛡️</div>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-xs font-black text-slate-900 dark:text-white">Privacy Policy</h4>
+                    <p className="text-[11px] font-semibold text-slate-400 truncate sm:whitespace-normal">Read data encryption standards, non-sale guidelines, and retention policies</p>
+                  </div>
+                </div>
+                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors shrink-0" />
+              </div>
+
+              <div
+                onClick={() => navigate('/terms-of-service')}
+                className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-between gap-3 cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 shrink-0">📜</div>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-xs font-black text-slate-900 dark:text-white">Terms & Conditions</h4>
+                    <p className="text-[11px] font-semibold text-slate-400 truncate sm:whitespace-normal">View user license agreements, subscriber terms, and jurisdiction rules</p>
+                  </div>
+                </div>
+                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors shrink-0" />
+              </div>
+
+              <div
+                onClick={() => setActivePolicyKey('disclaimer')}
+                className="p-3.5 sm:p-4 bg-slate-100 dark:bg-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-between gap-3 cursor-pointer hover:border-[#C8A34D] border border-transparent transition-all group"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500 shrink-0">⚠️</div>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-xs font-black text-slate-900 dark:text-white">AI Disclaimer</h4>
+                    <p className="text-[11px] font-semibold text-slate-400 truncate sm:whitespace-normal">Algorithmic limits, advisory scope, and precedent verification rules</p>
+                  </div>
+                </div>
+                <ChevronRight size={16} className="text-slate-400 group-hover:text-[#C8A34D] transition-colors shrink-0" />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Interactive Policy Document Modal Overlay */}
+      <AnimatePresence>
+        {activePolicyKey && POLICY_DOCUMENTS[activePolicyKey] && (() => {
+          const doc = POLICY_DOCUMENTS[activePolicyKey];
+          return (
+            <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-6">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setActivePolicyKey(null)}
+                className="fixed inset-0 bg-black/70 backdrop-blur-xs"
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="relative w-full max-w-2xl max-h-[85vh] bg-white dark:bg-[#1E293B] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col z-10 font-sans overflow-hidden text-slate-900 dark:text-white"
+              >
+                {/* Modal Header */}
+                <div className="p-5 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/30 text-[10px] font-black uppercase">
+                        {doc.version}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-400">Last Updated: {doc.lastUpdated}</span>
+                    </div>
+                    <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">{doc.title}</h2>
+                  </div>
+                  <button
+                    onClick={() => setActivePolicyKey(null)}
+                    className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-sm transition-all cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Modal Intro & Body Content */}
+                <div className="p-6 overflow-y-auto custom-scrollbar space-y-6 flex-1">
+                  {/* Intro Box */}
+                  <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 text-xs font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">
+                    💡 {doc.intro}
+                  </div>
+
+                  {/* Document Sections */}
+                  <div className="space-y-5">
+                    {doc.sections.map((sec) => (
+                      <div key={sec.id} className="space-y-2 border-b border-slate-100 dark:border-slate-800/80 pb-4 last:border-0">
+                        <h3 className="text-xs font-black text-[#C8A34D] tracking-wide uppercase">{sec.title}</h3>
+                        <p className="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed text-justify">
+                          {sec.content}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="p-4 sm:p-5 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+                  <span className="text-[10px] font-bold text-slate-400">AI LEGAL™ Compliance & Legal Framework</span>
+                  <button
+                    onClick={() => setActivePolicyKey(null)}
+                    className="px-6 py-2.5 rounded-xl bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black text-xs transition-all shadow-xs cursor-pointer"
+                  >
+                    I Understand
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          );
+        })()}
+      </AnimatePresence>
 
       {/* Confirmation Dialog Overlay */}
       <AnimatePresence>
@@ -1129,6 +1071,447 @@ const SettingsPage = () => {
                   Confirm
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      {/* 🐞 Interactive Report Bug Modal Overlay (Mobile App 100% Parity) */}
+      <AnimatePresence>
+        {isBugModalOpen && (
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => {
+                setIsBugModalOpen(false);
+                setBugSuccess(false);
+              }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-xs"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-xl max-h-[90vh] bg-white dark:bg-[#1E293B] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col z-10 font-sans overflow-hidden text-slate-900 dark:text-white"
+            >
+              {/* Header */}
+              <div className="p-5 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-xl font-bold">
+                    🐞
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">Report Bug</h2>
+                    <p className="text-[11px] font-semibold text-slate-400">Submit bugs or computational errors. Diagnostic logs will be collected.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsBugModalOpen(false);
+                    setBugSuccess(false);
+                  }}
+                  className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-sm transition-all cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {bugSuccess ? (
+                /* Success Receipt View */
+                <div className="p-8 text-center space-y-5 my-auto">
+                  <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-950/40 text-rose-600 flex items-center justify-center mx-auto text-3xl shadow-xs">
+                    🐞
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-black text-slate-900 dark:text-white">Bug Report Submitted Successfully</h3>
+                    <p className="text-xs font-semibold text-slate-400 max-w-md mx-auto leading-relaxed">
+                      Thank you for reporting this issue. Our Engineering Team has received your report and will investigate it immediately.
+                    </p>
+                  </div>
+
+                  <div className="p-4 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-xs mx-auto space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Reference Ticket ID</span>
+                    <span className="text-sm font-black text-rose-600 dark:text-rose-400 tracking-wider font-mono">{bugRefId}</span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setIsBugModalOpen(false);
+                      setBugSuccess(false);
+                      setBugForm({
+                        title: '',
+                        screenName: 'AI Chat',
+                        severity: 'Low',
+                        description: '',
+                        steps: '',
+                        includeLogs: true,
+                        attachments: []
+                      });
+                    }}
+                    className="px-8 py-3 rounded-2xl bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black text-xs shadow-md transition-all cursor-pointer"
+                  >
+                    Back to Settings
+                  </button>
+                </div>
+              ) : (
+                /* Bug Form Body */
+                <form onSubmit={handleBugSubmit} className="p-6 overflow-y-auto custom-scrollbar space-y-5 flex-1">
+                  {/* Bug Title */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Bug Title *</label>
+                    <input
+                      type="text"
+                      value={bugForm.title}
+                      onChange={(e) => setBugForm({ ...bugForm, title: e.target.value })}
+                      placeholder="Example: Crash while generating contract"
+                      className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#C8A34D]"
+                    />
+                  </div>
+
+                  {/* Screen Selection & Severity Row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Which screen were you on?</label>
+                      <select
+                        value={bugForm.screenName}
+                        onChange={(e) => setBugForm({ ...bugForm, screenName: e.target.value })}
+                        className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#C8A34D] cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                      >
+                        {['AI Chat', 'Draft Maker', 'Evidence Analysis', 'Contract Review', 'Case Predictor', 'Strategy Engine', 'Knowledge Hub', 'Mock Courtroom', 'Settings', 'Other'].map(opt => (
+                          <option key={opt} value={opt} className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">{opt}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Severity Level</label>
+                      <div className="grid grid-cols-4 gap-1 p-1 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        {['Low', 'Medium', 'High', 'Critical'].map(sev => {
+                          const isSel = bugForm.severity === sev;
+                          return (
+                            <button
+                              type="button"
+                              key={sev}
+                              onClick={() => setBugForm({ ...bugForm, severity: sev })}
+                              className={`py-2 rounded-xl text-[10px] font-black transition-all cursor-pointer text-center ${
+                                isSel
+                                  ? sev === 'Critical'
+                                    ? 'bg-rose-600 text-white shadow-xs'
+                                    : 'bg-[#C8A34D] text-[#111111] shadow-xs'
+                                  : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                              }`}
+                            >
+                              {sev}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Detailed Description *</label>
+                    <textarea
+                      rows={3}
+                      value={bugForm.description}
+                      onChange={(e) => setBugForm({ ...bugForm, description: e.target.value })}
+                      placeholder="Describe what happened, error messages, or unexpected behaviors..."
+                      className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#C8A34D] resize-none"
+                    />
+                  </div>
+
+                  {/* Steps to Reproduce */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Steps to Reproduce (Optional)</label>
+                    <textarea
+                      rows={2}
+                      value={bugForm.steps}
+                      onChange={(e) => setBugForm({ ...bugForm, steps: e.target.value })}
+                      placeholder="1. Open Draft Maker&#10;2. Click Generate&#10;3. System shows error..."
+                      className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#C8A34D] resize-none"
+                    />
+                  </div>
+
+                  {/* Attach Screenshots */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Attach Screenshots (Optional)</label>
+                      <span className="text-[10px] font-bold text-slate-400">{bugForm.attachments.length}/5 files</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {bugForm.attachments.map((att, idx) => (
+                        <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold">
+                          <span>📷 {att.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => setBugForm({ ...bugForm, attachments: bugForm.attachments.filter((_, i) => i !== idx) })}
+                            className="text-rose-500 hover:text-rose-700 text-xs font-black cursor-pointer ml-1"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                      {bugForm.attachments.length < 5 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const num = bugForm.attachments.length + 1;
+                            setBugForm({
+                              ...bugForm,
+                              attachments: [...bugForm.attachments, { name: `bug_screenshot_${num}.png`, size: '840 KB' }]
+                            });
+                            toast.success(`Attached bug_screenshot_${num}.png`);
+                          }}
+                          className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 border border-dashed border-slate-300 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 cursor-pointer transition-colors"
+                        >
+                          + Attach Screenshot
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Diagnostic Logs Toggle Card */}
+                  <div className="p-4 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-xs font-black text-slate-900 dark:text-white">Include Diagnostic Logs & Telemetry</h4>
+                        <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Collects OS version, device info, active route, and recent error stack</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setBugForm({ ...bugForm, includeLogs: !bugForm.includeLogs })}
+                        className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${bugForm.includeLogs ? 'bg-[#C8A34D]' : 'bg-slate-300 dark:bg-slate-700'}`}
+                      >
+                        <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 ${bugForm.includeLogs ? 'translate-x-5' : 'translate-x-0'}`} />
+                      </button>
+                    </div>
+
+                    {bugForm.includeLogs && (
+                      <div className="p-3 bg-slate-200/60 dark:bg-slate-950 rounded-xl text-[10px] font-mono text-slate-600 dark:text-slate-400 space-y-0.5 border border-slate-300/40 dark:border-slate-800">
+                        <p>💻 Device: Web Client (Chrome / Windows 11)</p>
+                        <p>📦 App Version: v1.2.0 (Build 402)</p>
+                        <p>📍 Current Route: /dashboard/settings</p>
+                        <p className="text-amber-600 dark:text-amber-400">⚠️ System Log: INFO: Render success. WARN: RAG latency 120ms. ERROR: JSON parse line 37.</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Form Footer Buttons */}
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => setIsBugModalOpen(false)}
+                      className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-black text-xs cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submittingBug}
+                      className="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-black rounded-xl text-xs shadow-md transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      {submittingBug ? 'Submitting...' : 'Submit Bug Report'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* 💡 Interactive Feature Request Modal Overlay (Mobile App 100% Parity) */}
+      <AnimatePresence>
+        {isFeatureModalOpen && (
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => {
+                setIsFeatureModalOpen(false);
+                setFeatureSuccess(false);
+              }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-xs"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-xl max-h-[90vh] bg-white dark:bg-[#1E293B] rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col z-10 font-sans overflow-hidden text-slate-900 dark:text-white"
+            >
+              {/* Header */}
+              <div className="p-5 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xl font-bold">
+                    💡
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">Feature Request</h2>
+                    <p className="text-[11px] font-semibold text-slate-400">Suggest new features or capabilities to improve AI LEGAL™.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setIsFeatureModalOpen(false);
+                    setFeatureSuccess(false);
+                  }}
+                  className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-sm transition-all cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {featureSuccess ? (
+                /* Success Receipt View */
+                <div className="p-8 text-center space-y-5 my-auto">
+                  <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-500 flex items-center justify-center mx-auto text-3xl shadow-xs">
+                    💡
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-black text-slate-900 dark:text-white">Feature Request Submitted</h3>
+                    <p className="text-xs font-semibold text-slate-400 max-w-md mx-auto leading-relaxed">
+                      Thank you for shaping AI LEGAL™. Our product management team will evaluate your proposal for upcoming roadmap cycles.
+                    </p>
+                  </div>
+
+                  <div className="p-4 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-xs mx-auto space-y-1">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Reference Request ID</span>
+                    <span className="text-sm font-black text-[#C8A34D] tracking-wider font-mono">{featureRefId}</span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setIsFeatureModalOpen(false);
+                      setFeatureSuccess(false);
+                      setFeatureForm({
+                        title: '',
+                        category: 'New AI Feature',
+                        whoBenefit: 'Advocates',
+                        priority: 'Nice to Have',
+                        description: '',
+                        whyNeeded: '',
+                        attachments: []
+                      });
+                    }}
+                    className="px-8 py-3 rounded-2xl bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black text-xs shadow-md transition-all cursor-pointer"
+                  >
+                    Back to Settings
+                  </button>
+                </div>
+              ) : (
+                /* Feature Request Form Body */
+                <form onSubmit={handleFeatureSubmit} className="p-6 overflow-y-auto custom-scrollbar space-y-5 flex-1">
+                  {/* Feature Title */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Feature Title *</label>
+                    <input
+                      type="text"
+                      value={featureForm.title}
+                      onChange={(e) => setFeatureForm({ ...featureForm, title: e.target.value })}
+                      placeholder="Example: Automated Hearing Summary PDF"
+                      className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#C8A34D]"
+                    />
+                  </div>
+
+                  {/* Category & Who Benefits */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Category</label>
+                      <select
+                        value={featureForm.category}
+                        onChange={(e) => setFeatureForm({ ...featureForm, category: e.target.value })}
+                        className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#C8A34D] cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                      >
+                        {['New AI Feature', 'Legal Research', 'AI Assistant', 'Automation', 'Document Intelligence', 'Voice & OCR', 'Knowledge Hub', 'Courtroom Tools', 'Productivity', 'Security', 'UI / UX', 'Performance', 'Other'].map(opt => (
+                          <option key={opt} value={opt} className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">{opt}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Who Benefits?</label>
+                      <select
+                        value={featureForm.whoBenefit}
+                        onChange={(e) => setFeatureForm({ ...featureForm, whoBenefit: e.target.value })}
+                        className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:border-[#C8A34D] cursor-pointer [&>option]:bg-white [&>option]:text-slate-900 dark:[&>option]:bg-[#1E293B] dark:[&>option]:text-white"
+                      >
+                        {['Advocates', 'Judges', 'Law Students', 'Law Firms', 'Corporate Legal Teams', 'Litigants', 'Everyone'].map(opt => (
+                          <option key={opt} value={opt} className="bg-white dark:bg-[#1E293B] text-slate-900 dark:text-white">{opt}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Priority Level */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Priority Level</label>
+                    <div className="grid grid-cols-3 gap-2 p-1 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+                      {['Nice to Have', 'Important', 'Critical'].map(prio => {
+                        const isSel = featureForm.priority === prio;
+                        return (
+                          <button
+                            type="button"
+                            key={prio}
+                            onClick={() => setFeatureForm({ ...featureForm, priority: prio })}
+                            className={`py-2 rounded-xl text-[10px] font-black transition-all cursor-pointer text-center ${
+                              isSel
+                                ? 'bg-[#C8A34D] text-[#111111] shadow-xs'
+                                : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                            }`}
+                          >
+                            {prio}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Detailed Description *</label>
+                    <textarea
+                      rows={3}
+                      value={featureForm.description}
+                      onChange={(e) => setFeatureForm({ ...featureForm, description: e.target.value })}
+                      placeholder="Describe the functionality you would like to see..."
+                      className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#C8A34D] resize-none"
+                    />
+                  </div>
+
+                  {/* Why Needed */}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 block">Why is it Needed?</label>
+                    <textarea
+                      rows={2}
+                      value={featureForm.whyNeeded}
+                      onChange={(e) => setFeatureForm({ ...featureForm, whyNeeded: e.target.value })}
+                      placeholder="Explain how this suggestion benefits active advocate litigation..."
+                      className="w-full p-3.5 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs font-semibold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#C8A34D] resize-none"
+                    />
+                  </div>
+
+                  {/* Form Footer Buttons */}
+                  <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => setIsFeatureModalOpen(false)}
+                      className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-black text-xs cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submittingFeature}
+                      className="px-6 py-2.5 bg-[#C8A34D] hover:bg-[#b08d3b] text-[#111111] font-black rounded-xl text-xs shadow-md transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      {submittingFeature ? 'Submitting...' : 'Submit Feature Request'}
+                    </button>
+                  </div>
+                </form>
+              )}
             </motion.div>
           </div>
         )}

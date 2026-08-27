@@ -73,14 +73,7 @@ apiClient.interceptors.request.use(
     const activeRole = localStorage.getItem('user_selected_role') || 'advocate';
     const activeWsId = activeRole === 'law_firm' ? (localStorage.getItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID') || 'personal_practice') : 'personal_practice';
 
-    const getBaseUrl = () => {
-      if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-        return 'http://localhost:8080/api';
-      }
-      return API;
-    };
-
-    config.baseURL = getBaseUrl();
+    config.baseURL = API;
 
     const deviceId = localStorage.getItem('aisa_device_id') || 'web_client';
     config.headers['X-User-Role'] = activeRole;
@@ -1672,6 +1665,58 @@ export const apiService = {
     } catch (error) {
       console.error('Failed to fetch latest personal case analysis:', error);
       throw error;
+    }
+  },
+
+  // --- Dedicated Case Chat API ---
+  async getCaseChat(caseId) {
+    try {
+      const response = await apiClient.get(`/projects/${caseId}/case-chat`);
+      return response.data;
+    } catch (error) {
+      console.warn("Failed to get case chat:", error);
+      return { success: false };
+    }
+  },
+
+  async getCaseChatMessages(caseId) {
+    try {
+      const response = await apiClient.get(`/projects/${caseId}/case-chat/messages`);
+      return response.data;
+    } catch (error) {
+      console.warn("Failed to get case chat messages:", error);
+      return { success: false, messages: [] };
+    }
+  },
+
+  async postCaseChatMessage(caseId, payload) {
+    try {
+      const response = await apiClient.post(`/projects/${caseId}/case-chat/messages`, payload);
+      return response.data;
+    } catch (error) {
+      console.warn("Failed to post case chat message:", error);
+      return { success: false };
+    }
+  },
+
+  // --- Workspace Activities API (Real-time App & Web Sync) ---
+  async getCaseWorkspaceActivities(caseId) {
+    try {
+      const response = await apiClient.get(`/workspace-activities/cases/${caseId}/activities`);
+      return response.data;
+    } catch (error) {
+      console.warn("Failed to fetch case workspace activities:", error);
+      return { success: false, activities: [] };
+    }
+  },
+
+  async deleteWorkspaceActivity(activityId) {
+    try {
+      const response = await apiClient.delete(`/workspace-activities/detail/${activityId}`);
+      return response.data;
+    } catch (error) {
+      console.warn("Failed to delete workspace activity:", error);
+      return { success: false };
     }
   }
 };

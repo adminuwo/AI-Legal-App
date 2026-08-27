@@ -548,7 +548,7 @@ const AIHistoryPanel = ({
       {/* History panel container */}
       <div
         ref={panelRef}
-        style={{ width: typeof window !== 'undefined' && window.innerWidth < 640 ? '100vw' : `${Math.min(width, 420)}px`, maxWidth: '100vw' }}
+        style={{ width: `${width}px` }}
         className={`fixed lg:absolute top-0 bottom-0 left-0 bg-white dark:bg-[#0d0e16] border-r border-slate-200/70 dark:border-zinc-800/80 z-[1050] flex flex-col transition-transform duration-300 custom-history-panel ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}

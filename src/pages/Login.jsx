@@ -362,6 +362,10 @@ const Login = () => {
         <div className="mt-6 text-center text-sm text-[#6B7280] dark:text-zinc-400">
           Don't have an account? <Link to="/signup" className="text-[#B8860B] dark:text-[#D4AF37] font-bold hover:underline transition-colors">Create Account</Link>
         </div>
+
+        <div className="mt-4 text-center text-xs text-[#9CA3AF] dark:text-zinc-500">
+          By signing in, you agree to our <Link to="/terms-of-service" className="hover:underline text-[#B8860B]">Terms</Link> & <Link to="/privacy-policy" className="hover:underline text-[#B8860B]">Privacy Policy</Link>
+        </div>
       </div>
 
       {/* Social Auth Verifying Overlay */}

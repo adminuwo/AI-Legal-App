@@ -41,8 +41,9 @@ const LawFirmOnboardingView = ({ onWorkspaceCreated }) => {
     try {
       setIsFetchingInvites(true);
       const res = await apiService.request('/workspaces/invitations/pending');
-      if (res && res.success && Array.isArray(res.invitations)) {
-        setPendingInvites(res.invitations);
+      const data = res?.data || res;
+      if (data && data.success && Array.isArray(data.invitations)) {
+        setPendingInvites(data.invitations);
       } else {
         setPendingInvites([]);
       }
@@ -84,16 +85,17 @@ const LawFirmOnboardingView = ({ onWorkspaceCreated }) => {
           practiceAreas: selectedPracticeAreas
         }
       });
+      const data = res?.data || res;
 
-      if (res && res.success && res.workspace) {
-        const newWs = res.workspace;
+      if (data && data.success && data.workspace) {
+        const newWs = data.workspace;
         const newWsId = newWs._id || newWs.id;
         localStorage.setItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID', newWsId);
         toast.success(`Welcome to ${firmName}! Firm Workspace Created.`, { id: tid });
         setIsCreateModalOpen(false);
         if (onWorkspaceCreated) onWorkspaceCreated(newWs);
       } else {
-        toast.error(res?.error || 'Failed to create law firm workspace.', { id: tid });
+        toast.error(data?.error || 'Failed to create law firm workspace.', { id: tid });
       }
     } catch (err) {
       console.error('[LawFirmOnboarding] Create error:', err);
@@ -109,15 +111,16 @@ const LawFirmOnboardingView = ({ onWorkspaceCreated }) => {
       const res = await apiService.request(`/workspaces/invitations/${inviteId}/accept`, {
         method: 'POST'
       });
+      const data = res?.data || res;
 
-      if (res && res.success) {
+      if (data && data.success) {
         toast.success('Joined Law Firm Workspace successfully!', { id: tid });
         if (workspaceId) {
           localStorage.setItem('AI_LEGAL_LAST_ACTIVE_WORKSPACE_ID', workspaceId);
         }
         if (onWorkspaceCreated) onWorkspaceCreated();
       } else {
-        toast.error(res?.error || 'Failed to accept invitation.', { id: tid });
+        toast.error(data?.error || 'Failed to accept invitation.', { id: tid });
       }
     } catch (err) {
       toast.error(err?.response?.data?.error || 'Error accepting invitation.');
@@ -129,8 +132,9 @@ const LawFirmOnboardingView = ({ onWorkspaceCreated }) => {
       const res = await apiService.request(`/workspaces/invitations/${inviteId}/reject`, {
         method: 'POST'
       });
+      const data = res?.data || res;
 
-      if (res && res.success) {
+      if (data && data.success) {
         toast.success('Invitation declined.');
         setPendingInvites(prev => prev.filter(i => (i._id || i.id) !== inviteId));
       }

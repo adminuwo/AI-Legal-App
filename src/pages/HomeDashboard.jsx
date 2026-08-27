@@ -160,12 +160,23 @@ export default function HomeDashboard() {
     }
   };
 
-  // Run on mount and establish background synchronization
+  // Run on mount, user/role switch, and establish background synchronization
   useEffect(() => {
     fetchDashboardData();
     const syncInterval = setInterval(() => fetchDashboardData(true), 15000);
-    return () => clearInterval(syncInterval);
-  }, []);
+
+    const handleRoleOrWsChange = () => {
+      fetchDashboardData(true);
+    };
+    window.addEventListener('user_role_changed', handleRoleOrWsChange);
+    window.addEventListener('workspace_changed', handleRoleOrWsChange);
+
+    return () => {
+      clearInterval(syncInterval);
+      window.removeEventListener('user_role_changed', handleRoleOrWsChange);
+      window.removeEventListener('workspace_changed', handleRoleOrWsChange);
+    };
+  }, [currentUser?.user?._id || currentUser?.user?.id || currentUser?.user?.email, selectedRole]);
 
   // Format calendar date
   const formatDate = (date) => {
@@ -479,7 +490,7 @@ export default function HomeDashboard() {
   if (selectedRole === 'student') {
     return (
       <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] p-4 sm:p-6 lg:p-8 w-full max-w-7xl mx-auto text-[#111827] dark:text-white font-sans transition-colors">
-        <StudentDashboardSection user={currentUser?.user} />
+        <StudentDashboardSection user={currentUser?.user} cases={cases} />
       </div>
     );
   }
@@ -487,7 +498,7 @@ export default function HomeDashboard() {
   if (selectedRole === 'law_firm') {
     return (
       <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0F172A] p-4 sm:p-6 lg:p-8 w-full max-w-7xl mx-auto text-[#111827] dark:text-white font-sans transition-colors">
-        <LawFirmDashboardSection user={currentUser?.user} cases={cases} workspaces={firmWorkspaces} onRefresh={fetchWorkspaces} />
+        <LawFirmDashboardSection user={currentUser?.user} cases={cases} workspaces={[]} onRefresh={fetchDashboardData} />
       </div>
     );
   }

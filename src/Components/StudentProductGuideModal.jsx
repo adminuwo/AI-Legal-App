@@ -48,16 +48,16 @@ export default function StudentProductGuideModal({ isOpen, onClose }) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[2000] flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-xs select-none">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs select-none">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ duration: 0.2 }}
-          className="relative w-full max-w-2xl bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl overflow-hidden p-5 sm:p-7 space-y-4 sm:space-y-6 max-h-[88vh] flex flex-col"
+          className="relative w-full max-w-2xl bg-white dark:bg-[#1E293B] rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-2xl overflow-hidden p-6 sm:p-8 space-y-6"
         >
           {/* Header */}
-          <div className="flex items-start justify-between gap-4 shrink-0">
+          <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#C8A34D]/10 text-[#C8A34D] border border-[#C8A34D]/30 inline-flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-[#C8A34D]" /> AI LEGAL™ PRODUCT GUIDE
@@ -72,14 +72,14 @@ export default function StudentProductGuideModal({ isOpen, onClose }) {
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer shrink-0"
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Features List */}
-          <div className="space-y-3 flex-1 overflow-y-auto pr-1">
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
             {features.map((item, idx) => {
               const IconComp = item.icon;
               return (
