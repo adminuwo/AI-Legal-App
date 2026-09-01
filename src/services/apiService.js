@@ -1718,6 +1718,17 @@ export const apiService = {
       console.warn("Failed to delete workspace activity:", error);
       return { success: false };
     }
+  },
+
+  // --- UWO SSO Central Auth Login ---
+  async uwoLogin(credentials) {
+    try {
+      const response = await apiClient.post('/auth/sso/uwo-login', credentials);
+      return response.data;
+    } catch (error) {
+      console.error("UWO Login failed:", error);
+      throw error;
+    }
   }
 };
 

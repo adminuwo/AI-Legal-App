@@ -74,9 +74,35 @@ const getApiUrl = () => {
   return 'http://localhost:8080/api';
 };
 
+export const getUnifiedApiBaseUrl = () => {
+  const envUrl = window._env_?.VITE_UNIFIED_BACKEND_API || import.meta.env.VITE_UNIFIED_BACKEND_API;
+
+  if (typeof window !== 'undefined' && window.location) {
+    const currentHost = window.location.hostname;
+    if (currentHost && currentHost !== 'localhost' && currentHost !== '127.0.0.1') {
+      if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+        return envUrl.trim().replace(/\/+$/, '');
+      }
+      return 'https://unified-dashboard-977864306871.asia-south1.run.app/api';
+    }
+  }
+
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
+    return envUrl.trim().replace(/\/+$/, '');
+  }
+
+  return 'http://localhost:8000/api';
+};
+
 const API = getApiUrl();
+const UNIFIED_API = getUnifiedApiBaseUrl();
 
 const apis = {
+  unifiedAuth: {
+    register: `${UNIFIED_API}/auth/register`,
+    login: `${UNIFIED_API}/auth/login`,
+  },
+  uwoLogin: `${API}/auth/sso/uwo-login`,
   resetPassword: `${API}/auth/reset-password-otp`,
   user: `${API}/user`,
   profile: `${API}/user/profile`,
