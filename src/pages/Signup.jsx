@@ -506,7 +506,7 @@ const Signup = () => {
           const formattedUser = {
             id: uUser.id || uUser._id,
             _id: uUser.id || uUser._id,
-            name: uUser.name || uUser.email?.split('@')[0] || 'User',
+            name: uUser.name || uUser.full_name || uUser.email?.split('@')[0] || 'Advocate',
             email: uUser.email,
             role: uUser.role || 'user',
             plan: uUser.plan || 'Basic',
@@ -514,7 +514,8 @@ const Signup = () => {
             token: data.token || data.access_token,
           };
           setUserData(formattedUser);
-          setUserRecoil(formattedUser);
+          setUserRecoil({ user: formattedUser });
+          localStorage.setItem('userId', formattedUser.id || formattedUser._id);
           localStorage.setItem('token', formattedUser.token);
           localStorage.setItem('user', JSON.stringify(formattedUser));
           navigate(AppRoute.DASHBOARD, { replace: true });

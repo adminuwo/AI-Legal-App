@@ -39,10 +39,14 @@ const AI_TOOLS = [
 const Sidebar = ({ isOpen, onClose, onOpenSettings }) => {
   const { badge } = useSubscription();
   const navigate = useNavigate();
-  const location = useLocation();
   const [currentUserData, setUserRecoil] = useRecoilState(userData);
   const selectedRole = useRecoilValue(selectedRoleState) || 'advocate';
-  const user = currentUserData.user || { name: "Advocate", email: "..." };
+  const rawUser = currentUserData?.user || (currentUserData?.email ? currentUserData : null) || getUserData() || {};
+  const user = {
+    ...rawUser,
+    name: rawUser.name || rawUser.email?.split('@')[0] || 'Advocate',
+    email: rawUser.email || '',
+  };
 
   // Collapse State
   const [isCollapsed, setIsCollapsed] = useState(() => {

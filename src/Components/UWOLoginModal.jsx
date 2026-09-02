@@ -95,15 +95,25 @@ export const UWOLoginModal = ({
         throw new Error(loginErr);
       }
 
-      // Fetch user profile from /auth/me
-      let uwoUser = { email, name: name || email.split('@')[0] };
+      // 2. Fetch full profile from Unified Auth
+      let uwoUser = {
+        name: loginData.user?.name || loginData.user?.full_name || name || email.split('@')[0],
+        email: loginData.user?.email || email,
+        id: loginData.user?.id || loginData.user?._id,
+      };
       try {
         const unifiedApiBase = getUnifiedApiBaseUrl();
         const meRes = await fetch(`${unifiedApiBase}/auth/me`, {
           headers: { Authorization: `Bearer ${loginData.access_token}` },
         });
         if (meRes.ok) {
-          uwoUser = await meRes.json();
+          const meData = await meRes.json();
+          uwoUser = {
+            ...meData,
+            name: meData.name || meData.full_name || uwoUser.name,
+            email: meData.email || uwoUser.email,
+            id: meData.id || meData._id || uwoUser.id,
+          };
         }
       } catch (meErr) {
         console.warn('Failed to fetch /auth/me:', meErr);
@@ -128,7 +138,12 @@ export const UWOLoginModal = ({
             token: ssoData.token,
             access_token: ssoData.token,
             uwo_token: loginData.access_token,
-            user: ssoData.user,
+            user: {
+              ...ssoData.user,
+              name: ssoData.user?.name || uwoUser.name,
+              email: ssoData.user?.email || uwoUser.email,
+              id: ssoData.user?.id || ssoData.user?._id || uwoUser.id,
+            },
           };
         }
       } catch (ssoErr) {
@@ -141,6 +156,10 @@ export const UWOLoginModal = ({
         localStorage.setItem('token', sessionToken);
         localStorage.setItem('uwo_access_token', loginData.access_token);
         localStorage.setItem('uwo_user', JSON.stringify(finalData.user));
+        localStorage.setItem('user', JSON.stringify(finalData.user));
+        if (finalData.user?.id || finalData.user?._id) {
+          localStorage.setItem('userId', finalData.user.id || finalData.user._id);
+        }
       }
 
       setLoading(false);

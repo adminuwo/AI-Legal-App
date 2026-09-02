@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { userData, selectedRoleState } from '../userStore/userData';
+import { userData, selectedRoleState, getUserData } from '../userStore/userData';
 import { apiService } from '../services/apiService';
 import toast from 'react-hot-toast';
 
@@ -28,7 +28,8 @@ export default function HomeDashboard() {
   const { notifications, fetchNotifications } = usePersonalization();
   const currentUser = useRecoilValue(userData);
   const selectedRole = useRecoilValue(selectedRoleState) || 'advocate';
-  const userName = currentUser?.user?.name || "Advocate";
+  const rawUser = currentUser?.user || (currentUser?.email ? currentUser : null) || getUserData() || {};
+  const userName = rawUser?.name || rawUser?.email?.split('@')[0] || "Advocate";
 
   const unreadNotifCount = (notifications || []).filter(n => !n.isRead).length;
 
@@ -513,7 +514,7 @@ export default function HomeDashboard() {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <h1 className="text-base sm:text-3xl font-extrabold tracking-tight text-[#111111] dark:text-white truncate">
-                  Welcome, Advocate {userName}
+                  Welcome, {userName.toLowerCase().startsWith('advocate') || userName.toLowerCase().startsWith('adv.') ? userName : `Advocate ${userName}`}
                 </h1>
                 {isSyncing && (
                   <RefreshCw size={14} className="text-[#C8A34D] animate-spin shrink-0" />
