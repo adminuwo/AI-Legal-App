@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, X, Mail, Lock, User, AlertCircle, CheckCircle2, Loader2, ArrowRight } from 'lucide-react';
+import { Zap, X, Mail, Lock, User, AlertCircle, CheckCircle2, Loader2, ArrowRight, ShieldCheck } from 'lucide-react';
 import { apis, getUnifiedApiBaseUrl } from '../types';
 
 export const UWOLoginModal = ({
@@ -19,6 +19,7 @@ export const UWOLoginModal = ({
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // Sync state if initialRegister changes
   React.useEffect(() => {
     setIsRegisterMode(initialRegister);
   }, [initialRegister]);
@@ -181,43 +182,46 @@ export const UWOLoginModal = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl">
         <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 20 }}
+          initial={{ opacity: 0, scale: 0.94, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.92, y: 20 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="relative w-full max-w-md p-7 bg-[#0b0f19] border border-[#C5A059]/30 rounded-[32px] shadow-[0_25px_60px_-15px_rgba(197,160,89,0.25)] overflow-hidden"
+          exit={{ opacity: 0, scale: 0.94, y: 15 }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+          className="relative w-full max-w-[440px] p-6 sm:p-8 bg-[#0B0D1B]/95 border border-[#C5A059]/40 rounded-[30px] shadow-[0_25px_70px_rgba(0,0,0,0.8),0_0_50px_rgba(197,160,89,0.25)] overflow-hidden text-white"
         >
-          {/* Subtle gold ambient glow */}
-          <div className="absolute top-[-25%] right-[-25%] w-48 h-48 bg-[#C5A059]/15 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-[-25%] left-[-25%] w-48 h-48 bg-[#B8860B]/15 rounded-full blur-3xl pointer-events-none" />
+          {/* Ambient Glows */}
+          <div className="absolute top-[-20%] right-[-20%] w-56 h-56 bg-[#C5A059]/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-[-20%] left-[-20%] w-56 h-56 bg-amber-600/20 rounded-full blur-3xl pointer-events-none" />
 
           {/* Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800/80 relative z-10">
+          <div className="flex items-center justify-between pb-5 border-b border-white/10 relative z-10">
             <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#C5A059] to-[#D4AF37] p-0.5 shadow-lg shadow-[#C5A059]/20 flex items-center justify-center">
-                <div className="w-full h-full bg-[#0b0f19] rounded-[14px] flex items-center justify-center text-[#D4AF37]">
-                  <Zap className="w-5 h-5 fill-[#D4AF37]" />
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#C5A059] via-[#D4AF37] to-[#B8860B] p-[1.5px] shadow-lg shadow-[#C5A059]/30 flex items-center justify-center shrink-0">
+                <div className="w-full h-full bg-[#0E1126] rounded-[14px] flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-[#D4AF37] fill-[#D4AF37]" />
                 </div>
               </div>
               <div>
-                <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-1.5">
+                <h3 className="text-base font-extrabold text-white tracking-wide flex items-center gap-2">
                   {isRegisterMode ? 'Create UWO Account' : 'UWO SSO Sign In'}
                 </h3>
-                <p className="text-[11px] font-medium text-slate-400">Unified Web Options Identity Platform</p>
+                <p className="text-xs font-semibold text-amber-200/80 flex items-center gap-1 mt-0.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  Unified Web Options Identity Platform
+                </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-xl bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/[0.07] hover:bg-white/[0.15] text-slate-300 hover:text-white transition-all border border-white/10 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {/* Mode Switcher Tabs */}
-          <div className="flex p-1 mt-5 bg-slate-950/70 border border-slate-800/80 rounded-2xl relative z-10">
+          <div className="flex p-1.5 mt-5 bg-white/[0.05] border border-white/10 rounded-2xl relative z-10 backdrop-blur-md">
             <button
               type="button"
               onClick={() => {
@@ -225,10 +229,10 @@ export const UWOLoginModal = ({
                 setError('');
                 setSuccessMsg('');
               }}
-              className={`flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all ${
+              className={`flex-1 py-2.5 text-xs font-extrabold uppercase tracking-wider rounded-xl transition-all cursor-pointer ${
                 !isRegisterMode
-                  ? 'bg-gradient-to-r from-[#C5A059] to-[#D4AF37] text-slate-950 shadow-md font-bold'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-gradient-to-r from-[#C5A059] via-[#D4AF37] to-[#B8860B] text-slate-950 font-black shadow-lg shadow-[#C5A059]/30'
+                  : 'text-slate-300 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
               Sign In
@@ -240,10 +244,10 @@ export const UWOLoginModal = ({
                 setError('');
                 setSuccessMsg('');
               }}
-              className={`flex-1 py-2 text-xs font-black uppercase tracking-wider rounded-xl transition-all ${
+              className={`flex-1 py-2.5 text-xs font-extrabold uppercase tracking-wider rounded-xl transition-all cursor-pointer ${
                 isRegisterMode
-                  ? 'bg-gradient-to-r from-[#C5A059] to-[#D4AF37] text-slate-950 shadow-md font-bold'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-gradient-to-r from-[#C5A059] via-[#D4AF37] to-[#B8860B] text-slate-950 font-black shadow-lg shadow-[#C5A059]/30'
+                  : 'text-slate-300 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
               Create Account
@@ -256,7 +260,7 @@ export const UWOLoginModal = ({
               <motion.div
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-3.5 text-xs font-semibold text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center gap-2.5"
+                className="p-3.5 text-xs font-semibold text-rose-300 bg-rose-500/15 border border-rose-500/30 rounded-2xl flex items-center gap-2.5"
               >
                 <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
                 <span>{error}</span>
@@ -267,7 +271,7 @@ export const UWOLoginModal = ({
               <motion.div
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-3.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-2.5"
+                className="p-3.5 text-xs font-semibold text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 rounded-2xl flex items-center gap-2.5"
               >
                 <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
                 <span>{successMsg}</span>
@@ -276,53 +280,53 @@ export const UWOLoginModal = ({
 
             {isRegisterMode && (
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 ml-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-200 mb-1.5 ml-1">
                   Full Name
                 </label>
                 <div className="relative flex items-center">
-                  <User className="absolute left-3.5 w-4 h-4 text-slate-500" />
+                  <User className="absolute left-3.5 w-4.5 h-4.5 text-[#D4AF37]" />
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Adv. Sanskar Sharma"
-                    className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-950/70 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-[#C5A059] focus:ring-2 focus:ring-[#C5A059]/20 transition-all"
+                    placeholder="Enter your name"
+                    className="w-full pl-11 pr-4 py-3 text-sm bg-white/[0.06] border border-white/15 focus:border-[#D4AF37] focus:ring-4 focus:ring-[#C5A059]/20 rounded-2xl text-white placeholder-slate-400 outline-none transition-all font-medium"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 ml-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-200 mb-1.5 ml-1">
                 Email Address
               </label>
               <div className="relative flex items-center">
-                <Mail className="absolute left-3.5 w-4 h-4 text-slate-500" />
+                <Mail className="absolute left-3.5 w-4.5 h-4.5 text-[#D4AF37]" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="advocate@uwo24.com"
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-950/70 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-[#C5A059] focus:ring-2 focus:ring-[#C5A059]/20 transition-all"
+                  placeholder="name@uwo24.com"
+                  className="w-full pl-11 pr-4 py-3 text-sm bg-white/[0.06] border border-white/15 focus:border-[#D4AF37] focus:ring-4 focus:ring-[#C5A059]/20 rounded-2xl text-white placeholder-slate-400 outline-none transition-all font-medium"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5 ml-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-200 mb-1.5 ml-1">
                 Password
               </label>
               <div className="relative flex items-center">
-                <Lock className="absolute left-3.5 w-4 h-4 text-slate-500" />
+                <Lock className="absolute left-3.5 w-4.5 h-4.5 text-[#D4AF37]" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-950/70 border border-slate-800 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-[#C5A059] focus:ring-2 focus:ring-[#C5A059]/20 transition-all"
+                  className="w-full pl-11 pr-4 py-3 text-sm bg-white/[0.06] border border-white/15 focus:border-[#D4AF37] focus:ring-4 focus:ring-[#C5A059]/20 rounded-2xl text-white placeholder-slate-400 outline-none transition-all font-medium"
                 />
               </div>
             </div>
@@ -330,14 +334,14 @@ export const UWOLoginModal = ({
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 mt-2 bg-gradient-to-r from-[#C5A059] via-[#D4AF37] to-[#B8860B] hover:opacity-95 text-slate-950 rounded-2xl font-black text-xs uppercase tracking-widest shadow-[0_10px_25px_-5px_rgba(197,160,89,0.3)] transition-all duration-200 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3.5 mt-2 bg-gradient-to-r from-[#C5A059] via-[#D4AF37] to-[#B8860B] hover:from-[#d4af37] hover:to-[#c5a059] text-slate-950 rounded-2xl font-black text-xs uppercase tracking-widest shadow-[0_12px_30px_rgba(197,160,89,0.4)] hover:shadow-[0_15px_40px_rgba(197,160,89,0.55)] transition-all duration-200 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer border border-[#D4AF37]/40"
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <>
                   <Zap className="w-4 h-4 fill-slate-950" />
-                  {isRegisterMode ? 'Register & Sign In' : 'Sign In with UWO'}
+                  <span>{isRegisterMode ? 'Register & Sign In' : 'Sign In with UWO'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -345,14 +349,14 @@ export const UWOLoginModal = ({
           </form>
 
           {/* Footer mode toggle */}
-          <div className="mt-5 pt-3.5 border-t border-slate-800/80 text-center text-xs text-slate-400 relative z-10">
+          <div className="mt-6 pt-4 border-t border-white/10 text-center text-xs text-slate-300 relative z-10">
             {isRegisterMode ? (
               <span>
                 Already have a UWO account?{' '}
                 <button
                   type="button"
                   onClick={() => setIsRegisterMode(false)}
-                  className="text-[#D4AF37] font-bold hover:underline ml-1"
+                  className="text-amber-300 font-bold hover:text-amber-200 hover:underline ml-1 cursor-pointer"
                 >
                   Sign In
                 </button>
@@ -363,7 +367,7 @@ export const UWOLoginModal = ({
                 <button
                   type="button"
                   onClick={() => setIsRegisterMode(true)}
-                  className="text-[#D4AF37] font-bold hover:underline ml-1"
+                  className="text-amber-300 font-bold hover:text-amber-200 hover:underline ml-1 cursor-pointer"
                 >
                   Create an Account
                 </button>
