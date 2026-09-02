@@ -1507,4 +1507,63 @@ router.post("/resend-code", async (req, res) => {
   }
 });
 
+// POST /api/auth/uwo-login (SSO Direct Alias)
+router.post('/uwo-login', async (req, res) => {
+  const { email, name, uwo_token } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Missing email' });
+  }
+
+  try {
+    let user = await UserModel.findOne({ email });
+
+    if (!user) {
+      console.log(`[UWO SSO] JIT provisioning AI-Legal user → ${email}`);
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(crypto.randomBytes(20).toString('hex'), salt);
+      user = await UserModel.create({
+        name: name || email.split('@')[0],
+        email,
+        password: hashedPassword,
+        isVerified: true,
+      });
+    } else {
+      user.lastLogin = new Date();
+      await user.save();
+    }
+
+    const sessionToken = generateTokenAndSetCookies(
+      res,
+      user._id,
+      user.email,
+      user.name,
+      user.plan || 'Basic',
+      user.role || 'user'
+    );
+
+    if (typeof createSession === 'function') {
+      await createSession(user._id, sessionToken, req);
+    }
+
+    return res.status(200).json({
+      token: sessionToken,
+      uwo_access_token: uwo_token,
+      user: {
+        id: user._id,
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role || 'user',
+        plan: user.plan || 'Basic',
+        avatar: user.avatar || null,
+        token: sessionToken,
+      },
+    });
+  } catch (err) {
+    console.error('[UWO SSO] Direct alias error:', err);
+    return res.status(500).json({ error: 'UWO SSO login failed', details: err.message });
+  }
+});
+
 export default router;
